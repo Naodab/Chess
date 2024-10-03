@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-	private final String[] PUBLIC_ENDPOINTS = {"/users", "/auth/**", "/rooms"};
+	private final String[] PUBLIC_ENDPOINTS = {"/users", "/users/forgot", "/users/reset", "/auth/**", "/rooms"};
 	private final String[] FRONTEND_ENDPOINTS = {"/public/**", "/css/**", "/js/**"};
 	
 	@Autowired

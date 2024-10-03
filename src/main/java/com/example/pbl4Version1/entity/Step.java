@@ -4,7 +4,6 @@
 //import jakarta.persistence.GeneratedValue;
 //import jakarta.persistence.GenerationType;
 //import jakarta.persistence.Id;
-//import jakarta.persistence.JoinColumn;
 //import jakarta.persistence.ManyToOne;
 //import lombok.AccessLevel;
 //import lombok.AllArgsConstructor;
@@ -19,20 +18,15 @@
 //@NoArgsConstructor
 //@AllArgsConstructor
 //@FieldDefaults(level = AccessLevel.PRIVATE)
-//public class Match {
+//public class Step {
 //	@Id
 //	@GeneratedValue(strategy = GenerationType.AUTO)
 //	Long id;
-//	@ManyToOne
-//	
-//	Room room;
+//	int thTime;
 //	
 //	@ManyToOne
-//	@JoinColumn(name = "white_user_id")
-//	User whiteUser;
+//	Match match;
 //	
-//	@ManyToOne
-//	@JoinColumn(name = "black_user_id")
-//	User blackUser;
-//	
+//	String from;
+//	String to;
 //}

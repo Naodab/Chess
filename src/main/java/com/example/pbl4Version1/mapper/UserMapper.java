@@ -1,6 +1,7 @@
 package com.example.pbl4Version1.mapper;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import com.example.pbl4Version1.dto.request.UserUpdateRequest;
 import com.example.pbl4Version1.dto.response.AchievementResponse;
 import com.example.pbl4Version1.dto.response.RoleResponse;
 import com.example.pbl4Version1.dto.response.UserResponse;
+import com.example.pbl4Version1.entity.Achievement;
 import com.example.pbl4Version1.entity.User;
 	
 @Component
@@ -30,15 +32,21 @@ public class UserMapper {
 	}
 
 	public UserResponse toUserResponse(User user) {
-		var roles = new HashSet<RoleResponse>(user.getRoles()
+		Set<RoleResponse> roles = null;
+		if (user.getRoles() != null) {
+			roles = new HashSet<RoleResponse>(user.getRoles()
 					.stream()
 					.map(roleMapper::toRoleResponse)
 					.toList());
+		}
 		
-		var achievements = new HashSet<AchievementResponse>(user.getAchievements()
-				.stream()
-				.map(achievementMapper::toAchievementResponse)
-				.toList());
+		Set<AchievementResponse> achievements = null;
+		if (user.getAchievements() != null) {
+			achievements = new HashSet<AchievementResponse>(user.getAchievements()
+					.stream()
+					.map(achievementMapper::toAchievementResponse)
+					.toList());
+		}
 		
 		var rank = user.getRank().getName();
 		

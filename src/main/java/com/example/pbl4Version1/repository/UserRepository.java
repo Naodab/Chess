@@ -10,5 +10,7 @@ import com.example.pbl4Version1.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
 	public boolean existsByUsername(String username);
+	public boolean existsByEmail(String email);
 	public Optional<User> findByUsername(String username);
+	public Optional<User> findByEmail(String email);
 }
