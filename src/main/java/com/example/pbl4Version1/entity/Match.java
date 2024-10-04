@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Data
-@Entity
+@Entity(name = "game_match")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

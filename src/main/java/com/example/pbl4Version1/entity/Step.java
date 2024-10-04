@@ -1,6 +1,7 @@
 package com.example.pbl4Version1.entity;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Data
-@Entity
+@Entity(name = "game_step")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,6 +29,9 @@ public class Step {
 	@ManyToOne(cascade = CascadeType.ALL)
 	Match match;
 	
+	@Column(name = "from_position")
 	String from;
+	
+	@Column(name = "to_position")
 	String to;
 }

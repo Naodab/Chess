@@ -91,6 +91,11 @@
 			<version>1.2</version>
 		</dependency>
 		<dependency>
+			<groupId>org.sitemesh</groupId>
+			<artifactId>spring-boot-starter-sitemesh</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+		<dependency>
 			<groupId>com.nimbusds</groupId>
 			<artifactId>nimbus-jose-jwt</artifactId>
 			<version>9.40</version>
