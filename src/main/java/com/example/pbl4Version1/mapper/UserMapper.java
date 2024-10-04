@@ -11,7 +11,6 @@ import com.example.pbl4Version1.dto.request.UserUpdateRequest;
 import com.example.pbl4Version1.dto.response.AchievementResponse;
 import com.example.pbl4Version1.dto.response.RoleResponse;
 import com.example.pbl4Version1.dto.response.UserResponse;
-import com.example.pbl4Version1.entity.Achievement;
 import com.example.pbl4Version1.entity.User;
 	
 @Component

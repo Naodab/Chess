@@ -9,10 +9,12 @@ import lombok.experimental.FieldDefaults;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PasswordResetRequest {
-	String token;
-	String newPassword;
+public class StepRequest {
+	Long matchId;
+	String from;
+	String to;
+	int thTime;
 }

@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,4 +50,7 @@ public class Room {
 		joinColumns = @JoinColumn(name = "room_id"), 
 		inverseJoinColumns = @JoinColumn(name = "viewer_id"))
 	Set<User> viewers;
+	
+	@OneToMany(mappedBy = "room")
+	Set<Match> matches;
 }

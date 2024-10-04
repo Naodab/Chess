@@ -52,13 +52,13 @@ public class RoomService {
 	
 	public RoomResponse getRoom(Long id) {
 		Room room = roomRepository.findById(id).orElseThrow(
-				() -> new AppException(ErrorCode.ROOM_NOTEXISTED));
+				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
 		return roomMapper.toRoomResponse(room);
 	}
 	
 	public RoomResponse update(Long id, RoomUpdateRequest request) {
 		Room room = roomRepository.findById(id).orElseThrow(
-				() -> new AppException(ErrorCode.ROOM_NOTEXISTED));
+				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
 		room.setHost(userRepository
 				.findById(request.getHostId()).orElseThrow(
 							() -> new AppException(ErrorCode.USER_NOT_EXISTED)));

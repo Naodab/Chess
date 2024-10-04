@@ -13,9 +13,10 @@ public enum ErrorCode {
     UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST), 
-    ROOM_NOTEXISTED(1009, "Room not existed.", HttpStatus.BAD_REQUEST),
+    ROOM_NOT_EXISTED(1009, "Room not existed.", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1010, "Email existed.", HttpStatus.BAD_REQUEST), 
-    INVALID_RESET_PASSWORD(1011, "Code is incorrect.", HttpStatus.BAD_REQUEST)
+    INVALID_RESET_PASSWORD(1011, "Code is incorrect.", HttpStatus.BAD_REQUEST), 
+    MATCH_NOT_EXISTED(1012, "Match not existed.", HttpStatus.BAD_REQUEST)
 	;
 	
 	private int code;
