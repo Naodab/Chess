@@ -12,6 +12,7 @@ import com.example.pbl4Version1.dto.response.AchievementResponse;
 import com.example.pbl4Version1.dto.response.RoleResponse;
 import com.example.pbl4Version1.dto.response.UserResponse;
 import com.example.pbl4Version1.entity.User;
+import com.example.pbl4Version1.enums.Rank;
 	
 @Component
 public class UserMapper {
@@ -47,7 +48,10 @@ public class UserMapper {
 					.toList());
 		}
 		
-		var rank = user.getRank().getName();
+		String rank = Rank.BEGGINNER.getName();
+		if (user.getRank() != null) {
+			rank = user.getRank().getName();
+		}
 		
 		return UserResponse.builder()
 				.id(user.getId())

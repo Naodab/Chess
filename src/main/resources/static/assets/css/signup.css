@@ -1,0 +1,135 @@
+body {
+	background-color: #2c2a29;
+	color: #ffffff;
+	font-family: Arial, sans-serif;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	margin: 0;
+}
+
+.container {
+	text-align: center;
+	width: 300px;
+}
+
+h1 {
+	font-size: 28px;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+p {
+	font-size: 16px;
+	margin-bottom: 20px;
+}
+
+.form-group {
+	position: relative;
+	margin-bottom: 15px;
+}
+
+.form-group input {
+	width: 100%;
+	padding: 10px 10px 10px 40px;
+	border: none;
+	border-radius: 5px;
+	background-color: #3a3938;
+	color: #ffffff;
+	font-size: 14px;
+}
+
+.form-group i {
+	position: absolute;
+	left: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #b3b3b3;
+}
+
+.form-group .fa-eye {
+	right: 10px;
+	left: auto;
+	cursor: pointer;
+}
+
+.form-group input::placeholder {
+	color: #b3b3b3;
+}
+
+.form-submit {
+	width: 100%;
+	padding: 10px;
+	border: none;
+	border-radius: 5px;
+	background-color: #4caf50;
+	color: #ffffff;
+	font-size: 16px;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.form-submit:hover {
+	background-color: #45a049;
+}
+
+.or {
+	margin: 20px 0;
+	display: flex;
+	align-items: center;
+	text-align: center;
+	color: #b3b3b3;
+}
+
+.or::before, .or::after {
+	content: '';
+	flex: 1;
+	border-bottom: 1px solid #b3b3b3;
+}
+
+.or:not(:empty)::before {
+	margin-right: .25em;
+}
+
+.or:not(:empty)::after {
+	margin-left: .25em;
+}
+
+.social-btn {
+	width: 100%;
+	padding: 10px;
+	border: none;
+	border-radius: 5px;
+	font-size: 14px;
+	cursor: pointer;
+	margin-bottom: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.social-btn.apple {
+	background-color: #000000;
+	color: #ffffff;
+}
+
+.social-btn.google {
+	background-color: #ffffff;
+	color: #000000;
+	border: 1px solid #b3b3b3;
+}
+
+.social-btn i {
+	margin-right: 10px;
+}
+
+.login-link {
+	font-size: 14px;
+}
+
+.login-link a {
+	color: #ffffff;
+	text-decoration: none;
+	font-weight: bold;
+}

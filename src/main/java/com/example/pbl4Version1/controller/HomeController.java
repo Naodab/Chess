@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 public class HomeController {
 	@GetMapping(value = {"/", "/home"})
 	public String index() {
-		return "user/index";
+		return "home";
 	}
 
     @GetMapping("/login")
@@ -22,5 +22,15 @@ public class HomeController {
     @GetMapping("/signup")
     public String signup() {
         return "signup";
+    }
+    
+    @GetMapping("/forgot")
+    public String forgot() {
+    	return "forgot";
+    }
+    
+    @GetMapping("/verify")
+    public String verify() {
+    	return "verify";
     }
 }

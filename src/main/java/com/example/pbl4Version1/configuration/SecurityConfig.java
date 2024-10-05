@@ -20,8 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-	private final String[] PUBLIC_ENDPOINTS = {"/users", "/auth/**"};
-	private final String[] FRONTEND_ENDPOINTS = {"/public/**", "/css/**", "/js/**"};
+	private final String[] PUBLIC_ENDPOINTS = { "/users", "/auth/token", "/auth/forgot", 
+												"/auth/intro", "/auth/refresh", "/auth/logout",
+												"/auth/verify"};
+	private final String[] FRONTEND_ENDPOINTS = {"/public/**", "/assets/**"};
 	
 	@Autowired
 	CustomJwtDecoder customJwtDecoder;

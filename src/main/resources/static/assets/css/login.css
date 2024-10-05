@@ -1,0 +1,99 @@
+@charset "UTF-8";
+
+body {
+	margin: 0;
+	font-family: Arial, sans-serif;
+	background-size: cover;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	position: relative;
+	overflow: hidden;
+}
+
+.background {
+	position: absolute;
+	background: #2b2b2b url(../img/background.jpg) no-repeat center center / cover;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: -2;
+}
+
+.overlay {
+	position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(8px);
+    z-index: -1;
+}
+
+.login-container {
+	background-color: rgba(75,64,47,0.8);
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(8px);
+	width: 300px;
+	text-align: center;
+}
+
+#form-1 {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.login-container input[type="text"], .login-container input[type="password"] {
+	width: 94%;
+	padding: 10px;
+	margin: 10px 0;
+	border: none;
+	border-radius: 5px;
+	background-color: rgba(255, 255, 255, 0.8);
+	color: #333;
+	font-weight: bold;
+}
+
+.login-container label {
+	color: #333;
+}
+
+.login-container a {
+	color: #fff;
+	text-decoration: none;
+}
+
+.login-container .form-submit {
+	background-color: #4CAF50;
+	color: white;
+	padding: 10px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	width: 100%;
+	margin: 10px 0;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.form-submit:hover {
+	background-color: rgba(76, 175, 80, 0.8);
+}
+
+#forgot {
+	font-size: 14px;
+}
+
+#forgot:hover {
+	text-decoration: underline;
+	color: #4CAF50;
+}
+
+.form-group.error input {
+	border: 2px solid red;
+}
