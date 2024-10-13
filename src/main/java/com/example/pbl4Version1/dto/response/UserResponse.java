@@ -19,7 +19,6 @@ public class UserResponse {
 	String id;
 	String email;
 	String username;
-	String name;
 	LocalDate dob;
 	int elo;
 	int battleNumber;

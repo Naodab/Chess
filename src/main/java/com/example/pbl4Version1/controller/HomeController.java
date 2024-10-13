@@ -19,11 +19,6 @@ public class HomeController {
         return "login";
     }
     
-    @GetMapping("/signup")
-    public String signup() {
-        return "signup";
-    }
-    
     @GetMapping("/forgot")
     public String forgot() {
     	return "forgot";

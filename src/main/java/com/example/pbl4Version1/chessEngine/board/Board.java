@@ -121,7 +121,7 @@ public class Board {
 	public static Board createStandardBoard() {
 		final Builder builder = new Builder();
 
-		builder.setPiece(new Rook(0, com.example.pbl4Version1.chessEngine.Alliance.BLACK));
+		builder.setPiece(new Rook(0, Alliance.BLACK));
 		builder.setPiece(new Knight(1, Alliance.BLACK));
 		builder.setPiece(new Bishop(2, Alliance.BLACK));
 		builder.setPiece(new Queen(3, Alliance.BLACK));
@@ -159,6 +159,105 @@ public class Board {
 
 		return builder.build();
 	}
+	
+	public static Board createBoardFromMap(List<List<String>> map) {
+		final Builder builder = new Builder();
+		for (int i = 0; i < BoardUtils.NUM_TILES_PER_ROW; i++) {
+			for (int j = 0; j < BoardUtils.NUM_TILES_PER_ROW; j++) {
+				String name = map.get(i).get(j);
+				System.out.println(name);
+				int position = i * BoardUtils.NUM_TILES_PER_ROW + j;
+				if (name.equals("WHITE_PAWN")) {
+					builder.setPiece(new Pawn(position, Alliance.WHITE));
+				} else if (name.equals("WHITE_ROOK")) {
+					builder.setPiece(new Rook(position, Alliance.WHITE));
+				} else if (name.equals("WHITE_KNIGHT")) {
+					builder.setPiece(new Knight(position, Alliance.WHITE));
+				} else if (name.equals("WHITE_BISHOP")) {
+					builder.setPiece(new Bishop(position, Alliance.WHITE));
+				} else if (name.equals("WHITE_QUEEN")) {
+					builder.setPiece(new Queen(position, Alliance.WHITE));
+				} else if (name.equals("WHITE_KING")) {
+					builder.setPiece(new King(position, Alliance.WHITE));
+				} else if (name.equals("BLACK_PAWN")) {
+					builder.setPiece(new Pawn(position, Alliance.BLACK));
+				} else if (name.equals("BLACK_ROOK")) {
+					builder.setPiece(new Rook(position, Alliance.BLACK));
+				} else if (name.equals("BLACK_KNIGHT")) {
+					builder.setPiece(new Knight(position, Alliance.BLACK));
+				} else if (name.equals("BLACK_BISHOP")) {
+					builder.setPiece(new Bishop(position, Alliance.BLACK));
+				} else if (name.equals("BLACK_QUEEN")) {
+					builder.setPiece(new Queen(position, Alliance.BLACK));
+				} else if (name.equals("BLACK_KING")) {
+					builder.setPiece(new King(position, Alliance.BLACK));
+				}
+			}
+		}
+		builder.setMoveMaker(Alliance.BLACK);
+		return builder.build();
+	}
+	
+	// FEN format: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1;
+	public static Board createByFEN(String fen) {
+		Builder builder = new Builder();
+		String[] info = fen.split(" ");
+		String[] rows = info[0].split("/");
+		int position = 0;
+		
+		for (String row : rows) {
+			for (char c : row.toCharArray()) {
+				if (Character.isDigit(c)) {
+					int emptySpaces = Character.getNumericValue(c);
+					position += emptySpaces;
+				} else {
+					if (c == 'p') {
+						builder.setPiece(new Pawn(position, Alliance.BLACK));
+					} else if (c == 'r') {
+						if ((position == 0 && info[2].contains("q")) 
+								|| (position == 7 && info[2].contains("k"))) {
+							builder.setPiece(new Rook(position, Alliance.BLACK));
+						} else {
+							builder.setPiece(new Rook(position, Alliance.BLACK, false));
+						}
+					} else if (c == 'n') {
+						builder.setPiece(new Knight(position, Alliance.BLACK));
+					} else if (c == 'b') {
+						builder.setPiece(new Bishop(position, Alliance.BLACK));
+					} else if (c == 'q') {
+						builder.setPiece(new Queen(position, Alliance.BLACK));
+					} else if (c == 'k') {
+						builder.setPiece(new King(position, Alliance.BLACK));
+					} else if (c == 'P') {
+						builder.setPiece(new Pawn(position, Alliance.WHITE));
+					} else if (c == 'R') {
+						if ((position == 56 && info[2].contains("Q")) 
+								|| (position == 63 && info[2].contains("K"))) {
+							builder.setPiece(new Rook(position, Alliance.WHITE));
+						} else {
+							builder.setPiece(new Rook(position, Alliance.WHITE, false));
+						}
+					} else if (c == 'N') {
+						builder.setPiece(new Knight(position, Alliance.WHITE));
+					} else if (c == 'B') {
+						builder.setPiece(new Bishop(position, Alliance.WHITE));
+					} else if (c == 'Q') {
+						builder.setPiece(new Queen(position, Alliance.WHITE));
+					} else if (c == 'K') {
+						builder.setPiece(new King(position, Alliance.WHITE));
+					}
+					position++;
+				}
+			}
+		}
+		
+		builder.setMoveMaker(Alliance.WHITE);
+		if (info[1].equals("b"))
+			builder.setMoveMaker(Alliance.BLACK);
+		
+		
+		return builder.build();
+	}
 
 	public static class Builder {
 		private Map<Integer, Piece> boardConfig;
@@ -194,5 +293,11 @@ public class Board {
 		public Pawn getEnPassantPawn() {
 			return this.enPassantPawn;
 		}
+	}
+	
+	public static void main(String[] args) {
+		String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+		Board board = Board.createByFEN(fen);
+		System.out.println(board);
 	}
 }

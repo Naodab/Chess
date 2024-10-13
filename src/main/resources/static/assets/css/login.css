@@ -1,4 +1,22 @@
 @charset "UTF-8";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap');
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		scale: 0;
+	}
+	to {
+		opacity: 1;
+		scale: 1;
+	}
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+}
 
 body {
 	margin: 0;
@@ -14,7 +32,7 @@ body {
 
 .background {
 	position: absolute;
-	background: #2b2b2b url(../img/background.jpg) no-repeat center center / cover;
+	background: #2b2b2b url(../img/background.jpg) no-repeat center center/cover;
 	top: 0;
 	left: 0;
 	width: 100%;
@@ -24,52 +42,131 @@ body {
 
 .overlay {
 	position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(8px);
-    z-index: -1;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.3);
+	z-index: -1;
 }
 
-.login-container {
-	background-color: rgba(75,64,47,0.8);
-	padding: 20px;
+.container {
+	background: conic-gradient(from 90deg, 
+		rgba(94, 123, 111, 0.5),
+		rgba(196, 154, 104, 0.5), 
+		rgba(94, 123, 111, 0.5),
+		rgba(196, 154, 104, 0.5), 
+		rgba(94, 123, 111, 0.5));
 	border-radius: 10px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	box-shadow: 0 0 10px rgba(155, 255, 255, 0.2);
+	display: flex;
+	align-items:center;
+	justify-content: center;
+	padding: 16px;
 	backdrop-filter: blur(8px);
-	width: 300px;
-	text-align: center;
+	animation: fadeIn 0.3s ease-in-out;
 }
 
-#form-1 {
+.chess-image {
+	width: 350px;
+	height: 350px;
+	height: 100%;
+	object-fit: cover;
+	overflow: hidden;
+	border-radius: 5px;
+	margin-right: 16px;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+	transition: opacity 0.6s ease-out;
+}
+
+.toggle {
+	width: 300px;
+	height: 350px;
+	position: relative;
+	overflow: hidden;
+	transition: all 0.6s ease-in-out;
+}
+
+.form-container-signup {
+	width: 300px;
+	overflow: hidden;
+	transition: all 0.6s ease-in-out;
+}
+
+#form-2 {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: fit-content;
+}
+
+.form-container {
+	position: absolute;
+    top: 0;
+    height: 100%;
+	width: 100%;
+	transition: all 0.6s ease-in-out;
+}
+
+.container.active.login {
+	display: none;
+}
+
+.container.signup {
+	display: none;
+}
+
+.container.active.signup {
+	display: block;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	position: absolute;
+	height: fit-content;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.form-group {
 	width: 100%;
 	display: flex;
 	flex-direction: column;
 }
 
-.login-container input[type="text"], .login-container input[type="password"] {
-	width: 94%;
+.form-control {
 	padding: 10px;
 	margin: 10px 0;
 	border: none;
+	height: 36px;
 	border-radius: 5px;
-	background-color: rgba(255, 255, 255, 0.8);
-	color: #333;
+	background-color: rgba(255, 255, 255, 0.5);
+	color: black;
 	font-weight: bold;
 }
 
-.login-container label {
-	color: #333;
+.form-control:focus {
+	background-color: white;
 }
 
-.login-container a {
+.container label {
+	color: black;
+}
+
+.container a {
 	color: #fff;
 	text-decoration: none;
 }
 
-.login-container .form-submit {
-	background-color: #4CAF50;
+.container .form-submit {
+	background-color: rgba(230, 158, 83, 0.4);
 	color: white;
 	padding: 10px;
 	border: none;
@@ -82,18 +179,39 @@ body {
 }
 
 .form-submit:hover {
-	background-color: rgba(76, 175, 80, 0.8);
+	background-color: rgba(230, 158, 83, 1);
+}
+
+.btn-signup, .btn-login {
+	background-color: rgba(255, 255, 255, 0.2);
+	margin: 5px 0;
+	width: 100%;
+	padding: 10px;
+	font-size: 14px;
+	font-weight: bold;
+	color: #333;
+	border-radius: 5px;
+	cursor: pointer;
+	text-align: center;
+}
+
+.btn-signup:hover,
+.btn-login:hover {
+	background-color: white;
 }
 
 #forgot {
 	font-size: 14px;
+	width: 100%;
+	text-align: right;
 }
 
 #forgot:hover {
 	text-decoration: underline;
-	color: #4CAF50;
+	color: rgba(230, 158, 83, 1);
 }
 
 .form-group.error input {
 	border: 2px solid red;
+	box-shadow: 0 0 10px red;
 }

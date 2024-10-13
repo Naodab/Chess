@@ -16,7 +16,7 @@ import com.example.pbl4Version1.dto.response.UserResponse;
 import com.example.pbl4Version1.entity.Achievement;
 import com.example.pbl4Version1.entity.Role;
 import com.example.pbl4Version1.entity.User;
-import com.example.pbl4Version1.enums.Rank;
+import com.example.pbl4Version1.enums.OperatingStatus;
 import com.example.pbl4Version1.exception.AppException;
 import com.example.pbl4Version1.exception.ErrorCode;
 import com.example.pbl4Version1.mapper.UserMapper;
@@ -53,7 +53,7 @@ public class UserService {
 		HashSet<Role> roles = new HashSet<Role>();
         roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
         user.setRoles(roles);
-        user.setRank(Rank.INTERMEDIATE);
+        user.setOperatingStatus(OperatingStatus.OFFLINE);
         user = userRepository.save(user);
         
 		return userMapper.toUserResponse(user);
@@ -91,7 +91,7 @@ public class UserService {
 		user.setRoles(new HashSet<Role>(roleRepository.findAllById(request.getRoles())));
 		user.setAchievements(new HashSet<Achievement>(achievementRepository
 				.findAllById(request.getAchievements())));
-		user.setRank(Rank.valueOf(request.getRank().toUpperCase()));
+		user.setOperatingStatus(OperatingStatus.ONLINE);
 		userRepository.save(user);
 		return userMapper.toUserResponse(user);
 	}

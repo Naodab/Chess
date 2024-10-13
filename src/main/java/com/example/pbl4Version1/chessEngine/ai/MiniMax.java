@@ -25,8 +25,6 @@ public class MiniMax implements MoveStrategy {
 		int highestSeenValue = Integer.MIN_VALUE;
 		int lowestSeenValue = Integer.MAX_VALUE;
 		int currentValue;
-//		int numMoves = board.getCurrentPlayer()
-//				.getLegalMoves().size();
 		for (final Move move : board.getCurrentPlayer()
 				.getLegalMoves()) {
 			final MoveTransition moveTransition = board

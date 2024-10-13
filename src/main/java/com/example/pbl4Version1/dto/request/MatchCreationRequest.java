@@ -14,6 +14,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MatchCreationRequest {
 	Long roomId;
-	String whiteUserId;
-	String blackUserId;
+	String whitePlayerId;
+	String blackPlayerId;
 }

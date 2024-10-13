@@ -9,62 +9,59 @@
 <link
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
 	rel="stylesheet" />
-<link href="/chess/assets/css/login.css" rel="stylesheet">
-<title>Todo List</title>
+<link href="/chess/assets/css/forgot.css" rel="stylesheet">
+<title>Chess</title>
 </head>
 <body>
 	<div class="background"></div>
 	<div class="overlay"></div>
-	<div class="login-container">
-		<form action="" method="POST" class="form" id="form-1">
-			<a href="#" class="login-logo" title="Chess.com"> Chess.com </a>
-			<div id="message"></div>
-			<div class="form-group">
-				<input id="username" name="username" type="text"
-					placeholder="Tài khoản hoặc email" class="form-control"> <span
-					class="form-message"></span>
-			</div>
-			<button id="form-submit" class="form-submit" type="submit">
-				Nhận Mail</button>
-		</form>
+	<div class="container">
+		<div class="form-container">
+			<form action="" method="POST" class="form" id="form-1">
+				<a href="#" style="font-size: 25px; margin-bottom: 16px"> Quên
+					mật khẩu </a>
+				<div id="message"></div>
+				<div class="form-group">
+					<input id="input" name="username" type="text"
+						placeholder="Tài khoản hoặc email" class="form-control"> <span
+						class="form-message"></span>
+				</div>
+				<button class="form-submit" type="submit">Nhận code</button>
+			</form>
+		</div>
 	</div>
-	<script src="/chess/assets/js/validator.js"></script>
 	<script>
-	Validator({
-        form: '#form-1',
-        formGroupSelector: ".form-group",
-        errorSelector: '.form-message',
-        rules: [
-            Validator.isRequired('#username')
-        ],
-        onSubmit: data => {
-            console.log(data);
-        	fetch('/chess/auth/forgot', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {	
-                	if (response.status === 401) {
-                        throw new Error('Email hoặc username không tồn tại');
-                    } else {
-                        throw new Error('An error occurred: ' + response.statusText);
-                    }
-                }
-                return response.json();
-            })
-            .then(data => {
-                localStorage.setItem("TOKEN", data.result.token);
-                window.location.href="/chess/public/confirm";
-            })
-            .catch(error => {
-                document.getElementById('message').innerText = error.message;
-            });
-        }
-    });
+	let step = 1;
+	
+	const input = document.getElementById("input");
+	const errorMessage = document.getElementById("message");
+	const form = document.getElementById("form-1");
+
+	document.querySelector(".form-submit").addEventListener("click", event => {
+		event.preventDefault();
+		if (step == 1) {
+			fetch('../auth/forgot', {
+				method: "POST",
+				header: "application/json",
+				body: JSON.stringify({username: input})
+			}).then(response => {
+				if (!response.ok) {
+					throw new Error("Tài khoản hoặc email không tồn tại.");
+				}
+				return response.json();
+			}).then(data => {
+				
+				return data;
+			}).catch(error => {
+				message.innerText = error.message;
+			});
+			step++;
+		} else if (step == 2) {
+
+		} else if (step == 3) {
+
+		}
+	});
 	</script>
 </body>
 </html>

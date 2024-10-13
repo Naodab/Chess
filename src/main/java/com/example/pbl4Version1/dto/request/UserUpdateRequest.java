@@ -18,7 +18,6 @@ import lombok.experimental.FieldDefaults;
 public class UserUpdateRequest {
 	String email;
 	String password;
-	String name;
 	LocalDate dob;
 	int elo;
 	String rank;

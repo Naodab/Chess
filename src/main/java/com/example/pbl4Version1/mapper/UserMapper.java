@@ -25,9 +25,7 @@ public class UserMapper {
 		return User.builder()
 				.username(request.getUsername())
 				.password(request.getPassword())
-				.dob(request.getDob())
 				.email(request.getEmail())
-				.name(request.getName())
 				.build();
 	}
 
@@ -48,17 +46,12 @@ public class UserMapper {
 					.toList());
 		}
 		
-		String rank = Rank.BEGGINNER.getName();
-		if (user.getRank() != null) {
-			rank = user.getRank().getName();
-		}
+		String rank = Rank.getRank(user.getElo()).getName();
 		
 		return UserResponse.builder()
 				.id(user.getId())
 				.email(user.getEmail())
 				.username(user.getUsername())
-				.name(user.getName())
-				.dob(user.getDob())
 				.elo(user.getElo())
 				.battleNumber(user.getBattleNumber())
 				.winNumber(user.getWinNumber())
@@ -72,8 +65,6 @@ public class UserMapper {
 	public User updateUser(User user, UserUpdateRequest request) {
 		user.setEmail(request.getEmail());
 		user.setPassword(request.getPassword());
-		user.setName(request.getName());
-		user.setDob(request.getDob());
 		user.setElo(request.getElo());
 		return user;
 	}

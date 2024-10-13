@@ -9,16 +9,16 @@
 <title>Todo List</title>
 </head>
 <body>
-	<button id="login">Login</button>
-	<button id="signup">Signup</button>
+	<button id="bot">Play with bot</button>
+	<button id="signup">Play with people</button>
 	<script type="text/javascript">
-		document.getElementById('login').addEventListener('click', event => {
+		document.getElementById('bot').addEventListener('click', event => {
 			event.preventDefault();
-			window.location.href="/chess/public/login";
+			
 		});
 		document.getElementById('signup').addEventListener('click', event => {
 			event.preventDefault();
-			window.location.href="/chess/public/signup";
+			
 		});
     </script>
 </body>

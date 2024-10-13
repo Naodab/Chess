@@ -3,9 +3,8 @@ package com.example.pbl4Version1.entity;
 import java.time.LocalDate;
 import java.util.Set;
 
-import com.example.pbl4Version1.enums.Rank;
+import com.example.pbl4Version1.enums.OperatingStatus;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -38,8 +37,10 @@ public class User {
 	
 	@Size(min = 8, message = "PASSWORD_INVALID")
 	String password;
-	String name;
-	LocalDate dob;
+	
+	@Builder.Default
+	LocalDate createDate = LocalDate.now();
+	LocalDate lastestLogin; // don't config yet
 	
 	@Builder.Default
 	int elo = 1200;
@@ -54,8 +55,7 @@ public class User {
 	int drawNumber = 0;
 	
 	@Enumerated(EnumType.STRING)
-    @Column(name = "rating", nullable = false)
-    Rank rank;
+    OperatingStatus operatingStatus;
 	
 	@ManyToMany
 	Set<Role> roles;

@@ -52,5 +52,5 @@ public class Room {
 	Set<User> viewers;
 	
 	@OneToMany(mappedBy = "room")
-	Set<Match> matches;
+	Set<MatchWithHuman> matches;
 }

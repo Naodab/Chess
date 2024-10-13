@@ -27,6 +27,7 @@ import com.example.pbl4Version1.dto.response.VerifyPasswordResponse;
 import com.example.pbl4Version1.entity.InvalidatedToken;
 import com.example.pbl4Version1.entity.PasswordResetToken;
 import com.example.pbl4Version1.entity.User;
+import com.example.pbl4Version1.enums.OperatingStatus;
 import com.example.pbl4Version1.exception.AppException;
 import com.example.pbl4Version1.exception.ErrorCode;
 import com.example.pbl4Version1.repository.InvalidatedTokenRepository;
@@ -96,7 +97,14 @@ public class AuthenticationService {
             InvalidatedToken invalidatedToken = InvalidatedToken.builder()
                     .id(jit).expiryTime(expiryTime)
                     .build();
-
+            String username = signToken.getJWTClaimsSet().getSubject();
+           
+            User user = userRepository.findByUsername(username)
+            	.orElseThrow(() -> 
+            		new AppException(ErrorCode.USER_NOT_EXISTED));
+            user.setOperatingStatus(OperatingStatus.OFFLINE);
+            userRepository.save(user);
+            
             invalidatedTokenRepository.save(invalidatedToken);
         } catch (AppException exception) {
             log.info("Token already expired");
@@ -129,6 +137,10 @@ public class AuthenticationService {
 		if (!authenticated)
 			throw new AppException(ErrorCode.UNAUTHENTICATED);
 		String token = generateToken(user);
+		
+		user.setOperatingStatus(OperatingStatus.ONLINE);
+		userRepository.save(user);
+		
 		return AuthenticationResponse.builder()
 				.token(token)
 				.build();

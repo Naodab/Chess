@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/achievements")
+@RequestMapping("/api/achievements")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AchievementController {
 	AchievementService achievementService;

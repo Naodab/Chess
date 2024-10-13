@@ -1,6 +1,5 @@
 package com.example.pbl4Version1.dto.request;
 
-import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +16,4 @@ public class UserCreateRequest {
 	String email;
 	String username;
 	String password;
-	String name;
-	LocalDate dob;
 }

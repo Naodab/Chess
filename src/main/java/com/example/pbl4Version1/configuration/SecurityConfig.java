@@ -20,9 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-	private final String[] PUBLIC_ENDPOINTS = { "/users", "/auth/token", "/auth/forgot", 
-												"/auth/intro", "/auth/refresh", "/auth/logout",
-												"/auth/verify"};
+	private final String[] PUBLIC_ENDPOINTS = { "/api/users", "/api/auth/token", "/api/auth/forgot", 
+												"/api/auth/intro", "/api/auth/refresh", 
+												"/api/auth/logout", "/api/auth/verify",
+												"/api/steps/bot"};
 	private final String[] FRONTEND_ENDPOINTS = {"/public/**", "/assets/**"};
 	
 	@Autowired
