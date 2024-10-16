@@ -14,7 +14,31 @@
 	<script type="text/javascript">
 		document.getElementById('bot').addEventListener('click', event => {
 			event.preventDefault();
+			const authorization = "Bearer " + localStorage.getItem('TOKEN');
+			const myHeaders = new Headers();
+			myHeaders.append("Content-Type", "application/json");
+			myHeaders.append("Authorization", authorization);
+
+			const requestOptions = {
+				method: "GET",
+				headers: myHeaders,
+				redirect: "follow"
+			};
 			
+			fetch("../api/matches/bot", requestOptions)
+			.then(response => {
+				if (!response.ok) {
+					throw new Error("Something is wrong!");
+				}
+				return response.json();
+			})
+			.then(() => {
+				alert("Tạo bàn thành công");
+				fetch("../public/user/play-with-bot");
+			})
+			.catch(error => {
+				alert(error.message);
+			});
 		});
 		document.getElementById('signup').addEventListener('click', event => {
 			event.preventDefault();

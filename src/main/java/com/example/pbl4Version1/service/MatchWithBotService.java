@@ -2,13 +2,12 @@ package com.example.pbl4Version1.service;
 
 import java.util.List;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.example.pbl4Version1.dto.request.MatchBotCreationRequest;
 import com.example.pbl4Version1.dto.response.MatchWithBotResponse;
-import com.example.pbl4Version1.dto.response.MatchWithHumanResponse;
 import com.example.pbl4Version1.entity.MatchWithBot;
-import com.example.pbl4Version1.entity.MatchWithHuman;
 import com.example.pbl4Version1.entity.User;
 import com.example.pbl4Version1.exception.AppException;
 import com.example.pbl4Version1.exception.ErrorCode;
@@ -54,13 +53,20 @@ public class MatchWithBotService {
 		return matchMapper.toMatchWithBotResponse(match);
 	}
 	
-	public MatchWithHumanResponse playWithBot(MatchBotCreationRequest request) {
-		User user = userRepository.findByUsername(request.getUsername())
+	public MatchWithBotResponse playWithBot() {
+		var authentication = SecurityContextHolder.getContext().getAuthentication();
+		String name = authentication.getName();
+		
+		User user = userRepository.findByUsername(name)
 				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-		MatchWithHuman match = new MatchWithHuman();
-		match.setWhitePlayer(user);
+		
+		MatchWithBot match = new MatchWithBot();
+		match.setPlayer(user);
+		match = matchRepository.save(match);
+		return matchMapper.toMatchWithBotResponse(match);
+	}
+
+	public MatchWithBotResponse update(Long id, MatchBotCreationRequest request) {
 		return null;
 	}
-	
-//	public MatchResponse update(Long i)
 }

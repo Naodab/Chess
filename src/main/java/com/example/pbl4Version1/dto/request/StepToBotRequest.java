@@ -15,4 +15,6 @@ import lombok.experimental.FieldDefaults;
 public class StepToBotRequest {
 	Long matchId;
 	String fen;
+	String from;
+	String to;
 }

@@ -28,4 +28,9 @@ public class HomeController {
     public String verify() {
     	return "verify";
     }
+    
+    @GetMapping("/play-with-bot")
+    public String playWithBot() {
+    	return "user/index";
+    }
 }

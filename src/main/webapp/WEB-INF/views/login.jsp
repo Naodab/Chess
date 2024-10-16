@@ -93,7 +93,7 @@
 			],
 			onSubmit: data => {
 				console.log(data);
-				fetch('../auth/token', {
+				fetch('../api/auth/token', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -131,7 +131,7 @@
 			],
 			onSubmit: data => {
 				console.log(data);
-				fetch('../users', {
+				fetch('../api/users', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -139,7 +139,7 @@
 					body: JSON.stringify(data)
 				}).then(response => {
 					if (!response.ok) {
-						throw new Error('Tài khoản hoặc mật khẩu không đúng');
+						throw new Error('Username hoặc email đã tồn tại');
 					}
 					return response.json();
 				}).then(() => {

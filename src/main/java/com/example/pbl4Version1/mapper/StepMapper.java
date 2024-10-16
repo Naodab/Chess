@@ -3,6 +3,7 @@ package com.example.pbl4Version1.mapper;
 import org.springframework.stereotype.Component;
 
 import com.example.pbl4Version1.dto.request.StepRequest;
+import com.example.pbl4Version1.dto.request.StepToBotRequest;
 import com.example.pbl4Version1.dto.response.StepResponse;
 import com.example.pbl4Version1.entity.Step;
 
@@ -22,6 +23,13 @@ public class StepMapper {
 				.to(step.getTo())
 				.thTime(step.getThTime())
 				.matchId(step.getMatch().getId())
+				.build();
+	}
+	
+	public Step toStep(StepToBotRequest request) {
+		return Step.builder()
+				.from(request.getFrom())
+				.to(request.getTo())
 				.build();
 	}
 }

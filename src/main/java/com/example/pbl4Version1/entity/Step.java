@@ -27,7 +27,7 @@ public class Step {
 	int thTime;
 	
 	@ManyToOne(cascade = CascadeType.ALL)
-	MatchWithHuman match;
+	Match match;
 	
 	@Column(name = "from_position")
 	String from;

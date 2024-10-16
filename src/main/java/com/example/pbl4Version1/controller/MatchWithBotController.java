@@ -1,5 +1,6 @@
 package com.example.pbl4Version1.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,13 @@ public class MatchWithBotController {
 	ApiResponse<MatchWithBotResponse> create(@RequestBody MatchBotCreationRequest request) {
 		return ApiResponse.<MatchWithBotResponse>builder()
 				.result(matchWithBotService.create(request))
+				.build();
+	}
+	
+	@GetMapping
+	ApiResponse<MatchWithBotResponse> createBoard() {
+		return ApiResponse.<MatchWithBotResponse>builder()
+				.result(matchWithBotService.playWithBot())
 				.build();
 	}
 }

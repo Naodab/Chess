@@ -1,0 +1,70 @@
+@charset "UTF-8";
+
+:root {
+    --bg-color: #302e2b;
+    --white-color: #EEEED2;
+    --black-color: #769656;
+    --highlight-black: rgba(0, 0, 0, 0.17);
+    --highlight-yellow: #f7f769;
+}
+
+body {
+    background-color: var(--bg-color);
+}
+
+#root {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: auto;
+}
+
+.squareRow {
+    display: flex;
+}
+
+.square {
+    width: 75px;
+    height: 75px;
+    position: relative;
+}
+
+.white {
+    background-color: var(--white-color);
+}
+
+.black {
+    background-color: var(--black-color);
+}
+
+.piece {
+    position: absolute;
+    top: 0;
+    left: 0 ;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.highlight {
+    position: absolute;
+    display: block;
+    width: 25%;
+    height: 25%;
+    border-radius: 50%;
+    background-color: var(--highlight-black);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+.capturedColor {
+    background-color: #ee4b2b;
+}
+
+.highlightYellow {
+    background-color: var(--highlight-yellow)   ;
+}

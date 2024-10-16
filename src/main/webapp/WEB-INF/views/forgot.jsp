@@ -40,7 +40,7 @@
 	document.querySelector(".form-submit").addEventListener("click", event => {
 		event.preventDefault();
 		if (step == 1) {
-			fetch('../auth/forgot', {
+			fetch('../api/auth/forgot', {
 				method: "POST",
 				header: "application/json",
 				body: JSON.stringify({username: input})
