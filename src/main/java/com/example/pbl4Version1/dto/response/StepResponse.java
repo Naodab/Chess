@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class StepResponse {
 	Long matchId;
+	String fen;
 	String from;
 	String to;
 	int thTime;

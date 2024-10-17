@@ -2,7 +2,7 @@ function Square(color, id, piece) {
     return { color, id, piece };
 }
 
-function SquareRow(rowId) { 
+function SquareRow(rowId) {
     const squareRow = [];
     const abcd = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     if (rowId % 2 == 0) {
@@ -31,6 +31,6 @@ function initGame() {
         game.push(SquareRow(i))
     }
     return game;
-} 
+}
 
 export { initGame };

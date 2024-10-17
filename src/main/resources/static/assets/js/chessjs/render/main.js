@@ -1,11 +1,14 @@
 import * as pieces from "../data/piece.js";
 import { ROOT_DIV } from "../helper/constants.js";
 import { globalState } from "../index.js";
+import { turnWhite, enpassantMove, turn } from "../event/global.js";
 
 const blackPieces = [];
 const whitePieces = [];
+let turnDraw = 0;
 
 function globalStateRender() {
+	console.log(generateFen());
 	globalState.forEach(row => {
 		row.forEach(element => {
 			if (element.highlight) {
@@ -144,6 +147,9 @@ function clearHighlight() {
 }
 
 function moveElement(piece, id) {
+	if (piece.piece_name.includes("PAWN"))
+		turnDraw = 0;
+
 	const flatData = globalState.flat();
 	const from = flatData.find(el => el.id == piece.current_position);
 	const to = flatData.find(el => el.id == id);
@@ -151,6 +157,7 @@ function moveElement(piece, id) {
 	const fromSquare = document.getElementById(from.id);
 	const toSquare = document.getElementById(to.id);
 	if (to.piece) {
+		turnDraw = 0;
 		if (to.piece.piece_name.includes("WHITE")) {
 			let index = whitePieces.findIndex(ele => ele.current_position == id);
 			whitePieces.splice(index, 1);
@@ -172,20 +179,80 @@ function moveElement(piece, id) {
 	clearHighlight();
 }
 
+function deletePiece(piece) {
+	turnDraw = 0;
+	const flatData = globalState.flat();
+	const pieceOnGlobalState = flatData.find(el => el.id == piece.current_position);
+
+	if (piece.piece_name.includes("WHITE")) {
+		let index = whitePieces.findIndex(ele => ele.current_position == piece.current_position);
+		whitePieces.splice(index, 1);
+	} else {
+		let index = blackPieces.findIndex(ele => ele.current_position == piece.current_position);
+		blackPieces.splice(index, 1);
+	}
+
+	const square = document.getElementById(piece.current_position);
+	square.innerHTML = "";
+	pieceOnGlobalState.piece = null;
+}
+
+function calculateCastling(pieces, color) {
+	let result = "";
+	let canKingCastle = false;
+	let canRookKingSide = false;
+	let canRookQueenSide = false;
+
+	pieces.forEach(piece => {
+		if (piece.piece_name.includes(color.toUpperCase() + "_KING") && !piece.moved) {
+			canKingCastle = true;
+		} else if (piece.piece_name.includes(color.toUpperCase() + "_ROOK") && !piece.moved) {
+			if (piece.current_position[0] == 'a') {
+				canRookQueenSide = true;
+			} else if (piece.current_position[0] == 'h') {
+				canRookKingSide = true;
+			}
+		}
+	})
+
+	if (canKingCastle && canRookKingSide) result += "k";
+	if (canKingCastle && canRookQueenSide) result += "q";
+	return (color == "white") ? result.toUpperCase() : result;
+}
+
 function generateFen() {
 	let fen = "";
-	globalState.forEach(row => {
+	globalState.forEach((row, index) => {
+		let count = 0;
 		row.forEach(element => {
-			let count = 0;
 			if (element.piece) {
 				if (count != 0) {
 					fen += `${count}`;
 					count = 0;
 				}
 				fen += element.piece.piece_signal;
+			} else {
+				count++;
 			}
 		});
+		if (count != 0) {
+			fen += `${count}`;
+			count = 0;
+		}
+		if (index != 7) fen += "/";
 	});
+	if (turnWhite)
+		fen += ' w ';
+	else fen += ' b ';
+	fen = fen + calculateCastling(whitePieces, "white");
+	fen = fen + calculateCastling(blackPieces, "black") + " ";
+
+	if (enpassantMove) fen += enpassantMove + " ";
+	else fen += "- ";
+
+	fen += `${turnDraw} ${turn}`
+
+	return fen;
 }
 
 export {
@@ -197,5 +264,6 @@ export {
 	selfHighlight,
 	clearPreviousSelfHighlight,
 	moveElement,
-	globalStateRender
+	globalStateRender,
+	deletePiece
 };

@@ -26,9 +26,9 @@ public class MatchWithBot extends Match{
 	
 	public MatchWithBot() {}
 
-	public MatchWithBot(Long id, String boardState, GameStatus gameStatus, 
+	public MatchWithBot(Long id, GameStatus gameStatus, 
 			PlayerType turn, PlayerType winner, Set<Step> steps, User player) {
-		super(id, boardState, gameStatus, turn, winner, steps);
+		super(id, gameStatus, turn, winner, steps);
 		this.player = player;
 	}
 }

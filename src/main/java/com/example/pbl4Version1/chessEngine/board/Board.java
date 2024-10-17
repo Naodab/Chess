@@ -28,7 +28,7 @@ public class Board {
 	private final WhitePlayer whitePlayer;
 	private final BlackPlayer blackPlayer;
 	private final Player currentPlayer;
-	
+
 	private final Pawn enPassantPawn;
 
 	private Board(final Builder builder) {
@@ -67,11 +67,11 @@ public class Board {
 	public Player getCurrentPlayer() {
 		return this.currentPlayer;
 	}
-	
+
 	public Pawn getEnPassantPawn() {
 		return this.enPassantPawn;
 	}
-	
+
 	public Iterable<Move> getAllLegalMoves() {
 		return Iterables.unmodifiableIterable(
 				Iterables.concat(this.whitePlayer.getLegalMoves(), this.blackPlayer.getLegalMoves()));
@@ -159,7 +159,7 @@ public class Board {
 
 		return builder.build();
 	}
-	
+
 	public static Board createBoardFromMap(List<List<String>> map) {
 		final Builder builder = new Builder();
 		for (int i = 0; i < BoardUtils.NUM_TILES_PER_ROW; i++) {
@@ -197,14 +197,16 @@ public class Board {
 		builder.setMoveMaker(Alliance.BLACK);
 		return builder.build();
 	}
-	
+
 	// FEN format: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1;
 	public static Board createByFEN(String fen) {
 		Builder builder = new Builder();
 		String[] info = fen.split(" ");
 		String[] rows = info[0].split("/");
+		int posEnpassantPawn = info[3].equals("-") ? -1 : BoardUtils.getCoordinateAtPosition(info[3]);
+		System.out.println(BoardUtils.getCoordinateAtPosition(info[3]));
 		int position = 0;
-		
+
 		for (String row : rows) {
 			for (char c : row.toCharArray()) {
 				if (Character.isDigit(c)) {
@@ -212,10 +214,14 @@ public class Board {
 					position += emptySpaces;
 				} else {
 					if (c == 'p') {
-						builder.setPiece(new Pawn(position, Alliance.BLACK));
+						System.out.println(BoardUtils.getPositionAtCoordinate(position));
+						Pawn pawn = new Pawn(position, Alliance.BLACK);
+						builder.setPiece(pawn);
+						if (posEnpassantPawn == position) {
+							builder.setEnPassantPawn(pawn);
+						}
 					} else if (c == 'r') {
-						if ((position == 0 && info[2].contains("q")) 
-								|| (position == 7 && info[2].contains("k"))) {
+						if ((position == 0 && info[2].contains("q")) || (position == 7 && info[2].contains("k"))) {
 							builder.setPiece(new Rook(position, Alliance.BLACK));
 						} else {
 							builder.setPiece(new Rook(position, Alliance.BLACK, false));
@@ -229,10 +235,14 @@ public class Board {
 					} else if (c == 'k') {
 						builder.setPiece(new King(position, Alliance.BLACK));
 					} else if (c == 'P') {
-						builder.setPiece(new Pawn(position, Alliance.WHITE));
+						System.out.println(BoardUtils.getPositionAtCoordinate(position));
+						Pawn pawn = new Pawn(position, Alliance.WHITE);
+						builder.setPiece(pawn);
+						if (posEnpassantPawn == position) {
+							builder.setEnPassantPawn(pawn);
+						}
 					} else if (c == 'R') {
-						if ((position == 56 && info[2].contains("Q")) 
-								|| (position == 63 && info[2].contains("K"))) {
+						if ((position == 56 && info[2].contains("Q")) || (position == 63 && info[2].contains("K"))) {
 							builder.setPiece(new Rook(position, Alliance.WHITE));
 						} else {
 							builder.setPiece(new Rook(position, Alliance.WHITE, false));
@@ -250,13 +260,82 @@ public class Board {
 				}
 			}
 		}
-		
+
 		builder.setMoveMaker(Alliance.WHITE);
 		if (info[1].equals("b"))
 			builder.setMoveMaker(Alliance.BLACK);
-		
-		
+
 		return builder.build();
+	}
+
+	public String calculateCanCastle(final Collection<Piece> pieces, final Alliance alliance) {
+		StringBuilder builder = new StringBuilder();
+		boolean kingCanCastle = false;
+		boolean rookKingSideCanCastle = false;
+		boolean rookQueenSideCanCastle = false;
+
+		for (Piece piece : whitePieces) {
+			if (piece.getPieceType().isKing() && piece.isFirstMove()) {
+				kingCanCastle = true;
+			}
+			if (piece.getPieceType().isRook() && piece.isFirstMove()) {
+				if (piece.getPiecePosition() == 0 || piece.getPiecePosition() == 56)
+					rookQueenSideCanCastle = true;
+				else
+					rookKingSideCanCastle = true;
+			}
+		}
+
+		if (kingCanCastle && rookKingSideCanCastle) {
+			builder.append("k");
+		}
+		if (kingCanCastle && rookQueenSideCanCastle) {
+			builder.append("q");
+		}
+
+		return alliance.isWhite() ? builder.toString().toUpperCase() : builder.toString();
+	}
+
+	public String genrateFen() {
+		final StringBuilder builder = new StringBuilder();
+		int countEmpty = 0;
+		for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
+			Tile tile = this.gameBoard.get(i);
+			if (tile.isTileOccupied()) {
+				if (countEmpty != 0) {
+					builder.append(countEmpty);
+					countEmpty = 0;
+				}
+				builder.append(tile.toString());
+			} else {
+				countEmpty++;
+			}
+			if ((i + 1) % BoardUtils.NUM_TILES_PER_ROW == 0) {
+				if (countEmpty != 0) {
+					builder.append(countEmpty);
+					countEmpty = 0;
+				}
+				builder.append("/");
+			}
+		}
+
+		if (this.getCurrentPlayer().getAlliance().isWhite()) {
+			builder.append(" w ");
+		} else {
+			builder.append(" b ");
+		}
+
+		String castleWhite = calculateCanCastle(whitePieces, Alliance.WHITE);
+		String castleBlack = calculateCanCastle(blackPieces, Alliance.BLACK);
+		builder.append(castleWhite + castleBlack + " ");
+
+		if (this.getEnPassantPawn() != null) {
+			builder.append(this.getEnPassantPawn().getPiecePosition() + " ");
+		} else {
+			builder.append("- ");
+		}
+
+		return builder.toString();
 	}
 
 	public static class Builder {
@@ -289,15 +368,19 @@ public class Board {
 		public void setEnPassantPawn(Pawn enPassantPawn) {
 			this.enPassantPawn = enPassantPawn;
 		}
-		
+
 		public Pawn getEnPassantPawn() {
 			return this.enPassantPawn;
 		}
 	}
-	
+
 	public static void main(String[] args) {
-		String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+		String fen = "rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPP2PPP/RNBQKBNR w KQkq e5 0 3";
 		Board board = Board.createByFEN(fen);
 		System.out.println(board);
+		System.out.println(board.genrateFen());
+		for (int i = 0; i < 64; i++) {
+			System.out.println(BoardUtils.getPositionAtCoordinate(i));
+		}
 	}
 }

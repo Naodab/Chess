@@ -8,7 +8,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<div id="root"></div>
+	<div id="game-board"></div>
     <script type="module" src="../assets/js/chessjs/index.js"></script>
 </body>
 </html>

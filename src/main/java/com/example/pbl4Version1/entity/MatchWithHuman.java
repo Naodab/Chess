@@ -34,10 +34,10 @@ public class MatchWithHuman extends Match {
 	
 	public MatchWithHuman() {}
 
-	public MatchWithHuman(Long id, String boardState, GameStatus gameStatus, 
+	public MatchWithHuman(Long id, GameStatus gameStatus, 
 			PlayerType turn, PlayerType winner, Set<Step> steps, 
 			Room room, User whitePlayer, User blackPlayer) {
-		super(id, boardState, gameStatus, turn, winner, steps);
+		super(id, gameStatus, turn, winner, steps);
 		this.room = room;
 		this.whitePlayer = whitePlayer;
 		this.blackPlayer = blackPlayer;

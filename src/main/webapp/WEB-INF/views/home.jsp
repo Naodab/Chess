@@ -33,8 +33,7 @@
 				return response.json();
 			})
 			.then(() => {
-				alert("Tạo bàn thành công");
-				fetch("../public/user/play-with-bot");
+				window.location.href = "../public/play-with-bot";
 			})
 			.catch(error => {
 				alert(error.message);

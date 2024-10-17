@@ -14,6 +14,7 @@ public class StepMapper {
 				.from(request.getFrom())
 				.to(request.getTo())
 				.thTime(request.getThTime())
+				.boardState(request.getFen())
 				.build();
 	}
 	
@@ -23,11 +24,13 @@ public class StepMapper {
 				.to(step.getTo())
 				.thTime(step.getThTime())
 				.matchId(step.getMatch().getId())
+				.fen(step.getBoardState())
 				.build();
 	}
 	
 	public Step toStep(StepToBotRequest request) {
 		return Step.builder()
+				.boardState(request.getFen())
 				.from(request.getFrom())
 				.to(request.getTo())
 				.build();

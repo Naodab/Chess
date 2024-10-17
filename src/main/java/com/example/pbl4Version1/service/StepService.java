@@ -53,7 +53,6 @@ public class StepService {
 		stepRepository.save(stepUser);
 		// TODO: Handle game status
 		
-		mwb.setBoardState(request.getFen());
 		Board board = Board.createByFEN(request.getFen());
 		
 		MoveStrategy minmax = new MiniMax(4);

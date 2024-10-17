@@ -33,13 +33,6 @@ public class Match {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	Long id;
-
-	// Save board state as a FEN
-	// FEN format: 
-	// row1/row2/row3/row4/row5/row6/row7/roww8 turn isCastleds enPassantPawn numberOfDrawSteps thStep
-	@Column(columnDefinition = "TEXT")
-	@Builder.Default
-	String boardState = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 	
 	@Enumerated(EnumType.STRING)
     @Column(nullable = false)
