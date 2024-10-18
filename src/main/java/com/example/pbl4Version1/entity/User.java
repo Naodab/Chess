@@ -62,6 +62,7 @@ public class User {
 	
 	@ManyToMany
 	Set<Achievement> achievements;
-	
-	int avatar;
+
+	@Builder.Default
+	int avatar = 0;
 }
