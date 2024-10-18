@@ -124,9 +124,12 @@ public abstract class Piece {
 		public int getPieceValue() {
 			return this.pieceValue;
 		}
-		
+
 		public boolean isRook() {
 			return this.pieceName.equals("R");
+		}
+		public boolean isPawn() {
+			return this.pieceName.equals("P");
 		}
 	}
 }

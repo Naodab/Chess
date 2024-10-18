@@ -17,5 +17,4 @@ public class StepResponse {
 	String fen;
 	String from;
 	String to;
-	int thTime;
 }

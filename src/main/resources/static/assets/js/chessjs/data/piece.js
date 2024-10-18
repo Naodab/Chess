@@ -21,7 +21,7 @@ function blackKnight(current_position) {
         current_position,
         img: "../assets/img/pieces/black/knight.png",
         piece_name: "BLACK_KNIGHT",
-		piece_signal: 'k'
+		piece_signal: 'n'
     };
 }
 
@@ -76,7 +76,7 @@ function whiteKnight(current_position) {
         current_position,
         img: "../assets/img/pieces/white/knight.png",
         piece_name: "WHITE_KNIGHT",
-		piece_signal: 'K'
+		piece_signal: 'N'
     };
 }
 

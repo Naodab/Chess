@@ -17,5 +17,4 @@ public class StepRequest {
 	String fen;
 	String from;
 	String to;
-	int thTime;
 }

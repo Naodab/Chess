@@ -13,7 +13,6 @@ public class StepMapper {
 		return Step.builder()
 				.from(request.getFrom())
 				.to(request.getTo())
-				.thTime(request.getThTime())
 				.boardState(request.getFen())
 				.build();
 	}
@@ -22,7 +21,6 @@ public class StepMapper {
 		return StepResponse.builder()
 				.from(step.getFrom())
 				.to(step.getTo())
-				.thTime(step.getThTime())
 				.matchId(step.getMatch().getId())
 				.fen(step.getBoardState())
 				.build();

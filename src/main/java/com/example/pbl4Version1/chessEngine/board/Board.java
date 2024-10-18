@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.pbl4Version1.chessEngine.Alliance;
+import com.example.pbl4Version1.chessEngine.ai.MiniMax;
+import com.example.pbl4Version1.chessEngine.ai.MoveStrategy;
 import com.example.pbl4Version1.chessEngine.piece.Bishop;
 import com.example.pbl4Version1.chessEngine.piece.King;
 import com.example.pbl4Version1.chessEngine.piece.Knight;
@@ -19,6 +21,8 @@ import com.example.pbl4Version1.chessEngine.player.Player;
 import com.example.pbl4Version1.chessEngine.player.WhitePlayer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import lombok.Getter;
+import lombok.Setter;
 
 public class Board {
 	private final List<Tile> gameBoard;
@@ -204,7 +208,6 @@ public class Board {
 		String[] info = fen.split(" ");
 		String[] rows = info[0].split("/");
 		int posEnpassantPawn = info[3].equals("-") ? -1 : BoardUtils.getCoordinateAtPosition(info[3]);
-		System.out.println(BoardUtils.getCoordinateAtPosition(info[3]));
 		int position = 0;
 
 		for (String row : rows) {
@@ -214,7 +217,6 @@ public class Board {
 					position += emptySpaces;
 				} else {
 					if (c == 'p') {
-						System.out.println(BoardUtils.getPositionAtCoordinate(position));
 						Pawn pawn = new Pawn(position, Alliance.BLACK);
 						builder.setPiece(pawn);
 						if (posEnpassantPawn == position) {
@@ -235,7 +237,6 @@ public class Board {
 					} else if (c == 'k') {
 						builder.setPiece(new King(position, Alliance.BLACK));
 					} else if (c == 'P') {
-						System.out.println(BoardUtils.getPositionAtCoordinate(position));
 						Pawn pawn = new Pawn(position, Alliance.WHITE);
 						builder.setPiece(pawn);
 						if (posEnpassantPawn == position) {
@@ -296,7 +297,7 @@ public class Board {
 		return alliance.isWhite() ? builder.toString().toUpperCase() : builder.toString();
 	}
 
-	public String genrateFen() {
+	public String generateFen() {
 		final StringBuilder builder = new StringBuilder();
 		int countEmpty = 0;
 		for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
@@ -318,30 +319,29 @@ public class Board {
 				builder.append("/");
 			}
 		}
-
 		if (this.getCurrentPlayer().getAlliance().isWhite()) {
 			builder.append(" w ");
 		} else {
 			builder.append(" b ");
 		}
-
 		String castleWhite = calculateCanCastle(whitePieces, Alliance.WHITE);
 		String castleBlack = calculateCanCastle(blackPieces, Alliance.BLACK);
-		builder.append(castleWhite + castleBlack + " ");
-
+		builder.append(castleWhite).append(castleBlack).append(" ");
 		if (this.getEnPassantPawn() != null) {
-			builder.append(this.getEnPassantPawn().getPiecePosition() + " ");
+			builder.append(BoardUtils.getPositionAtCoordinate(this.getEnPassantPawn().getPiecePosition())).append(" ");
 		} else {
 			builder.append("- ");
 		}
-
 		return builder.toString();
 	}
 
 	public static class Builder {
-		private Map<Integer, Piece> boardConfig;
-		private Alliance nextMoveMaker;
-		private Pawn enPassantPawn;
+		private final Map<Integer, Piece> boardConfig;
+		@Getter
+        private Alliance nextMoveMaker;
+		@Getter
+        @Setter
+        private Pawn enPassantPawn;
 
 		public Builder() {
 			this.boardConfig = new HashMap<Integer, Piece>();
@@ -360,27 +360,20 @@ public class Board {
 		public Board build() {
 			return new Board(this);
 		}
+    }
 
-		public Alliance getNextMoveMaker() {
-			return this.nextMoveMaker;
-		}
-
-		public void setEnPassantPawn(Pawn enPassantPawn) {
-			this.enPassantPawn = enPassantPawn;
-		}
-
-		public Pawn getEnPassantPawn() {
-			return this.enPassantPawn;
-		}
-	}
-
+	// TEST
 	public static void main(String[] args) {
-		String fen = "rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPP2PPP/RNBQKBNR w KQkq e5 0 3";
+		String fen = "rkb1kbkr/pppp1ppp/4p3/8/8/2P3P1/PP1PBP1P/RNBQK1KR/ w KQkq - ";
 		Board board = Board.createByFEN(fen);
 		System.out.println(board);
-		System.out.println(board.genrateFen());
-		for (int i = 0; i < 64; i++) {
-			System.out.println(BoardUtils.getPositionAtCoordinate(i));
-		}
+		MoveStrategy minmax = new MiniMax(4);
+		Move bestMove = minmax.execute(board);
+		Board after = board.getCurrentPlayer().makeMove(bestMove).getTransitionBoard();
+		String from = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate());
+		String to = BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
+		System.out.println(after);
+		System.out.println(from + " " + to);
+		System.out.println(after.generateFen());
 	}
 }

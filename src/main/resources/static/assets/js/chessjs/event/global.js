@@ -6,7 +6,8 @@ import {
     moveElement,
     clearHighlight,
     globalStateRender,
-    deletePiece
+    deletePiece,
+    generateFen
 }
     from "../render/main.js";
 import { checkPieceOfOpponentOnElement, willBeInCheck, getPieceAtPosition } from "../helper/commonHelper.js";
@@ -25,17 +26,11 @@ function clearHighlightLocal() {
     highlight_state = false;
 }
 
-function movePieceFromXtoY(from, to) {
-    to.piece = from.piece;
-    from.piece = null;
-    globalStateRender();
-}
-
 function highlightLocal(legalMoves) {
     legalMoves.normal.forEach(element => {
         globalState.forEach(row => {
             row.forEach(ele => {
-                if (ele.id == element) {
+                if (ele.id === element) {
                     ele.highlight = true;
                 }
             });
@@ -46,7 +41,7 @@ function highlightLocal(legalMoves) {
         document.getElementById(dest).classList.add("capturedColor");
         globalState.forEach(row => {
             row.forEach(ele => {
-                if (ele.id == dest) {
+                if (ele.id === dest) {
                     ele.highlightCaptured = true;
                     ele.highlight = true;
                 }
@@ -56,15 +51,15 @@ function highlightLocal(legalMoves) {
 }
 
 function calculatePawnLegalMove({ current_position }, color, check = checkPieceOfOpponentOnElement) {
-    const m = (color == "white") ? 1 : -1;
-    const firstRow = (color == "white") ? "2" : "7";
+    const m = (color === "white") ? 1 : -1;
+    const firstRow = (color === "white") ? "2" : "7";
     const normal = [];
     const attack = [];
 
     const candidate = `${current_position[0]}${Number(current_position[1]) + m}`;
     if (!check(candidate)) {
         normal.push(candidate);
-        if (current_position[1] == firstRow) {
+        if (current_position[1] === firstRow) {
             const doubleCandidate = `${current_position[0]}${Number(current_position[1]) + 2 * m}`;
             if (!check(doubleCandidate))
                 normal.push(doubleCandidate);
@@ -385,7 +380,7 @@ function calculateLegalMoves(color, board = globalState, check = checkPieceOfOpp
 function whitePawnClick({ piece }) {
     if (highlight_state) {
         const square = document.getElementById(piece.current_position);
-        if (piece.current_position == previousHighlight.current_position || !turnWhite) {
+        if (piece.current_position === previousHighlight.current_position || !turnWhite) {
             moveOrCancelMove(square);
             return;
         }
@@ -405,7 +400,7 @@ function whitePawnClick({ piece }) {
     const legalMoves = calculatePawnLegalMove(piece, "white");
 
     if (enpassantPawn && enpassantPawn.piece_name.includes("BLACK")
-        && Math.abs(enpassantPawn.current_position.charCodeAt(0) - piece.current_position.charCodeAt(0)) == 1
+        && Math.abs(enpassantPawn.current_position.charCodeAt(0) - piece.current_position.charCodeAt(0)) === 1
         && enpassantPawn.current_position.includes(piece.current_position[1])) {
         legalMoves.attack.push(enpassantMove);
     }
@@ -417,7 +412,7 @@ function whitePawnClick({ piece }) {
 function whiteRookClick({ piece }) {
     if (highlight_state) {
         const square = document.getElementById(piece.current_position);
-        if (piece.current_position == previousHighlight.current_position || !turnWhite) {
+        if (piece.current_position === previousHighlight.current_position || !turnWhite) {
             moveOrCancelMove(square);
             return;
         }
@@ -442,7 +437,7 @@ function whiteRookClick({ piece }) {
 function whiteKnightClick({ piece }) {
     if (highlight_state) {
         const square = document.getElementById(piece.current_position);
-        if (piece.current_position == previousHighlight.current_position || !turnWhite) {
+        if (piece.current_position === previousHighlight.current_position || !turnWhite) {
             moveOrCancelMove(square);
             return;
         }
@@ -467,7 +462,7 @@ function whiteKnightClick({ piece }) {
 function whiteBishopClick({ piece }) {
     if (highlight_state) {
         const square = document.getElementById(piece.current_position);
-        if (piece.current_position == previousHighlight.current_position || !turnWhite) {
+        if (piece.current_position === previousHighlight.current_position || !turnWhite) {
             moveOrCancelMove(square);
             return;
         }
@@ -492,7 +487,7 @@ function whiteBishopClick({ piece }) {
 function whiteQueenClick({ piece }) {
     if (highlight_state) {
         const square = document.getElementById(piece.current_position);
-        if (piece.current_position == previousHighlight.current_position || !turnWhite) {
+        if (piece.current_position === previousHighlight.current_position || !turnWhite) {
             moveOrCancelMove(square);
             return;
         }
@@ -517,7 +512,7 @@ function whiteQueenClick({ piece }) {
 function whiteKingClick({ piece }) {
     if (highlight_state) {
         const square = document.getElementById(piece.current_position);
-        if (piece.current_position == previousHighlight.current_position || !turnWhite) {
+        if (piece.current_position === previousHighlight.current_position || !turnWhite) {
             moveOrCancelMove(square);
             return;
         }
@@ -582,7 +577,7 @@ function whiteKingClick({ piece }) {
 function blackPawnClick({ piece }) {
     if (highlight_state) {
         const square = document.getElementById(piece.current_position);
-        if (piece.current_position == previousHighlight.current_position || turnWhite) {
+        if (piece.current_position === previousHighlight.current_position || turnWhite) {
             moveOrCancelMove(square);
             return;
         }
@@ -602,7 +597,7 @@ function blackPawnClick({ piece }) {
     const legalMoves = calculatePawnLegalMove(piece, "black");
 
     if (enpassantPawn && enpassantPawn.piece_name.includes("WHITE")
-        && Math.abs(enpassantPawn.current_position.charCodeAt(0) - piece.current_position.charCodeAt(0)) == 1
+        && Math.abs(enpassantPawn.current_position.charCodeAt(0) - piece.current_position.charCodeAt(0)) === 1
         && enpassantPawn.current_position.includes(piece.current_position[1])) {
         legalMoves.attack.push(enpassantMove);
     }
@@ -614,7 +609,7 @@ function blackPawnClick({ piece }) {
 function blackRookClick({ piece }) {
     if (highlight_state) {
         const square = document.getElementById(piece.current_position);
-        if (piece.current_position == previousHighlight.current_position || turnWhite) {
+        if (piece.current_position === previousHighlight.current_position || turnWhite) {
             moveOrCancelMove(square);
             return;
         }
@@ -639,7 +634,7 @@ function blackRookClick({ piece }) {
 function blackKnightClick({ piece }) {
     if (highlight_state) {
         const square = document.getElementById(piece.current_position);
-        if (piece.current_position == previousHighlight.current_position || turnWhite) {
+        if (piece.current_position === previousHighlight.current_position || turnWhite) {
             moveOrCancelMove(square);
             return;
         }
@@ -664,7 +659,7 @@ function blackKnightClick({ piece }) {
 function blackBishopClick({ piece }) {
     if (highlight_state) {
         const square = document.getElementById(piece.current_position);
-        if (piece.current_position == previousHighlight.current_position || turnWhite) {
+        if (piece.current_position === previousHighlight.current_position || turnWhite) {
             moveOrCancelMove(square);
             return;
         }
@@ -689,7 +684,7 @@ function blackBishopClick({ piece }) {
 function blackQueenClick({ piece }) {
     if (highlight_state) {
         const square = document.getElementById(piece.current_position);
-        if (piece.current_position == previousHighlight.current_position || turnWhite) {
+        if (piece.current_position === previousHighlight.current_position || turnWhite) {
             moveOrCancelMove(square);
             return;
         }
@@ -714,7 +709,7 @@ function blackQueenClick({ piece }) {
 function blackKingClick({ piece }) {
     if (highlight_state) {
         const square = document.getElementById(piece.current_position);
-        if (piece.current_position == previousHighlight.current_position || turnWhite) {
+        if (piece.current_position === previousHighlight.current_position || turnWhite) {
             moveOrCancelMove(square);
             return;
         }
@@ -776,6 +771,40 @@ function blackKingClick({ piece }) {
     globalStateRender();
 }
 
+function prepareForMoving(piece, id) {
+    if (piece.piece_name.includes("KING")) {            // CASTLING
+        const fromCol = piece.current_position.charCodeAt(0);
+        const toCol = id.charCodeAt(0);
+        if (fromCol - toCol === -2) {
+            const rook = getPieceAtPosition(`h${id[1]}`);
+            const desRook = `f${id[1]}`;
+            moveElement(rook, desRook);
+        } else if (fromCol - toCol === 2) {
+            const rook = getPieceAtPosition(`a${id[1]}`);
+            const desRook = `d${id[1]}`;
+            moveElement(rook, desRook);
+        }
+    } else if (piece.piece_name.includes("PAWN")) {     // EN PASSANT
+        const rowFrom = Number(piece.current_position[1]);
+        const rowTo = Number(id[1]);
+        if (Math.abs(rowFrom - rowTo) === 2) {
+            enpassantPawn = piece;
+            const direction = piece.piece_name.includes("WHITE") ? 1 : -1;
+            enpassantMove = `${piece.current_position[0]}${Number(piece.current_position[1]) + direction}`;
+        } else if (enpassantMove && id.includes(enpassantMove)) {
+            deletePiece(enpassantPawn);
+            enpassantMove = null;
+            enpassantPawn = null;
+        } else {
+            enpassantPawn = null;
+            enpassantMove = null;
+        }
+    } else {
+        enpassantPawn = null;
+        enpassantMove = null;
+    }
+}
+
 function moveOrCancelMove(square) {
     const spanHighlight = square.querySelector('span');
 
@@ -783,39 +812,10 @@ function moveOrCancelMove(square) {
         if (!willBeInCheck(moveState, square.id)) {
             turnWhite = !turnWhite;
             turn++;
-            if (moveState.piece_name.includes("KING")) {            // CASTLING
-                const fromCol = moveState.current_position.charCodeAt(0);
-                const toCol = square.id.charCodeAt(0);
-                if (fromCol - toCol == -2) {
-                    const rook = getPieceAtPosition(`h${square.id[1]}`);
-                    const desRook = `f${square.id[1]}`;
-                    moveElement(rook, desRook);
-                } else if (fromCol - toCol == 2) {
-                    const rook = getPieceAtPosition(`a${square.id[1]}`);
-                    const desRook = `d${square.id[1]}`;
-                    moveElement(rook, desRook);
-                }
-            } else if (moveState.piece_name.includes("PAWN")) {     // EN PASSANT
-                const rowFrom = Number(moveState.current_position[1]);
-                const rowTo = Number(square.id[1]);
-                if (Math.abs(rowFrom - rowTo) == 2) {
-                    enpassantPawn = moveState;
-                    const direction = moveState.piece_name.includes("WHITE") ? 1 : -1;
-                    enpassantMove = `${moveState.current_position[0]}${Number(moveState.current_position[1]) + direction}`;
-                } else if (enpassantMove && square.id.includes(enpassantMove)) {
-                    deletePiece(enpassantPawn);
-                    enpassantMove = null;
-                    enpassantPawn = null;
-                } else {
-                    enpassantPawn = null;
-                    enpassantMove = null;
-                }
-            } else {
-                enpassantPawn = null;
-                enpassantMove = null;
-            }
-
+            prepareForMoving(moveState, square.id);
             moveElement(moveState, square.id);
+            // TODO: send Step API to Server
+            sendStepToServer(moveState.current_position, square.id);
         } else {
             clearPreviousSelfHighlight(previousHighlight);
         }
@@ -878,4 +878,31 @@ function globalEvent() {
     });
 }
 
-export { globalEvent, movePieceFromXtoY, calculateLegalMoves, turnWhite, enpassantMove, turn }
+const  matchID = localStorage.getItem('MATCH_ID');
+
+async function sendStepToServer(from, to) {
+    const fen = generateFen();
+    try {
+        const response = await fetch("/chess/api/steps/bot", {
+            method: 'POST',
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+            },
+            body: JSON.stringify({ matchId: matchID, fen: fen, from: from, to: to }),
+            redirect: "follow"
+        });
+        if (response.ok) {
+            const data = await response.json();
+            const piece = getPieceAtPosition(data.result.from);
+            // TODO: handling fen received from server
+            prepareForMoving(piece, data.result.to);
+            moveElement(piece, data.result.to);
+            turnWhite = !turnWhite;
+            turn++;
+        }
+    } catch (error) {
+    }
+}
+
+export { globalEvent, calculateLegalMoves, turnWhite, enpassantMove, turn }

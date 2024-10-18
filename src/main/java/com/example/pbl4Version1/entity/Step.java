@@ -24,7 +24,6 @@ public class Step {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	Long id;
-	int thTime;
 
 	@ManyToOne(cascade = CascadeType.ALL)
 	Match match;

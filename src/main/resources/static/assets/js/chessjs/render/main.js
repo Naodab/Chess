@@ -8,7 +8,6 @@ const whitePieces = [];
 let turnDraw = 0;
 
 function globalStateRender() {
-	console.log(generateFen());
 	globalState.forEach(row => {
 		row.forEach(element => {
 			if (element.highlight) {
@@ -52,56 +51,56 @@ function pieceRender(data) {
 function initGameRender(data) {
 	data.forEach(row => {
 		const rowEl = document.createElement("div");
-		row.forEach((square, index) => {
+		row.forEach((square) => {
 			const squareDiv = document.createElement('div');
 			squareDiv.classList.add(square.color, "square");
 			squareDiv.id = square.id;
 
-			if (square.id[1] == 7) {
+			if (square.id[1] === "7") {
 				const piece = pieces.blackPawn(square.id);
 				blackPieces.push(piece);
 				square.piece = piece;
-			} else if (square.id == "h8" || square.id == "a8") {
+			} else if (square.id === "h8" || square.id === "a8") {
 				const piece = pieces.blackRook(square.id);
 				blackPieces.push(piece);
 				square.piece = piece;
-			} else if (square.id == "g8" || square.id == "b8") {
+			} else if (square.id === "g8" || square.id === "b8") {
 				const piece = pieces.blackKnight(square.id);
 				blackPieces.push(piece);
 				square.piece = piece;
-			} else if (square.id == "f8" || square.id == "c8") {
+			} else if (square.id === "f8" || square.id === "c8") {
 				const piece = pieces.blackBishop(square.id);
 				blackPieces.push(piece);
 				square.piece = piece;
-			} else if (square.id == "d8") {
+			} else if (square.id === "d8") {
 				const piece = pieces.blackQueen(square.id);
 				blackPieces.push(piece);
 				square.piece = piece;
-			} else if (square.id == "e8") {
+			} else if (square.id === "e8") {
 				const piece = pieces.blackKing(square.id);
 				blackPieces.push(piece);
 				square.piece = piece;
-			} else if (square.id[1] == 2) {
+			} else if (square.id[1] === "2") {
 				const piece = pieces.whitePawn(square.id);
 				whitePieces.push(piece);
 				square.piece = piece;
-			} else if (square.id == "h1" || square.id == "a1") {
+			} else if (square.id === "h1" || square.id === "a1") {
 				const piece = pieces.whiteRook(square.id);
 				whitePieces.push(piece);
 				square.piece = piece;
-			} else if (square.id == "g1" || square.id == "b1") {
+			} else if (square.id === "g1" || square.id === "b1") {
 				const piece = pieces.whiteKnight(square.id);
 				whitePieces.push(piece);
 				square.piece = piece;
-			} else if (square.id == "f1" || square.id == "c1") {
+			} else if (square.id === "f1" || square.id === "c1") {
 				const piece = pieces.whiteBishop(square.id);
 				whitePieces.push(piece);
 				square.piece = piece;
-			} else if (square.id == "d1") {
+			} else if (square.id === "d1") {
 				const piece = pieces.whiteQueen(square.id);
 				whitePieces.push(piece);
 				square.piece = piece;
-			} else if (square.id == "e1") {
+			} else if (square.id === "e1") {
 				const piece = pieces.whiteKing(square.id);
 				whitePieces.push(piece);
 				square.piece = piece;
@@ -112,12 +111,6 @@ function initGameRender(data) {
 		ROOT_DIV.appendChild(rowEl);
 	});
 	pieceRender(data);
-}
-
-function renderHighLight(squareId) {
-	const highlightSpan = document.createElement("span");
-	highlightSpan.classList.add("highlight");
-	document.getElementById(squareId).appendChild(highlightSpan);
 }
 
 function clearPreviousSelfHighlight(piece) {
@@ -151,18 +144,18 @@ function moveElement(piece, id) {
 		turnDraw = 0;
 
 	const flatData = globalState.flat();
-	const from = flatData.find(el => el.id == piece.current_position);
-	const to = flatData.find(el => el.id == id);
+	const from = flatData.find(el => el.id === piece.current_position);
+	const to = flatData.find(el => el.id === id);
 
 	const fromSquare = document.getElementById(from.id);
 	const toSquare = document.getElementById(to.id);
 	if (to.piece) {
 		turnDraw = 0;
 		if (to.piece.piece_name.includes("WHITE")) {
-			let index = whitePieces.findIndex(ele => ele.current_position == id);
+			let index = whitePieces.findIndex(ele => ele.current_position === id);
 			whitePieces.splice(index, 1);
 		} else {
-			let index = blackPieces.findIndex(ele => ele.current_position == id);
+			let index = blackPieces.findIndex(ele => ele.current_position === id);
 			blackPieces.splice(index, 1);
 		}
 	}
@@ -182,13 +175,13 @@ function moveElement(piece, id) {
 function deletePiece(piece) {
 	turnDraw = 0;
 	const flatData = globalState.flat();
-	const pieceOnGlobalState = flatData.find(el => el.id == piece.current_position);
+	const pieceOnGlobalState = flatData.find(el => el.id === piece.current_position);
 
 	if (piece.piece_name.includes("WHITE")) {
-		let index = whitePieces.findIndex(ele => ele.current_position == piece.current_position);
+		let index = whitePieces.findIndex(ele => ele.current_position === piece.current_position);
 		whitePieces.splice(index, 1);
 	} else {
-		let index = blackPieces.findIndex(ele => ele.current_position == piece.current_position);
+		let index = blackPieces.findIndex(ele => ele.current_position === piece.current_position);
 		blackPieces.splice(index, 1);
 	}
 
@@ -207,9 +200,9 @@ function calculateCastling(pieces, color) {
 		if (piece.piece_name.includes(color.toUpperCase() + "_KING") && !piece.moved) {
 			canKingCastle = true;
 		} else if (piece.piece_name.includes(color.toUpperCase() + "_ROOK") && !piece.moved) {
-			if (piece.current_position[0] == 'a') {
+			if (piece.current_position[0] === 'a') {
 				canRookQueenSide = true;
-			} else if (piece.current_position[0] == 'h') {
+			} else if (piece.current_position[0] === 'h') {
 				canRookKingSide = true;
 			}
 		}
@@ -217,7 +210,7 @@ function calculateCastling(pieces, color) {
 
 	if (canKingCastle && canRookKingSide) result += "k";
 	if (canKingCastle && canRookQueenSide) result += "q";
-	return (color == "white") ? result.toUpperCase() : result;
+	return (color === "white") ? result.toUpperCase() : result;
 }
 
 function generateFen() {
@@ -226,7 +219,7 @@ function generateFen() {
 		let count = 0;
 		row.forEach(element => {
 			if (element.piece) {
-				if (count != 0) {
+				if (count !== 0) {
 					fen += `${count}`;
 					count = 0;
 				}
@@ -235,23 +228,20 @@ function generateFen() {
 				count++;
 			}
 		});
-		if (count != 0) {
+		if (count !== 0) {
 			fen += `${count}`;
 			count = 0;
 		}
-		if (index != 7) fen += "/";
+		if (index !== 7) fen += "/";
 	});
 	if (turnWhite)
 		fen += ' w ';
 	else fen += ' b ';
 	fen = fen + calculateCastling(whitePieces, "white");
 	fen = fen + calculateCastling(blackPieces, "black") + " ";
-
 	if (enpassantMove) fen += enpassantMove + " ";
 	else fen += "- ";
-
 	fen += `${turnDraw} ${turn}`
-
 	return fen;
 }
 
@@ -259,11 +249,11 @@ export {
 	blackPieces,
 	whitePieces,
 	initGameRender,
-	renderHighLight,
 	clearHighlight,
 	selfHighlight,
 	clearPreviousSelfHighlight,
 	moveElement,
 	globalStateRender,
+	generateFen,
 	deletePiece
 };

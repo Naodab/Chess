@@ -32,8 +32,9 @@
 				}
 				return response.json();
 			})
-			.then(() => {
-				window.location.href = "../public/play-with-bot";
+			.then(data => {
+				localStorage.setItem("MATCH_ID", data.result.id);
+                window.location.href = "../public/play-with-bot";
 			})
 			.catch(error => {
 				alert(error.message);

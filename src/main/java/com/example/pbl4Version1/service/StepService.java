@@ -1,5 +1,7 @@
 package com.example.pbl4Version1.service;
 
+import com.example.pbl4Version1.enums.GameStatus;
+import com.example.pbl4Version1.enums.PlayerType;
 import org.springframework.stereotype.Service;
 
 import com.example.pbl4Version1.chessEngine.ai.MiniMax;
@@ -51,27 +53,48 @@ public class StepService {
 		Step stepUser = stepMapper.toStep(request);
 		stepUser.setMatch(mwb);
 		stepRepository.save(stepUser);
-		// TODO: Handle game status
-		
+
+		// TODO: handle for human win
 		Board board = Board.createByFEN(request.getFen());
-		
+		if (board.getCurrentPlayer().isInCheckMate()) {
+			mwb.setGameStatus(GameStatus.CHECKMATE);
+			mwb.setWinner(PlayerType.HUMAN);
+		} else if (board.getCurrentPlayer().isInStaleMate()) {
+			mwb.setGameStatus(GameStatus.STALEMATE);
+			mwb.setWinner(PlayerType.HUMAN);
+		}
+
 		MoveStrategy minmax = new MiniMax(4);
-		Move bestMove = minmax.excute(board);
+		Move bestMove = minmax.execute(board);
+        Board executeBoard = board.getCurrentPlayer().makeMove(bestMove).getTransitionBoard();
+
+		if (executeBoard.getCurrentPlayer().isInCheckMate()) {
+			mwb.setGameStatus(GameStatus.CHECKMATE);
+			mwb.setWinner(PlayerType.COMPUTER);
+		} else if (executeBoard.getCurrentPlayer().isInStaleMate()) {
+			mwb.setGameStatus(GameStatus.STALEMATE);
+			mwb.setWinner(PlayerType.COMPUTER);
+		}
+
 		String from = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate());
 		String to = BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
-		
+
+		String[] info = request.getFen().split(" ");
+		int turnDraw = (bestMove.isAttack() || bestMove.getMovedPiece().getPieceType().isPawn())
+				? 0 : Integer.parseInt(info[4]);
+		turnDraw++;
+		int turn = Integer.parseInt(info[5]);
+		turn++;
+		String fen = executeBoard.generateFen() + turnDraw + " " + turn;
 		Step stepAI = Step.builder()
 				.from(from)
 				.to(to)
-				.thTime(mwb.getSteps().size() + 1)
 				.match(mwb)
+				.boardState(executeBoard.generateFen())
 				.build();
+
 		stepRepository.save(stepAI);
 		matchWithBotRepository.save(mwb);
-		
-		return StepResponse.builder()
-				.from(from)
-				.to(to)
-				.build();
+		return stepMapper.toStepResponse(stepAI);
 	}
 }

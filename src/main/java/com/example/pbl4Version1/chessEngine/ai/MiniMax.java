@@ -4,6 +4,10 @@ import com.example.pbl4Version1.chessEngine.board.Board;
 import com.example.pbl4Version1.chessEngine.board.Move;
 import com.example.pbl4Version1.chessEngine.player.MoveTransition;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
+
 public class MiniMax implements MoveStrategy {
 	private final BoardEvaluator boardEvaluator;
 	private int searchDepth;
@@ -19,36 +23,85 @@ public class MiniMax implements MoveStrategy {
 	}
 
 	@Override
-	public Move excute(Board board) {
+	public Move execute(Board board) {
 		final long startTime = System.currentTimeMillis();
 		Move bestMove = null;
 		int highestSeenValue = Integer.MIN_VALUE;
 		int lowestSeenValue = Integer.MAX_VALUE;
-		int currentValue;
-		for (final Move move : board.getCurrentPlayer()
-				.getLegalMoves()) {
-			final MoveTransition moveTransition = board
-					.getCurrentPlayer().makeMove(move);
-			if (moveTransition.getMoveStatus().isDone()) {
-				currentValue = board
-					.getCurrentPlayer().getAlliance().isWhite() ?
-						min(moveTransition.getTransitionBoard(), this.searchDepth - 1) :
-						max(moveTransition.getTransitionBoard(), this.searchDepth - 1);
-				if (board.getCurrentPlayer().getAlliance().isWhite()
-						&& currentValue >= highestSeenValue) {
-					highestSeenValue = currentValue;
-					bestMove = move;
-				} else if (board.getCurrentPlayer().getAlliance().isBlack()
-						&& currentValue <= lowestSeenValue) {
-					lowestSeenValue = currentValue;
-					bestMove = move;
+
+		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		List<Future<MoveEvaluation>> futures = new ArrayList<>();
+
+		for (final Move move : board.getCurrentPlayer().getLegalMoves()) {
+			Callable<MoveEvaluation> task = () -> {
+				final MoveTransition transition = board.getCurrentPlayer().makeMove(move);
+				if (transition.getMoveStatus().isDone()) {
+					int currentValue = board
+							.getCurrentPlayer().getAlliance().isWhite() ?
+							min(transition.getTransitionBoard(), this.searchDepth - 1) :
+							max(transition.getTransitionBoard(), this.searchDepth - 1);
+					return new MoveEvaluation(move, currentValue);
 				}
+				return null;
+			};
+			futures.add(executorService.submit(task));
+		}
+
+		for (Future<MoveEvaluation> future : futures) {
+			try {
+				MoveEvaluation result = future.get();
+				if (result != null) {
+					int currentValue = result.getValue();
+					if (board.getCurrentPlayer().getAlliance().isWhite() && currentValue >= highestSeenValue) {
+						highestSeenValue = currentValue;
+						bestMove = result.getMove();
+					} else if (board.getCurrentPlayer().getAlliance().isBlack() && currentValue <= lowestSeenValue) {
+						lowestSeenValue = currentValue;
+						bestMove = result.getMove();
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
+
+		executorService.shutdown();
 		final long executionTime = System.currentTimeMillis() - startTime;
 		System.out.println("Execution time: " + executionTime);
 		return bestMove;
 	}
+
+//	@Override
+//	public Move excute(Board board) {
+//		final long startTime = System.currentTimeMillis();
+//		Move bestMove = null;
+//		int highestSeenValue = Integer.MIN_VALUE;
+//		int lowestSeenValue = Integer.MAX_VALUE;
+//		int currentValue;
+//		for (final Move move : board.getCurrentPlayer()
+//				.getLegalMoves()) {
+//			final MoveTransition moveTransition = board
+//					.getCurrentPlayer().makeMove(move);
+//			if (moveTransition.getMoveStatus().isDone()) {
+//				currentValue = board
+//					.getCurrentPlayer().getAlliance().isWhite() ?
+//						min(moveTransition.getTransitionBoard(), this.searchDepth - 1) :
+//						max(moveTransition.getTransitionBoard(), this.searchDepth - 1);
+//				if (board.getCurrentPlayer().getAlliance().isWhite()
+//						&& currentValue >= highestSeenValue) {
+//					highestSeenValue = currentValue;
+//					bestMove = move;
+//				} else if (board.getCurrentPlayer().getAlliance().isBlack()
+//						&& currentValue <= lowestSeenValue) {
+//					lowestSeenValue = currentValue;
+//					bestMove = move;
+//				}
+//			}
+//		}
+//		final long executionTime = System.currentTimeMillis() - startTime;
+//		System.out.println("Execution time: " + executionTime);
+//		return bestMove;
+//	}
 	
 	public int min(final Board board, final int depth) {
 		if (depth == 0 || isEndGameScenario(board)) {
