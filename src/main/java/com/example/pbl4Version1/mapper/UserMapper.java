@@ -59,6 +59,8 @@ public class UserMapper {
 				.roles(roles)
 				.achievements(achievements)
 				.rank(rank)
+				.latestLogin(user.getLatestLogin())
+				.createDate(user.getCreateDate())
 				.build();
 	}
 

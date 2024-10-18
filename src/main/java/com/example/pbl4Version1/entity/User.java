@@ -40,7 +40,7 @@ public class User {
 	
 	@Builder.Default
 	LocalDate createDate = LocalDate.now();
-	LocalDate latestLogin; // don't config yet
+	LocalDate latestLogin = LocalDate.now();
 	
 	@Builder.Default
 	int elo = 1200;

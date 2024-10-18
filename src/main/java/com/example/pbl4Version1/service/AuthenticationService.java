@@ -2,6 +2,7 @@ package com.example.pbl4Version1.service;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Random;
@@ -102,6 +103,7 @@ public class AuthenticationService {
             User user = userRepository.findByUsername(username)
             	.orElseThrow(() -> 
             		new AppException(ErrorCode.USER_NOT_EXISTED));
+			user.setLatestLogin(LocalDate.now());
             user.setOperatingStatus(OperatingStatus.OFFLINE);
             userRepository.save(user);
             
@@ -136,6 +138,7 @@ public class AuthenticationService {
 				user.getPassword());
 		if (!authenticated)
 			throw new AppException(ErrorCode.UNAUTHENTICATED);
+		user.setLatestLogin(LocalDate.now());
 		String token = generateToken(user);
 		
 		user.setOperatingStatus(OperatingStatus.ONLINE);
