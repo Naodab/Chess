@@ -25,11 +25,11 @@ public class MatchWithHuman extends Match {
 	Room room;
 	
 	@ManyToOne
-	@JoinColumn(name = "white_user_id")
+	@JoinColumn(name = "white_player_id")
 	User whitePlayer;
 	
 	@ManyToOne
-	@JoinColumn(name = "black_user_id")
+	@JoinColumn(name = "black_player_id")
 	User blackPlayer;
 	
 	public MatchWithHuman() {}

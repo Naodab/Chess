@@ -10,6 +10,9 @@ import com.example.pbl4Version1.dto.request.RoomCreateRequest;
 import com.example.pbl4Version1.dto.response.RoomResponse;
 import com.example.pbl4Version1.dto.response.UserResponse;
 import com.example.pbl4Version1.entity.Room;
+import com.example.pbl4Version1.entity.RoomUser;
+import com.example.pbl4Version1.entity.User;
+import com.example.pbl4Version1.enums.Mode;
 
 @Component
 public class RoomMapper {
@@ -23,17 +26,25 @@ public class RoomMapper {
 	}
 
 	public RoomResponse toRoomResponse(Room room) {
-		Set<UserResponse> viewers = new HashSet<UserResponse>();
-		if (room.getViewers() != null) {
-			room.getViewers().stream()
-				.map(userMapper::toUserResponse)
-				.forEach(viewers::add);
-		}
-		var host = userMapper.toUserResponse(room.getHost());
 		UserResponse player = null;
-		if (room.getPlayer() != null) {
-			player = userMapper.toUserResponse(room.getPlayer());
+		UserResponse host = null;
+		Set<UserResponse> viewers = new HashSet<UserResponse>();
+		
+		Set<RoomUser> users = room.getRoomUsers();
+		if (users != null) {
+			for (RoomUser roomUser : users) {
+				if (roomUser.getRole() == Mode.HOST) {
+					host = userMapper.toUserResponse(roomUser.getUser());
+				}
+				else if (roomUser.getRole() == Mode.PLAYER) {
+					player = userMapper.toUserResponse(roomUser.getUser());
+				}
+				else if (roomUser.getRole() == Mode.VIEWER) {
+					viewers.add(userMapper.toUserResponse(roomUser.getUser()));
+				}
+			}
 		}
+		
 		return RoomResponse.builder()
 				.id(room.getId())
 				.host(host)

@@ -40,7 +40,7 @@ public class User {
 	
 	@Builder.Default
 	LocalDate createDate = LocalDate.now();
-	LocalDate lastestLogin; // don't config yet
+	LocalDate latestLogin; // don't config yet
 	
 	@Builder.Default
 	int elo = 1200;
@@ -62,4 +62,6 @@ public class User {
 	
 	@ManyToMany
 	Set<Achievement> achievements;
+	
+	int avatar;
 }

@@ -72,4 +72,3 @@ public enum Alliance {
 	public abstract Player choosePlayer(final WhitePlayer whitePlayer, 
 			final BlackPlayer blackPlayer);
 }
-//doan abcd

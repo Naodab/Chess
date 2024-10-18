@@ -3,14 +3,11 @@ package com.example.pbl4Version1.entity;
 import java.time.LocalDate;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,19 +34,8 @@ public class Room {
 	@Builder.Default
 	boolean active = true;
 
-	@ManyToOne
-	@JoinColumn(name = "host_id")
-	User host;
-
-	@ManyToOne
-	@JoinColumn(name = "player_id")
-	User player;
-
-	@ManyToMany
-	@JoinTable(name = "room_viewers", 
-		joinColumns = @JoinColumn(name = "room_id"), 
-		inverseJoinColumns = @JoinColumn(name = "viewer_id"))
-	Set<User> viewers;
+	@OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    Set<RoomUser> roomUsers;
 	
 	@OneToMany(mappedBy = "room")
 	Set<MatchWithHuman> matches;
