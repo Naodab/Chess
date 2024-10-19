@@ -82,7 +82,7 @@ function willBeInCheck(piece, id) {
         checkPieceOfOpponentOnElementOnClone);
 
     const result = opponentLegalMoves.attack.includes(posKing);
-    if (result) {
+    if (result && !piece.piece_name.includes("KING")) {
         const squareKing = document.getElementById(posKing).querySelector('.piece');
         squareKing.classList.add('shake');
 

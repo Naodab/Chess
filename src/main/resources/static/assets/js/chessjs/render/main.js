@@ -1,10 +1,41 @@
 import * as pieces from "../data/piece.js";
 import { ROOT_DIV } from "../helper/constants.js";
 import { globalState } from "../index.js";
-import { turnWhite, enpassantMove, turn } from "../event/global.js";
+import {
+	turnWhite,
+	enPassantMove,
+	turn,
+	changeTurn,
+	setEnPassantMove,
+	setTurnNumber
+} from "../event/global.js";
+import {
+	BLACK_DEFEATED_PIECES,
+	WHITE_DEFEATED_PIECES,
+	GB_CONTAINER,
+	OVERLAY,
+	PROMPT_PIECES,
+} from "../helper/constants.js";
 
 const blackPieces = [];
 const whitePieces = [];
+const whiteDefeatedPiece = {
+	pawns: 0,
+	rooks: 0,
+	knights: 0,
+	bishops: 0,
+	queens: 0
+};
+const blackDefeatedPiece = {
+	pawns: 0,
+	rooks: 0,
+	knights: 0,
+	bishops: 0,
+	queens: 0
+};
+const whiteMoves = [];
+const blackMoves = [];
+let promotionPiece;
 let turnDraw = 0;
 
 function globalStateRender() {
@@ -139,6 +170,110 @@ function clearHighlight() {
 	globalStateRender();
 }
 
+function renderDefeatedPiece(area, name, count) {
+	const pieceContainer = document.createElement('div');
+	pieceContainer.classList.add(name + "s");
+	for (let i = 0; i < count; i++) {
+		const pawn = document.createElement('div');
+		pawn.classList.add(name, "defeated-piece");
+		pieceContainer.appendChild(pawn);
+	}
+	area.appendChild(pieceContainer);
+}
+
+function addDefeatedPieces(piece) {
+	let selector = WHITE_DEFEATED_PIECES;
+	let defeatedPieces = whiteDefeatedPiece;
+	if (piece.piece_name.includes("BLACK")) {
+		selector = BLACK_DEFEATED_PIECES;
+		defeatedPieces = blackDefeatedPiece;
+	}
+	if (piece.piece_name.includes("PAWN")) {
+		defeatedPieces.pawns++;
+	} else if (piece.piece_name.includes("ROOK")) {
+		defeatedPieces.rooks++;
+	} else if (piece.piece_name.includes("BISHOP")) {
+		defeatedPieces.bishops++;
+	} else if (piece.piece_name.includes("KNIGHT")) {
+		defeatedPieces.knights++;
+	} else if (piece.piece_name.includes("QUEEN")) {
+		defeatedPieces.queens++;
+	}
+	const area = document.querySelector(selector);
+	area.innerHTML = "";
+
+	for(let att in defeatedPieces) {
+		if (defeatedPieces[att] > 0) {
+			renderDefeatedPiece(area, att.slice(0, -1), defeatedPieces[att]);
+		}
+	}
+}
+
+function beginPromotionPawn(piece) {
+	OVERLAY.style.zIndex = "2";
+	GB_CONTAINER.classList.add("prompt");
+	if (piece.piece_name.includes("WHITE")) {
+		PROMPT_PIECES.className = "alliance-white";
+	} else {
+		PROMPT_PIECES.className = "alliance-black";
+	}
+	promotionPiece = piece;
+}
+
+function finishPromotionPawn(name) {
+	OVERLAY.style.zIndex = "-1";
+	GB_CONTAINER.classList.remove("prompt");
+	PROMPT_PIECES.className = "";
+	const color = promotionPiece.piece_name.includes("WHITE") ? "WHITE_" : "BLACK_";
+	name = color + name;
+	let pieceCreate;
+	switch (name) {
+		case "WHITE_ROOK":
+			pieceCreate = pieces.whiteRook;
+			break;
+		case "WHITE_KNIGHT":
+			pieceCreate = pieces.whiteKnight;
+			break;
+		case "WHITE_BISHOP":
+			pieceCreate = pieces.whiteBishop;
+			break;
+		case "WHITE_QUEEN":
+			pieceCreate = pieces.whiteQueen;
+			break;
+		case "BLACK_ROOK":
+			pieceCreate = pieces.blackRook;
+			break;
+		case "BLACK_KNIGHT":
+			pieceCreate = pieces.blackKnight;
+			break;
+		case "BLACK_BISHOP":
+			pieceCreate = pieces.blackBishop;
+			break;
+		case "BLACK_QUEEN":
+			pieceCreate = pieces.blackQueen;
+			break;
+	}
+	const newPiece = pieceCreate(promotionPiece.current_position);
+	globalState.forEach(row => {
+		row.forEach(element => {
+			if (element.piece && element.piece.current_position === newPiece.current_position) {
+				element.piece = newPiece;
+			}
+		});
+	});
+	const square = document.getElementById(newPiece.current_position).querySelector(".piece");
+	square.src = newPiece.img;
+	if (color === "WHITE") {
+		let index = whitePieces.findIndex(ele => ele.current_position === promotionPiece.current_position);
+		whitePieces.splice(index, 1);
+		whitePieces.push(newPiece);
+	} else {
+		let index = blackPieces.findIndex(ele => ele.current_position === promotionPiece.current_position);
+		blackPieces.splice(index, 1);
+		blackPieces.push(newPiece);
+	}
+}
+
 function moveElement(piece, id) {
 	if (piece.piece_name.includes("PAWN"))
 		turnDraw = 0;
@@ -151,6 +286,7 @@ function moveElement(piece, id) {
 	const toSquare = document.getElementById(to.id);
 	if (to.piece) {
 		turnDraw = 0;
+		addDefeatedPieces(to.piece);
 		if (to.piece.piece_name.includes("WHITE")) {
 			let index = whitePieces.findIndex(ele => ele.current_position === id);
 			whitePieces.splice(index, 1);
@@ -172,8 +308,139 @@ function moveElement(piece, id) {
 	clearHighlight();
 }
 
+function convertCoordinateToPosition(coordinate) {
+	const col = String.fromCharCode(coordinate % 8 + 97);
+	const row = 8 - Math.floor(coordinate / 8);
+	return `${col}${row}`;
+}
+
+function initGameFromFenRender(data, fen) {
+	const info = fen.split(" ");
+	console.log(info);
+	const board = info[0].split("/");
+	let coordinate = 0;
+	whiteDefeatedPiece.pawns = -8;
+	whiteDefeatedPiece.rooks = -2;
+	whiteDefeatedPiece.knights = -2;
+	whiteDefeatedPiece.bishops = -2;
+	whiteDefeatedPiece.queens = -1;
+
+	blackDefeatedPiece.pawns = -8;
+	blackDefeatedPiece.rooks = -2;
+	blackDefeatedPiece.knights = -2;
+	blackDefeatedPiece.bishops = -2;
+	blackDefeatedPiece.queens = -1;
+
+	board.forEach((row) => {
+		const rowEl = document.createElement("div");
+		for (let square of row) {
+			const code = square.charCodeAt(0);
+			if (code > 48 && code < 57) {
+				for (let i = 0; i < code - 48; i++) {
+					const squareDiv = document.createElement('div');
+					squareDiv.classList.add(data[Math.floor(coordinate / 8)][coordinate % 8].color, "square");
+					squareDiv.id = convertCoordinateToPosition(coordinate);
+					rowEl.appendChild(squareDiv);
+					coordinate++;
+				}
+			} else {
+				const squareDiv = document.createElement('div');
+				squareDiv.classList.add(data[Math.floor(coordinate / 8)][coordinate % 8].color, "square");
+				const id = convertCoordinateToPosition(coordinate);
+				squareDiv.id = id;
+				let piece;
+				const position = id;
+				if (square === "p") {
+					piece = pieces.blackPawn(position);
+					blackPieces.push(piece);
+					blackDefeatedPiece.pawns++;
+				} else if (square === "r") {
+					piece = pieces.blackRook(position);
+					if ((position === "a8" && info[2].includes("q")) ||
+						(position === "h8" && info[2].includes("k")))
+						piece.moved = true;
+					blackPieces.push(piece);
+					blackDefeatedPiece.rooks++;
+				} else if (square === "n") {
+					piece = pieces.blackKnight(position);
+					blackPieces.push(piece);
+					blackDefeatedPiece.knights++;
+				} else if (square === "b") {
+					piece = pieces.blackBishop(position);
+					blackPieces.push(piece);
+					blackDefeatedPiece.bishops++;
+				} else if (square === "q") {
+					piece = pieces.blackQueen(position);
+					blackPieces.push(piece);
+					blackDefeatedPiece.queens++;
+				} else if (square === "k") {
+					piece = pieces.blackKing(position);
+					blackPieces.push(piece);
+				} else if (square === "P") {
+					piece = pieces.whitePawn(position);
+					whitePieces.push(piece);
+					whiteDefeatedPiece.pawns++;
+				} else if (square === "R") {
+					piece = pieces.whiteRook(position);
+					if ((position === "a1" && info[2].includes("Q")) ||
+						(position === "h1" && info[2].includes("K")))
+						piece.moved = true;
+					whitePieces.push(piece);
+					whiteDefeatedPiece.rooks++;
+				} else if (square === "N") {
+					piece = pieces.whiteKnight(position);
+					whitePieces.push(piece);
+					whiteDefeatedPiece.knights++;
+				} else if (square === "B") {
+					piece = pieces.whiteBishop(position);
+					whitePieces.push(piece);
+					whiteDefeatedPiece.bishops++;
+				} else if (square === "Q") {
+					piece = pieces.whiteQueen(position);
+					whitePieces.push(piece);
+					whiteDefeatedPiece.queens++;
+				} else if (square === "K") {
+					piece = pieces.whiteKing(position);
+					whitePieces.push(piece);
+				}
+				data[Math.floor(coordinate / 8)][coordinate % 8].piece = piece;
+				rowEl.appendChild(squareDiv);
+				coordinate++;
+			}
+		}
+		rowEl.classList.add("squareRow");
+		ROOT_DIV.appendChild(rowEl);
+	});
+	pieceRender(data);
+	if (info[1] === "w") changeTurn(true);
+	else changeTurn(false);
+
+	if (info[3].length > 1)
+		setEnPassantMove(info[3]);
+
+	turnDraw = Number(info[4]);
+	setTurnNumber(Number(info[5]));
+
+	let area = document.querySelector(BLACK_DEFEATED_PIECES);
+	for(let att in blackDefeatedPiece) {
+		blackDefeatedPiece[att] = -blackDefeatedPiece[att];
+		if (blackDefeatedPiece[att] > 0) {
+			renderDefeatedPiece(area, att.slice(0, -1), blackDefeatedPiece[att]);
+		}
+	}
+	area = document.querySelector(WHITE_DEFEATED_PIECES);
+	for(let att in whiteDefeatedPiece) {
+		whiteDefeatedPiece[att] = -whiteDefeatedPiece[att];
+		if (whiteDefeatedPiece[att] > 0) {
+			renderDefeatedPiece(area, att.slice(0, -1), whiteDefeatedPiece[att]);
+		}
+	}
+
+}
+
 function deletePiece(piece) {
 	turnDraw = 0;
+	addDefeatedPieces(piece);
 	const flatData = globalState.flat();
 	const pieceOnGlobalState = flatData.find(el => el.id === piece.current_position);
 
@@ -239,21 +506,24 @@ function generateFen() {
 	else fen += ' b ';
 	fen = fen + calculateCastling(whitePieces, "white");
 	fen = fen + calculateCastling(blackPieces, "black") + " ";
-	if (enpassantMove) fen += enpassantMove + " ";
+	if (enPassantMove) fen += enPassantMove + " ";
 	else fen += "- ";
 	fen += `${turnDraw} ${turn}`
 	return fen;
 }
 
 export {
-	blackPieces,
-	whitePieces,
+	whiteMoves,
+	blackMoves,
 	initGameRender,
+	initGameFromFenRender,
 	clearHighlight,
 	selfHighlight,
 	clearPreviousSelfHighlight,
 	moveElement,
 	globalStateRender,
 	generateFen,
-	deletePiece
+	deletePiece,
+	beginPromotionPawn,
+	finishPromotionPawn
 };

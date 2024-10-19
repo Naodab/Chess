@@ -22,8 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityConfig {
 	private final String[] PUBLIC_ENDPOINTS = { "/api/users", "/api/auth/token", "/api/auth/forgot", 
 												"/api/auth/intro", "/api/auth/refresh", 
-												"/api/auth/logout", "/api/auth/verify",
-												"/api/steps/bot"};
+												"/api/auth/logout", "/api/auth/verify"};
 	private final String[] FRONTEND_ENDPOINTS = {"/public/**", "/assets/**"};
 	
 	@Autowired

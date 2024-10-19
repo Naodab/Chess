@@ -5,16 +5,7 @@ import java.util.Set;
 import com.example.pbl4Version1.enums.GameStatus;
 import com.example.pbl4Version1.enums.PlayerType;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,6 +38,6 @@ public class Match {
 	@Enumerated(EnumType.STRING)
 	PlayerType winner;
 	
-	@OneToMany(mappedBy = "match")
+	@OneToMany(mappedBy = "match", fetch = FetchType.EAGER)
 	Set<Step> steps;
 }

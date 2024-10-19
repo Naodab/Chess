@@ -316,7 +316,8 @@ public class Board {
 					builder.append(countEmpty);
 					countEmpty = 0;
 				}
-				builder.append("/");
+				if (i != BoardUtils.NUM_TILES - 1)
+					builder.append("/");
 			}
 		}
 		if (this.getCurrentPlayer().getAlliance().isWhite()) {

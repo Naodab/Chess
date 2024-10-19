@@ -75,10 +75,16 @@ public class UserService {
 		UserResponse userResponse = userMapper.toUserResponse(user);
 		return userResponse;
 	}
-	
+
 	@PostAuthorize("returnObject.username == authentication.name")
 	public UserResponse getUser(String id) {
 		User user = userRepository.findById(id).orElseThrow(
+				() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+		return userMapper.toUserResponse(user);
+	}
+	
+	public UserResponse getUserByUsername(String username) {
+		User user = userRepository.findByUsername(username).orElseThrow(
 				() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 		return userMapper.toUserResponse(user);
 	}

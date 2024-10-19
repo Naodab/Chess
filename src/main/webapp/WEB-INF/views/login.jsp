@@ -8,8 +8,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-	rel="stylesheet" />
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+		rel="stylesheet"/>
 <link href="../assets/css/login.css" rel="stylesheet">
 <title>Log In</title>
 </head>
@@ -103,8 +103,9 @@
 						throw new Error('Tài khoản hoặc mật khẩu không đúng');
 					}
 					return response.json();
-				}).then(data => {
-					localStorage.setItem("TOKEN", data.result.token);
+				}).then(data2 => {
+					localStorage.setItem("TOKEN", data2.result.token)
+					localStorage.setItem("USERNAME", data.username);
 					window.location.href = "../public/home";
 				}).catch(error => {
 					$("#message").innerText = error.message;

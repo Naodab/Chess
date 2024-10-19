@@ -34,7 +34,20 @@
 			})
 			.then(data => {
 				localStorage.setItem("MATCH_ID", data.result.id);
-                window.location.href = "../public/play-with-bot";
+				window.location.href = "../public/play-with-bot";
+				// fetch("../public/save-data", {
+				// 	method: "POST",
+				// 	headers: {
+				// 		"Content-Type": "application/json"
+				// 	},
+				// 	body: JSON.stringify({ name: "username", data: data.result.player.username }),
+				// 	redirect: "follow"
+				// })
+				// .then(response => {
+				// 	if (response.ok) {
+				// 		window.location.href = "../public/play-with-bot";
+				// 	}}
+				// );
 			})
 			.catch(error => {
 				alert(error.message);

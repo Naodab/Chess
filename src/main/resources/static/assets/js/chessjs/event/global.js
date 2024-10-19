@@ -1,4 +1,9 @@
-import { ROOT_DIV, SQUARE_SELECTOR } from "../helper/constants.js"
+import {
+    ROOT_DIV,
+    SQUARE_SELECTOR,
+    PROMPT_PIECE,
+    MOVE_SOUND
+} from "../helper/constants.js"
 import { globalState } from "../index.js";
 import {
     selfHighlight,
@@ -7,23 +12,43 @@ import {
     clearHighlight,
     globalStateRender,
     deletePiece,
-    generateFen
-}
-    from "../render/main.js";
-import { checkPieceOfOpponentOnElement, willBeInCheck, getPieceAtPosition } from "../helper/commonHelper.js";
+    generateFen,
+    beginPromotionPawn,
+    finishPromotionPawn
+} from "../render/main.js";
+import {
+    checkPieceOfOpponentOnElement,
+    willBeInCheck,
+    getPieceAtPosition
+} from "../helper/commonHelper.js";
 
 let highlight_state = false;
 let previousHighlight = null;
 let moveState = null;
 let turnWhite = true;
-let enpassantPawn;
-let enpassantMove;
+let enPassantPawn;
+let enPassantMove;
 let turn = 0;
 
-//TODO: enpassthan pawn, nhap thanh, vua, chuot toi cuoi duong
 function clearHighlightLocal() {
     clearHighlight();
     highlight_state = false;
+}
+
+function changeTurn(turn) {
+    turnWhite = turn;
+}
+
+function setTurnNumber(num) {
+    turn = num;
+}
+
+function setEnPassantMove(position) {
+    enPassantMove = position;
+    if (position.includes("3") || position.includes("6")) {
+        console.log(getPieceAtPosition(position));
+        enPassantPawn = getPieceAtPosition(position);
+    }
 }
 
 function highlightLocal(legalMoves) {
@@ -399,10 +424,10 @@ function whitePawnClick({ piece }) {
     previousHighlight = piece;
     const legalMoves = calculatePawnLegalMove(piece, "white");
 
-    if (enpassantPawn && enpassantPawn.piece_name.includes("BLACK")
-        && Math.abs(enpassantPawn.current_position.charCodeAt(0) - piece.current_position.charCodeAt(0)) === 1
-        && enpassantPawn.current_position.includes(piece.current_position[1])) {
-        legalMoves.attack.push(enpassantMove);
+    if (enPassantPawn && enPassantPawn.piece_name.includes("BLACK")
+        && Math.abs(enPassantPawn.current_position.charCodeAt(0) - piece.current_position.charCodeAt(0)) === 1
+        && enPassantPawn.current_position.includes(piece.current_position[1])) {
+        legalMoves.attack.push(enPassantMove);
     }
 
     highlightLocal(legalMoves);
@@ -596,10 +621,10 @@ function blackPawnClick({ piece }) {
     previousHighlight = piece;
     const legalMoves = calculatePawnLegalMove(piece, "black");
 
-    if (enpassantPawn && enpassantPawn.piece_name.includes("WHITE")
-        && Math.abs(enpassantPawn.current_position.charCodeAt(0) - piece.current_position.charCodeAt(0)) === 1
-        && enpassantPawn.current_position.includes(piece.current_position[1])) {
-        legalMoves.attack.push(enpassantMove);
+    if (enPassantPawn && enPassantPawn.piece_name.includes("WHITE")
+        && Math.abs(enPassantPawn.current_position.charCodeAt(0) - piece.current_position.charCodeAt(0)) === 1
+        && enPassantPawn.current_position.includes(piece.current_position[1])) {
+        legalMoves.attack.push(enPassantMove);
     }
 
     highlightLocal(legalMoves);
@@ -788,20 +813,20 @@ function prepareForMoving(piece, id) {
         const rowFrom = Number(piece.current_position[1]);
         const rowTo = Number(id[1]);
         if (Math.abs(rowFrom - rowTo) === 2) {
-            enpassantPawn = piece;
+            enPassantPawn = piece;
             const direction = piece.piece_name.includes("WHITE") ? 1 : -1;
-            enpassantMove = `${piece.current_position[0]}${Number(piece.current_position[1]) + direction}`;
-        } else if (enpassantMove && id.includes(enpassantMove)) {
-            deletePiece(enpassantPawn);
-            enpassantMove = null;
-            enpassantPawn = null;
+            enPassantMove = `${piece.current_position[0]}${Number(piece.current_position[1]) + direction}`;
+        } else if (enPassantMove && id.includes(enPassantMove)) {
+            deletePiece(enPassantPawn);
+            enPassantMove = null;
+            enPassantPawn = null;
         } else {
-            enpassantPawn = null;
-            enpassantMove = null;
+            enPassantMove = null;
+            enPassantPawn = null;
         }
     } else {
-        enpassantPawn = null;
-        enpassantMove = null;
+        enPassantPawn = null;
+        enPassantMove = null;
     }
 }
 
@@ -813,9 +838,14 @@ function moveOrCancelMove(square) {
             turnWhite = !turnWhite;
             turn++;
             prepareForMoving(moveState, square.id);
+            const oldMove = moveState.current_position;
             moveElement(moveState, square.id);
+            if (moveState.piece_name.includes("PAWN") &&
+                (square.id.includes("8") || square.id.includes("1"))) {
+                beginPromotionPawn(moveState);
+            }
             // TODO: send Step API to Server
-            sendStepToServer(moveState.current_position, square.id);
+            sendStepToServer(oldMove, square.id);
         } else {
             clearPreviousSelfHighlight(previousHighlight);
         }
@@ -876,6 +906,12 @@ function globalEvent() {
             moveOrCancelMove(square);
         }
     });
+    PROMPT_PIECE.forEach(piece => {
+        piece.addEventListener('click', () => {
+            const name = piece.getAttribute("name");
+            finishPromotionPawn(name);
+        });
+    });
 }
 
 const  matchID = localStorage.getItem('MATCH_ID');
@@ -894,10 +930,14 @@ async function sendStepToServer(from, to) {
         });
         if (response.ok) {
             const data = await response.json();
+            if (data.result.winner === "HUMAN") {
+                alert(data.result.winner + " " + data.result.gameStatus);
+                return;
+            }
             const piece = getPieceAtPosition(data.result.from);
-            // TODO: handling fen received from server
             prepareForMoving(piece, data.result.to);
             moveElement(piece, data.result.to);
+            // TODO: CHECK CHECKMATE AND STALEMATE
             turnWhite = !turnWhite;
             turn++;
         }
@@ -905,4 +945,13 @@ async function sendStepToServer(from, to) {
     }
 }
 
-export { globalEvent, calculateLegalMoves, turnWhite, enpassantMove, turn }
+export {
+    globalEvent,
+    calculateLegalMoves,
+    changeTurn,
+    setEnPassantMove,
+    setTurnNumber,
+    turnWhite,
+    enPassantMove,
+    turn
+}

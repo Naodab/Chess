@@ -27,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -45,7 +47,7 @@ public class StepService {
 		step = stepRepository.save(step);
 		return stepMapper.toStepResponse(step);
 	}
-	
+
 	public StepResponse toBot(StepToBotRequest request) {
 		MatchWithBot mwb = matchWithBotRepository.findById(request.getMatchId())
 				.orElseThrow(() -> new AppException(ErrorCode.MATCH_NOT_EXISTED));
@@ -59,9 +61,19 @@ public class StepService {
 		if (board.getCurrentPlayer().isInCheckMate()) {
 			mwb.setGameStatus(GameStatus.CHECKMATE);
 			mwb.setWinner(PlayerType.HUMAN);
+			matchWithBotRepository.save(mwb);
+			return StepResponse.builder()
+					.winner(mwb.getWinner().name())
+					.gameStatus(mwb.getGameStatus().name())
+					.build();
 		} else if (board.getCurrentPlayer().isInStaleMate()) {
 			mwb.setGameStatus(GameStatus.STALEMATE);
 			mwb.setWinner(PlayerType.HUMAN);
+			matchWithBotRepository.save(mwb);
+			return StepResponse.builder()
+					.winner(mwb.getWinner().name())
+					.gameStatus(mwb.getGameStatus().name())
+					.build();
 		}
 
 		MoveStrategy minmax = new MiniMax(4);
@@ -90,11 +102,36 @@ public class StepService {
 				.from(from)
 				.to(to)
 				.match(mwb)
-				.boardState(executeBoard.generateFen())
+				.boardState(fen)
 				.build();
 
 		stepRepository.save(stepAI);
 		matchWithBotRepository.save(mwb);
-		return stepMapper.toStepResponse(stepAI);
+
+		StepResponse response = stepMapper.toStepResponse(stepAI);
+		response.setGameStatus(mwb.getGameStatus().name());
+		if (mwb.getWinner() != null)
+			response.setWinner(mwb.getWinner().name());
+		return response;
+	}
+
+	public StepResponse getNewestStepOfMatchWithBot(Long matchID) {
+		MatchWithBot mwb = matchWithBotRepository.findById(matchID)
+				.orElseThrow(() -> new AppException(ErrorCode.MATCH_NOT_EXISTED));
+		List<Step> steps = stepRepository.findByMatchId(matchID);
+		log.info("getNewestStepOfMatchWithBot: " + steps.isEmpty());
+		if (!steps.isEmpty()) {
+			int size = steps.size();
+			log.info("size: " + size);
+			for (Step step : steps) {
+				log.info("step: " + step.getBoardState().split(" ")[5]);
+				if (size ==  Integer.parseInt(step.getBoardState().split(" ")[5])) {
+					log.info("fen: " + step.getBoardState());
+					return stepMapper.toStepResponse(step);
+				}
+			}
+
+		}
+		return stepMapper.toStepResponse(Step.builder().match(mwb).build());
 	}
 }

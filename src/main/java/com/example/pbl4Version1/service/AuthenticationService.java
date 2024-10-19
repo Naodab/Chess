@@ -232,7 +232,7 @@ public class AuthenticationService {
     public void deleteToken(PasswordResetToken token) {
         passwordResetTokenRepository.delete(token);
     }
-    
+
     private String generateString(int length) {
     	String digits = "0123456789";
     	Random random = new Random();
