@@ -14,10 +14,21 @@
         <nav class="main-nav">
         </nav>
         <div class="play-area">
-            <div class="player-info-container alliance-black">
-                <div class="avatar avatar-1"></div>
-                <span class="name name-1">Computer(200)</span>
-                <span class="defeated-pieces"></span>
+            <div class="player-info-container">
+                <div class="player-info alliance-white">
+                    <div class="avatar"></div>
+                    <span class="content">
+                        <span class="name">Computer</span>
+                        <span class="elo">200</span>
+                    </span>
+                </div>
+                <div class="player-info alliance-black">
+                    <span class="content">
+                        <span class="name">Computer</span>
+                        <span class="elo">200</span>
+                    </span>
+                    <div class="avatar"></div>
+                </div>
             </div>
 
             <div class="game-board-container">
@@ -30,10 +41,9 @@
                 </div>
             </div>
 
-            <div class="player-info-container alliance-white">
-                <div class="avatar avatar-2"></div>
-                <span class="name" id="name-2"></span>
-                <span class="defeated-pieces"></span>
+            <div class="defeated-pieces-container">
+                <span class="defeated-pieces alliance-white"></span>
+                <span class="defeated-pieces alliance-black"></span>
             </div>
         </div>
         <!-- MAYBE CHAT BOX HERE -->

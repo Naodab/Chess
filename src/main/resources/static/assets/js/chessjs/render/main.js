@@ -356,8 +356,8 @@ function initGameFromFenRender(data, fen) {
 					blackDefeatedPiece.pawns++;
 				} else if (square === "r") {
 					piece = pieces.blackRook(position);
-					if ((position === "a8" && info[2].includes("q")) ||
-						(position === "h8" && info[2].includes("k")))
+					if (!((position === "a8" && info[2].includes("q")) ||
+						(position === "h8" && info[2].includes("k"))))
 						piece.moved = true;
 					blackPieces.push(piece);
 					blackDefeatedPiece.rooks++;
@@ -382,8 +382,8 @@ function initGameFromFenRender(data, fen) {
 					whiteDefeatedPiece.pawns++;
 				} else if (square === "R") {
 					piece = pieces.whiteRook(position);
-					if ((position === "a1" && info[2].includes("Q")) ||
-						(position === "h1" && info[2].includes("K")))
+					if (!((position === "a1" && info[2].includes("Q")) ||
+						(position === "h1" && info[2].includes("K"))))
 						piece.moved = true;
 					whitePieces.push(piece);
 					whiteDefeatedPiece.rooks++;

@@ -2,12 +2,23 @@ import { initGame } from "./data/data.js";
 import { initGameRender, initGameFromFenRender } from "./render/main.js";
 import { globalEvent } from "./event/global.js";
 
-const name2 = document.getElementById("name-2");
+window.onload = function() {
+    const gbContainer = document.querySelector(".game-board-container");
+    gbContainer.style.width = gbContainer.offsetHeight + 'px';
+}
+
+window.onresize = function() {
+    const gbContainer = document.querySelector(".game-board-container");
+    gbContainer.style.width = gbContainer.offsetHeight + 'px';
+}
 
 // will be useful when game ends
 const globalState = initGame();
 
 const matchID = localStorage.getItem("MATCH_ID");
+const allianceWhite = document.querySelector(".player-info.alliance-white");
+const nameWhite = allianceWhite.querySelector(".name");
+const eloWhite = allianceWhite.querySelector(".elo");
 let fen = "";
 document.body.onload = async function () {
     await fetch(`/chess/api/steps/bot/${matchID}`, {
@@ -22,9 +33,9 @@ document.body.onload = async function () {
         }
         throw new Error("Match has been deleted or already played");
     }).then(data => {
-        console.log(data);
         fen = data.result.fen;
-        name2.innerText = `${data.result.match.player.username}(${data.result.match.player.elo})`;
+        nameWhite.innerText = data.result.match.player.username;
+        eloWhite.innerText = data.result.match.player.elo;
         initGameFromFenRender(globalState, fen);
         globalEvent();
     }).catch(error => {

@@ -10,6 +10,7 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -131,9 +132,10 @@ public class AuthenticationService {
     }
 	
 	public AuthenticationResponse authenticate(AuthenticationRequest request) {
-		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-		User user = userRepository.findByUsername(request.getUsername()).orElseThrow(
-				() -> new AppException(ErrorCode.USERNAME_INVALID));
+		User user = userRepository.findByUsername(request.getUsername())
+				.or(() -> userRepository.findByEmail(request.getUsername()))
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
 		boolean authenticated = passwordEncoder.matches(request.getPassword(), 
 				user.getPassword());
 		if (!authenticated)
@@ -172,20 +174,16 @@ public class AuthenticationService {
 	}
 	
 	public PasswordResetToken createTokenForResetPassword(ForgotRequest request) {
-		String username = request.getUsername();
-		User user = userRepository.findByUsername(username)
-				.orElse(userRepository.findByEmail(username)
-						.orElseThrow(() -> 
-							new AppException(ErrorCode.USER_NOT_EXISTED)));
-		
+		User user = userRepository.findByUsername(request.getUsername())
+				.or(() -> userRepository.findByEmail(request.getUsername()))
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 		PasswordResetToken token = PasswordResetToken.builder()
-				.token(generateString(6))
-				.user(user)
-				.expiryDate(new Date(Instant.now()
-						.plus(VALID_VERIFY_TIME, ChronoUnit.SECONDS)
-						.toEpochMilli()))
-				.build();
-		
+			.token(generateString(6))
+			.user(user)
+			.expiryDate(new Date(Instant.now()
+					.plus(VALID_VERIFY_TIME, ChronoUnit.SECONDS)
+					.toEpochMilli()))
+			.build();
 		passwordResetTokenRepository.save(token);
 		return token;
 	}
@@ -197,7 +195,6 @@ public class AuthenticationService {
         				() -> new AppException(ErrorCode.INVALID_RESET_PASSWORD));
 		boolean valid = passwordResetToken.getUser().getEmail().equals(request.getUsername())
 				&& passwordResetToken.getExpiryDate().after(new Date());
-		
 		String token = generateToken(passwordResetToken.getUser());
 		return VerifyPasswordResponse.builder()
 				.token(token)
@@ -206,13 +203,13 @@ public class AuthenticationService {
 	}
 	
 	public String confirmChangePassword(ConfirmChangePasswordRequest request) {
-		String username = request.getUsername();
+		String username = SecurityContextHolder.getContext()
+				.getAuthentication().getName();
 		User user = userRepository.findByUsername(username)
-				.orElse(userRepository.findByEmail(username)
-						.orElseThrow(() -> 
-							new AppException(ErrorCode.USER_NOT_EXISTED)));
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
-		user = userRepository.save(user);
+		userRepository.save(user);
 		return "Success";
 	}
 	

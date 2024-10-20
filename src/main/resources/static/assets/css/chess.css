@@ -47,10 +47,21 @@
     }
 }
 
+@keyframes zoomIn {
+    from {
+        scale: 0;
+        opacity: 0;
+    }
+    to {
+        scale: 1;
+        opacity: 1;
+    }
+}
+
 :root {
     --bg-color: #302e2b;
-    --white-color: #F7E0D8;
-    --black-color: #2C3F45;
+    --white-color: #DEEABA;
+    --black-color: #D88C34;
     --black-highlight-color: #667376;
     --highlight-black: rgba(0, 0, 0, 0.17);
     --highlight-yellow: #fefbfb;
@@ -110,8 +121,65 @@ body {
 
 .player-info-container {
     display: flex;
-    padding: 8px 20px;
     align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
+    border-radius: 40px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 4px black;
+}
+
+.player-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+}
+
+.player-info .content {
+    display: flex;
+    flex-direction: column;
+}
+
+.content .elo {
+    font-weight: bold;
+}
+
+.player-info:last-child {
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.player-info:last-child .avatar {
+    margin-left: 16px;
+}
+
+.player-info:first-child .avatar {
+    margin-right: 16px;
+}
+
+.player-info:first-child.alliance-white {
+    background: linear-gradient(to right, var(--white-color), transparent);
+}
+
+.player-info:first-child.alliance-black {
+    background: linear-gradient(to right, var(--black-color), transparent);
+}
+
+.player-info:last-child.alliance-black {
+    background: linear-gradient(to left, var(--black-color), transparent);
+}
+
+.player-info:last-child.alliance-white {
+    background: linear-gradient(to left, var(--white-color), transparent);
+}
+
+.alliance-white .content {
+    color: white;
+}
+
+.alliance-black .content {
+    color: black;
 }
 
 .player-info-container .avatar {
@@ -120,11 +188,10 @@ body {
     background: url('../img/avatar/1.jpg') no-repeat center center / cover;
     border-radius: 50%;
     border: 2px solid brown;
-    margin-right: 16px;
+    box-shadow: 0 0 10px black;
 }
 
 .player-info-container .name {
-    color: white;
     font-size: 25px;
     font-weight: bold;
 }
@@ -134,7 +201,7 @@ body {
     background: none;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    padding: 0 20px;
 }
 
 .alliance-black .pawn {
@@ -189,6 +256,10 @@ body {
     margin-left: -30px;
 }
 
+.defeated-pieces:last-child {
+    justify-content: flex-end;
+}
+
 .game-board-container {
     width: 640px;
     height: 640px;
@@ -236,8 +307,8 @@ body {
 
 #game-board {
     position: absolute;
-    width: 600px;
-    height: 600px;
+    width: 93%;
+    height: 93%;
     display: flex;
     flex-direction: column;
     margin: auto;
@@ -248,6 +319,10 @@ body {
     transform: translate(-50%, -50%);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     z-index: 1;
+}
+
+.defeated-pieces-container {
+    display: flex;
 }
 
 .squareRow {

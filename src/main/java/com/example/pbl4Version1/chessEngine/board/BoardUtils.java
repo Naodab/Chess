@@ -66,6 +66,10 @@ public class BoardUtils {
                 "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
                 "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"));
 	}
+
+	public static boolean isThreatenedBoardImmediate(final Board board) {
+		return board.getWhitePlayer().isInCheck() || board.getBlackPlayer().isInCheck();
+	}
 	
 	private BoardUtils() {
 		throw new RuntimeException("Cannot instantiate BoardUtils.");
@@ -81,5 +85,10 @@ public class BoardUtils {
 	
 	public static int getCoordinateAtPosition(final String position) {
 		return POSITION_TO_COORDINATE.get(position);
+	}
+
+	public static boolean isEndGame(final Board board) {
+		return board.getCurrentPlayer().isInCheckMate() ||
+				board.getCurrentPlayer().isInStaleMate();
 	}
 }

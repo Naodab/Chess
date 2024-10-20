@@ -72,8 +72,7 @@ public class UserService {
 		String name = authentication.getName();
 		User user = userRepository.findByUsername(name).orElseThrow(() 
 				-> new AppException(ErrorCode.USER_NOT_EXISTED));
-		UserResponse userResponse = userMapper.toUserResponse(user);
-		return userResponse;
+		return userMapper.toUserResponse(user);
 	}
 
 	@PostAuthorize("returnObject.username == authentication.name")
