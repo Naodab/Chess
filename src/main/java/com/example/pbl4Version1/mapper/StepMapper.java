@@ -28,6 +28,7 @@ public class StepMapper {
 				.to(step.getTo())
 				.match(matchMapper.toMatchWithBotResponse((MatchWithBot) step.getMatch()))
 				.fen(step.getBoardState())
+				.name(step.getName())
 				.build();
 	}
 	
@@ -36,6 +37,7 @@ public class StepMapper {
 				.boardState(request.getFen())
 				.from(request.getFrom())
 				.to(request.getTo())
+				.name(request.getName())
 				.build();
 	}
 }

@@ -1,10 +1,11 @@
 import * as pieces from "../data/piece.js";
 import { ROOT_DIV } from "../helper/constants.js";
-import { globalState } from "../index.js";
+import { globalState, ALLIANCE } from "../index.js";
 import {
 	turnWhite,
 	enPassantMove,
 	turn,
+	pushXToNameMove,
 	changeTurn,
 	setEnPassantMove,
 	setTurnNumber
@@ -286,6 +287,7 @@ function moveElement(piece, id) {
 	const toSquare = document.getElementById(to.id);
 	if (to.piece) {
 		turnDraw = 0;
+		pushXToNameMove();
 		addDefeatedPieces(to.piece);
 		if (to.piece.piece_name.includes("WHITE")) {
 			let index = whitePieces.findIndex(ele => ele.current_position === id);
@@ -316,9 +318,9 @@ function convertCoordinateToPosition(coordinate) {
 
 function initGameFromFenRender(data, fen) {
 	const info = fen.split(" ");
-	console.log(info);
 	const board = info[0].split("/");
 	let coordinate = 0;
+
 	whiteDefeatedPiece.pawns = -8;
 	whiteDefeatedPiece.rooks = -2;
 	whiteDefeatedPiece.knights = -2;
@@ -331,8 +333,9 @@ function initGameFromFenRender(data, fen) {
 	blackDefeatedPiece.bishops = -2;
 	blackDefeatedPiece.queens = -1;
 
+	const listRow = [];
 	board.forEach((row) => {
-		const rowEl = document.createElement("div");
+		const squareRow = [];
 		for (let square of row) {
 			const code = square.charCodeAt(0);
 			if (code > 48 && code < 57) {
@@ -340,7 +343,7 @@ function initGameFromFenRender(data, fen) {
 					const squareDiv = document.createElement('div');
 					squareDiv.classList.add(data[Math.floor(coordinate / 8)][coordinate % 8].color, "square");
 					squareDiv.id = convertCoordinateToPosition(coordinate);
-					rowEl.appendChild(squareDiv);
+					squareRow.push(squareDiv);
 					coordinate++;
 				}
 			} else {
@@ -356,6 +359,7 @@ function initGameFromFenRender(data, fen) {
 					blackDefeatedPiece.pawns++;
 				} else if (square === "r") {
 					piece = pieces.blackRook(position);
+
 					if (!((position === "a8" && info[2].includes("q")) ||
 						(position === "h8" && info[2].includes("k"))))
 						piece.moved = true;
@@ -404,13 +408,34 @@ function initGameFromFenRender(data, fen) {
 					whitePieces.push(piece);
 				}
 				data[Math.floor(coordinate / 8)][coordinate % 8].piece = piece;
-				rowEl.appendChild(squareDiv);
+				squareRow.push(squareDiv);
 				coordinate++;
 			}
 		}
-		rowEl.classList.add("squareRow");
-		ROOT_DIV.appendChild(rowEl);
+		listRow.push(squareRow);
 	});
+
+	if (ALLIANCE === "WHITE") {
+		for (let i = 0; i < listRow.length; i++) {
+			const rowEl = document.createElement("div");
+			for (let square of listRow[i]) {
+				rowEl.appendChild(square);
+			}
+			rowEl.classList.add("squareRow");
+			ROOT_DIV.appendChild(rowEl);
+		}
+	} else {
+		for (let i = listRow.length - 1; i >= 0; i--) {
+			listRow[i].reverse();
+			const rowEl = document.createElement("div");
+			for (let square of listRow[i]) {
+				rowEl.appendChild(square);
+			}
+			rowEl.classList.add("squareRow");
+			ROOT_DIV.appendChild(rowEl);
+		}
+	}
+
 	pieceRender(data);
 	if (info[1] === "w") changeTurn(true);
 	else changeTurn(false);

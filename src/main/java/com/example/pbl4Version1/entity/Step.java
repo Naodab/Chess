@@ -24,6 +24,7 @@ public class Step {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	Long id;
+	String name;
 
 	@ManyToOne(cascade = CascadeType.ALL)
 	Match match;

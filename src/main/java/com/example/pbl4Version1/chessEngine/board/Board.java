@@ -376,7 +376,7 @@ public class Board {
 		Move bm2 = minmax2.execute(board);
 		Move bm3 = minmax3.execute(board);
 
-		System.out.println(board.currentPlayer.makeMove(bm2).getTransitionBoard());
-		System.out.println(board.currentPlayer.makeMove(bm3).getTransitionBoard());
+		System.out.println(board.currentPlayer.makeMove(bm2).getTransitionBoard() + " " + bm2.toString());
+		System.out.println(board.currentPlayer.makeMove(bm3).getTransitionBoard() + " " + bm3.toString());
 	}
 }

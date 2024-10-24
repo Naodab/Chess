@@ -17,6 +17,7 @@ public class StepResponse {
 	String fen;
 	String from;
 	String to;
+	String name;
 	String gameStatus;
 	String winner;
 }

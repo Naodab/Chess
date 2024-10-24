@@ -17,4 +17,5 @@ public class StepToBotRequest {
 	String fen;
 	String from;
 	String to;
+	String name;
 }

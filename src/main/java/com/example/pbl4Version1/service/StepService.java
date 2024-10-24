@@ -104,6 +104,7 @@ public class StepService {
 				.to(to)
 				.match(mwb)
 				.boardState(fen)
+				.name(bestMove.toString())
 				.build();
 
 		stepRepository.save(stepAI);
