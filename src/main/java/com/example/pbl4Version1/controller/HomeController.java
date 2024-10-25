@@ -1,5 +1,4 @@
 package com.example.pbl4Version1.controller;
-
 import com.example.pbl4Version1.repository.UserRepository;
 import com.example.pbl4Version1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,5 +40,18 @@ public class HomeController {
     public String playWithBot() {
         return "user/index";
     }
+    @GetMapping("/playonl")
+    public String playonl() {
+    	return "user/playonl";
+    }
+    @GetMapping("/selectplay")
+    public String selectplay() {
+    	return "user/selectplay";
+    }
+    @GetMapping("/playbot")
+    public String playbot() {
+    	return "user/playbot";
+    }
+
 
 }
