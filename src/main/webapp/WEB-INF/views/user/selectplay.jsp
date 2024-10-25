@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<html>
+<<html>
 
 <head>
     <title>Chess Online</title>
@@ -9,56 +9,69 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background-image: url('../assets/img/background.jpg');
+          background-image: url('../assets/img/background.jpg');
             color: #fff;
             display: flex;
             height: 100vh;
         }
 
         .sidebar {
-            width: 200px;
+            width: 134px;
+            /* 200px * 0.67 */
             background-color: rgba(43, 43, 43, 0.4);
-            padding: 20px;
+            padding: 13.4px;
+            /* 20px * 0.67 */
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
         .sidebar img {
-            width: 150px;
-            margin-bottom: 20px;
+            width: 100px;
+            /* 150px * 0.67 */
+            margin-bottom: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .sidebar a {
             color: #fff;
             text-decoration: none;
-            margin: 10px 0;
+            margin: 6.7px 0;
+            /* 10px * 0.67 */
             display: flex;
             align-items: center;
-            font-size: 18px;
+            font-size: 12px;
+            /* 18px * 0.67 */
         }
 
         .sidebar a i {
-            margin-right: 10px;
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .sidebar .search {
-            margin: 20px 0;
+            margin: 13.4px 0;
+            /* 20px * 0.67 */
         }
 
         .sidebar .search input {
             width: 100%;
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             border: none;
-            border-radius: 5px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
         }
 
         .sidebar .button {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
+            padding: 6.7px;
+            /* 10px * 0.67 */
+            margin: 6.7px 0;
+            /* 10px * 0.67 */
             text-align: center;
-            border-radius: 5px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             cursor: pointer;
         }
 
@@ -85,75 +98,72 @@
         }
 
         .main-content .chess-board {
-            width: 400px;
-            height: 400px;
+            width: 268px;
+            /* 400px * 0.67 */
+            height: 268px;
+            /* 400px * 0.67 */
             background-image: url('https://placehold.co/600x600');
             background-size: cover;
         }
 
-
-
-
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 536px;
+            /* 800px * 0.67 */
             margin: 0 auto;
-
-            padding: 20px;
+            padding: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
-            width: 900px;
-
+            padding: 13.4px 0;
+            /* 20px * 0.67 */
+            width: 603px;
+            /* 900px * 0.67 */
         }
 
         .header button {
-            padding: 10px 20px;
+            padding: 6.7px 13.4px;
+            /* 10px 20px * 0.67 */
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            font-size: 10.7px;
+            /* 16px * 0.67 */
             cursor: pointer;
-
         }
 
-
-        .header .play-now {
-            background-color: #D3BFA7;
-            color: black;
-        }
-
+        .header .play-now,
         .header .create-room {
             background-color: #D3BFA7;
             color: black;
-
-
         }
 
         .table {
-            width: 900px;
+            width: 603px;
+            /* 900px * 0.67 */
             border-collapse: collapse;
-            margin-top: 20px;
-            height: 600px;
+            margin-top: 13.4px;
+            /* 20px * 0.67 */
+            height: 402px;
+            /* 600px * 0.67 */
         }
 
         .table th,
         .table td {
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             text-align: center;
-
         }
 
         .table th {
-
             background-color: rgba(43, 43, 43, 0.1);
         }
 
         .table td {
-
             background-color: rgba(43, 43, 43, 0.1);
         }
 
@@ -163,16 +173,20 @@
 
         .table .room-id {
             background-color: rgba(43, 43, 43, 0.1);
-            border-radius: 5px;
-            padding: 10px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            padding: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .table .main-btn {
             background-color: red;
             color: white;
             border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            padding: 6.7px 13.4px;
+            /* 10px 20px * 0.67 */
             cursor: pointer;
         }
 
@@ -180,58 +194,64 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 20px 0;
+            padding: 13.4px 0;
+            /* 20px * 0.67 */
         }
-
-
 
         .profile {
             display: flex;
             align-items: center;
-            padding: 10px 0;
+            padding: 6.7px 0;
+            /* 10px * 0.67 */
         }
 
         .profile img {
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
         }
 
-
-
         .right-panel {
-            width: 300px;
+            width: 201px;
+            /* 300px * 0.67 */
             background-color: rgba(43, 43, 43, 0.4);
-            padding: 80px;
+            padding: 53.6px;
+            /* 80px * 0.67 */
             display: flex;
             flex-direction: column;
             align-items: center;
             overflow-y: auto;
-            /* Thêm thanh cuộn dọc */
             max-height: 100vh;
-            /* Chiều cao tối đa để thanh cuộn xuất hiện khi nội dung vượt quá */
         }
 
-
         .right-panel .title {
-            font-size: 45px;
-            margin-bottom: 10px;
+            font-size: 30.15px;
+            /* 45px * 0.67 */
+            margin-bottom: 6.7px;
+            /* 10px * 0.67 */
             text-align: center;
         }
 
         .right-panel .stats {
-            font-size: 18px;
-            margin-bottom: 20px;
+            font-size: 12px;
+            /* 18px * 0.67 */
+            margin-bottom: 13.4px;
+            /* 20px * 0.67 */
             text-align: center;
         }
 
         .right-panel .button {
             width: 100%;
-            padding: 20px;
-            margin: 10px 0;
+            padding: 13.4px;
+            /* 20px * 0.67 */
+            margin: 6.7px 0;
+            /* 10px * 0.67 */
             text-align: center;
-            border-radius: 5px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             cursor: pointer;
-            font-size: 18px;
+            font-size: 12px;
+            /* 18px * 0.67 */
         }
 
         .right-panel .button.play-online {
@@ -244,21 +264,22 @@
             color: #fff;
         }
 
-
-
         .right-panel::-webkit-scrollbar {
-            width: 8px;
+            width: 5.36px;
+            /* 8px * 0.67 */
         }
 
         .right-panel::-webkit-scrollbar-thumb {
             background-color: #000;
-            border-radius: 4px;
+            border-radius: 2.68px;
+            /* 4px * 0.67 */
         }
 
         .player {
             display: flex;
             align-items: center;
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             border-bottom: 1px solid #444;
             width: 100%;
         }
@@ -268,10 +289,13 @@
         }
 
         .player img {
-            width: 30px;
-            height: 30px;
+            width: 20.1px;
+            /* 30px * 0.67 */
+            height: 20.1px;
+            /* 30px * 0.67 */
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .player .info {
@@ -281,24 +305,25 @@
         }
 
         .player .info .name {
-            font-size: 14px;
+            font-size: 9.38px;
+            /* 14px * 0.67 */
             font-weight: bold;
         }
 
         .player .info .rating {
-            font-size: 12px;
+            font-size: 8.04px;
+            /* 12px * 0.67 */
             color: #ccc;
         }
 
         .player .status {
-            font-size: 12px;
+            font-size: 8.04px;
+            /* 12px * 0.67 */
             color: #ccc;
-
         }
 
         .player .status.online {
             color: #00ff00;
-
         }
 
         .player .status.playing {
@@ -306,25 +331,27 @@
         }
 
         .player .flag {
-            width: 20px;
-            height: 15px;
-            margin-left: 5px;
+            width: 13.4px;
+            /* 20px * 0.67 */
+            height: 10.05px;
+            /* 15px * 0.67 */
+            margin-left: 3.35px;
+            /* 5px * 0.67 */
         }
 
         .player .title {
             background-color: #ff0000;
             color: #ffffff;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-size: 12px;
-            margin-right: 5px;
+            padding: 1.34px 2.68px;
+            /* 2px 4px * 0.67 */
+            border-radius: 2.01px;
+            /* 3px * 0.67 */
+            font-size: 8.04px;
+            /* 12px * 0.67 */
+            margin-right: 3.35px;
+            /* 5px * 0.67 */
         }
 
-
-
-
-
-        /* Ẩn mặc định */
         #overlay {
             display: none;
             position: fixed;
@@ -333,9 +360,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.9);
-            /* Làm mờ nền */
             z-index: 1;
-            /* Đặt overlay phía trên */
         }
 
         .popup-create-room {
@@ -344,14 +369,16 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            padding: 20px;
+            width: 402px;
+            /* 600px * 0.67 */
+            height: 402px;
+            /* 600px * 0.67 */
+            padding: 13.4px;
+            /* 20px * 0.67 */
             text-align: center;
-
             z-index: 2;
-            /* Đặt popup phía trên overlay */
-            border-radius: 10px;
+            border-radius: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .popup-create-room h2,
@@ -360,42 +387,50 @@
         }
 
         .popup-create-room button {
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             background-color: white;
             border: none;
             cursor: pointer;
         }
 
-
-
-
         .container1 {
-            max-width: 600px;
+            max-width: 402px;
+            /* 600px * 0.67 */
             margin: 0 auto;
             background-color: #302E2B;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 13.4px;
+            /* 20px * 0.67 */
+            border-radius: 6.7px;
+            /* 10px * 0.67 */
+            box-shadow: 0 0 6.7px rgba(0, 0, 0, 0.5);
+            /* 10px * 0.67 */
         }
 
         .header1 {
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 16.08px;
+            /* 24px * 0.67 */
+            margin-bottom: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .button-group1 {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .button-group1 button {
             background-color: #D3BFA7;
             border: none;
-            padding: 10px 20px;
+            padding: 6.7px 13.4px;
+            /* 10px 20px * 0.67 */
             color: black;
-            font-size: 16px;
-            border-radius: 5px;
+            font-size: 10.72px;
+            /* 16px * 0.67 */
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             cursor: pointer;
         }
 
@@ -404,19 +439,24 @@
         }
 
         .section {
-            margin-bottom: 20px;
+            margin-bottom: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .section-title {
-            font-size: 18px;
-            margin-bottom: 10px;
+            font-size: 12.06px;
+            /* 18px * 0.67 */
+            margin-bottom: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .betting-box,
         .time-box {
             background-color: #5a4a3a;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -424,71 +464,78 @@
 
         .betting-box span,
         .time-box span {
-            font-size: 16px;
+            font-size: 10.72px;
+            /* 16px * 0.67 */
         }
 
         .betting-box .value,
         .time-box .value {
-            font-size: 18px;
+            font-size: 12.06px;
+            /* 18px * 0.67 */
             font-weight: bold;
         }
 
         .control-buttons {
             display: flex;
             justify-content: space-between;
-            margin-top: 10px;
+            margin-top: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .control-buttons button {
             background-color: #7a6a5a;
             border: none;
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             color: #d3b18a;
-            font-size: 16px;
-            border-radius: 5px;
+            font-size: 10.72px;
+            /* 16px * 0.67 */
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             cursor: pointer;
         }
 
         .create-button1 {
             background-color: #b37a3a;
             border: none;
-            padding: 15px 30px;
+            padding: 10.05px 20.1px;
+            /* 15px 30px * 0.67 */
             color: #3a2a1a;
-            font-size: 18px;
+            font-size: 12.06px;
+            /* 18px * 0.67 */
             font-weight: bold;
-            border-radius: 5px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             cursor: pointer;
         }
 
         .close-popup {
-
-
             background-color: #a67c52;
             border: none;
-            border-radius: 5px;
-            height: 50px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            height: 33.5px;
+            /* 50px * 0.67 */
             color: black;
             cursor: pointer;
-            width: 200px;
-            font-size: 18px;
-            margin-left: -20px;
+            width: 134px;
+            /* 200px * 0.67 */
+            font-size: 12.06px;
+            /* 18px * 0.67 */
+            margin-left: -13.4px;
+            /* -20px * 0.67 */
         }
-
 
         .taoban {
             position: relative;
             display: inline-block;
-
         }
-
-
-
 
         .extra-buttons {
             display: flex;
             position: absolute;
-            bottom: 40px;
-            /* Hiển thị ở phía trên */
+            bottom: 26.8px;
+            /* 40px * 0.67 */
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
@@ -496,13 +543,17 @@
 
         .extra-buttons button {
             display: block;
-            width: 100px;
-            margin: 5px 0;
-            padding: 8px;
+            width: 67px;
+            /* 100px * 0.67 */
+            margin: 3.35px 0;
+            /* 5px * 0.67 */
+            padding: 5.36px;
+            /* 8px * 0.67 */
             background-color: #2ecc71;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             cursor: pointer;
         }
 
@@ -510,53 +561,53 @@
             display: flex;
         }
 
-        /* Để các nút hiển thị mượt mà */
         .extra-buttons {
             transition: opacity 0.3s ease;
             opacity: 0;
-            gap: 10px;
-            /* Khoảng cách giữa các nút */
+            gap: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .taoban:hover .extra-buttons {
             opacity: 1;
         }
 
-
-
-        .search{
-            margin-right: 20px;
+        .search {
+            margin-right: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .search-room {
             display: flex;
             align-items: center;
-           
         }
 
         .search-room input {
-            padding: 8px;
-            font-size: 16px;
-            width: 200px;
+            padding: 5.36px;
+            /* 8px * 0.67 */
+            font-size: 10.72px;
+            /* 16px * 0.67 */
+            width: 134px;
+            /* 200px * 0.67 */
             border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-right: 20px;
+            border-radius: 2.68px;
+            /* 4px * 0.67 */
+            margin-right: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .search-room button {
-            padding: 8px 12px;
-            
-            font-size: 16px;
+            padding: 5.36px 8.04px;
+            /* 8px 12px * 0.67 */
+            font-size: 10.72px;
+            /* 16px * 0.67 */
             cursor: pointer;
             border: none;
             background-color: #4CAF50;
             color: white;
-            border-radius: 4px;
+            border-radius: 2.68px;
+            /* 4px * 0.67 */
         }
-
-      
-
-       
     </style>
 </head>
 
@@ -565,7 +616,7 @@
     <div id="popup-create-room" class="popup-create-room">
         <div class="container1">
             <div class="header1">Chơi với bạn</div>
-         
+
             <div class="section">
                 <div class="section-title">THỜI LƯỢNG</div>
                 <div class="time-box">
@@ -599,7 +650,7 @@
         <img alt="Chess.com logo"
             src="https://oaidalleapiprodscus.blob.core.windows.net/private/org-LmQ09WWGIGwOeeA4ArnRw0x5/user-uJPET5fjNenSso8wCETWVNOp/img-Qd3FxrBNS31HwV7wA9Aaf7S0.png?st=2024-09-17T11%3A18%3A12Z&se=2024-09-17T13%3A18%3A12Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2024-09-16T23%3A13%3A37Z&ske=2024-09-17T23%3A13%3A37Z&sks=b&skv=2024-08-04&sig=peMWZS7vf0zeUn%2BBgo9S5KlpoZNddHeADtofLdDYA7s%3D"
             width="150" height="50" />
-        <a href="/chess/public/playonl"><i class="fas fa-chess"></i> Play Online</a>
+       <a href="/chess/public/playonl"><i class="fas fa-chess"></i> Play Online</a>
         <a href="/chess/public/playbot"><i class="fas fa-puzzle-piece"></i> Play Computer</a>
 
         <div class="search">

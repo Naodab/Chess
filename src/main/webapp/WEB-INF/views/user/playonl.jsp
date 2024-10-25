@@ -7,12 +7,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <style>
         body {
-            background-image: url('./img/background.jpg');
+            background-image: url('../assets/img/background.jpg');
             color: #ffffff;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -24,15 +23,19 @@
         }
 
         .sidebar {
-            width: 200px;
+            width: 134px;
+            /* 200px * 0.67 */
             background-color: rgba(43, 43, 43, 0.1);
-            padding: 20px;
+            padding: 13.4px;
+            /* 20px * 0.67 */
             box-sizing: border-box;
         }
 
         .sidebar img {
-            width: 100px;
-            margin-bottom: 20px;
+            width: 67px;
+            /* 100px * 0.67 */
+            margin-bottom: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .sidebar ul {
@@ -41,44 +44,55 @@
         }
 
         .sidebar ul li {
-            margin: 20px 0;
+            margin: 13.4px 0;
+            /* 20px * 0.67 */
             display: flex;
             align-items: center;
         }
 
         .sidebar ul li i {
-            margin-right: 10px;
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .sidebar ul li a {
             color: #fff;
             text-decoration: none;
-            font-size: 18px;
+            font-size: 12px;
+            /* 18px * 0.67 */
         }
 
         .sidebar .search {
-            margin-top: 20px;
+            margin-top: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .sidebar .search input {
             width: 100%;
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             border: none;
-            border-radius: 5px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             box-sizing: border-box;
         }
 
         .sidebar .auth-buttons {
-            margin-top: 20px;
+            margin-top: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .sidebar .auth-buttons button {
             width: 100%;
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             border: none;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            font-size: 16px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            margin-bottom: 6.7px;
+            /* 10px * 0.67 */
+            font-size: 10.72px;
+            /* 16px * 0.67 */
             cursor: pointer;
         }
 
@@ -94,7 +108,8 @@
 
         .main-content {
             flex: 1;
-            padding: 20px;
+            padding: 13.4px;
+            /* 20px * 0.67 */
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -109,15 +124,19 @@
         }
 
         .chess-board img {
-            width: 600px;
-            height: 600px;
+            width: 402px;
+            /* 600px * 0.67 */
+            height: 402px;
+            /* 600px * 0.67 */
         }
 
         .player-info {
             display: flex;
             justify-content: space-between;
-            width: 400px;
-            margin-top: 20px;
+            width: 268px;
+            /* 400px * 0.67 */
+            margin-top: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .player {
@@ -126,52 +145,56 @@
         }
 
         .player img {
-            width: 50px;
-            height: 50px;
+            width: 33.5px;
+            /* 50px * 0.67 */
+            height: 33.5px;
+            /* 50px * 0.67 */
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .player .name {
-            font-size: 20px;
+            font-size: 13.4px;
+            /* 20px * 0.67 */
             cursor: pointer;
         }
-
-
-
-
-
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            width: 600px;
-
+            margin-bottom: 13.4px;
+            /* 20px * 0.67 */
+            width: 402px;
+            /* 600px * 0.67 */
         }
-
-
 
         .header div {
             display: flex;
             align-items: center;
-            font-size: 30px;
+            font-size: 20.1px;
+            /* 30px * 0.67 */
         }
 
         .header div i {
-            margin-right: 5px;
+            margin-right: 3.35px;
+            /* 5px * 0.67 */
         }
 
         .header div span {
-            font-size: 20px;
+            font-size: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .time-selection {
             background-color: #3a3a3a;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            margin-bottom: 13.4px;
+            /* 20px * 0.67 */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -179,65 +202,71 @@
         }
 
         .time-selection i {
-            margin-right: 5px;
+            margin-right: 3.35px;
+            /* 5px * 0.67 */
         }
 
         .time-selection span {
-            font-size: 16px;
+            font-size: 10.72px;
+            /* 16px * 0.67 */
         }
 
         .dropdown-content {
             display: none;
             background-color: #3a3a3a;
-            border-radius: 5px;
-            margin-top: 5px;
-            padding: 10px;
-
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            margin-top: 3.35px;
+            /* 5px * 0.67 */
+            padding: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .dropdown-content button {
             background-color: #4a4a4a;
             color: #ffffff;
             border: none;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 5px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            margin-bottom: 3.35px;
+            /* 5px * 0.67 */
             width: 100%;
             cursor: pointer;
         }
 
         .play-button {
-            margin-top: 200px;
+            margin-top: 134px;
+            /* 200px * 0.67 */
             background-color: #00ff00;
             color: #000000;
             border: none;
-            padding: 15px;
-            border-radius: 5px;
+            padding: 10.05px;
+            /* 15px * 0.67 */
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             width: 100%;
-            font-size: 30px;
+            font-size: 20.1px;
+            /* 30px * 0.67 */
             cursor: pointer;
-            height: 100px;
+            height: 67px;
+            /* 100px * 0.67 */
         }
 
         .play-button button:hover {
             background-color: red;
         }
 
-
-
-
-
-
-
-
-
         .container9 {
-            width: 600px;
+            width: 402px;
+            /* 600px * 0.67 */
             height: 100vh;
             background-color: rgba(43, 43, 43, 0.1);
-            /* background-color: rgba(43, 43, 43, 0.9);  */
-            padding: 20px;
-            border-radius: 10px 0 0 10px;
+            padding: 13.4px;
+            /* 20px * 0.67 */
+            border-radius: 6.7px;
+            /* 10px * 0.67 */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -247,7 +276,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 10px;
+            padding-bottom: 6.7px;
+            /* 10px * 0.67 */
             border-bottom: 1px solid #444;
         }
 
@@ -257,17 +287,19 @@
         }
 
         .header9 div i {
-            margin-right: 5px;
+            margin-right: 3.35px;
+            /* 5px * 0.67 */
         }
 
         .header9 div span {
-            font-size: 14px;
+            font-size: 9.38px;
+            /* 14px * 0.67 */
         }
 
         .moves9 {
-            margin-top: 20px;
+            margin-top: 13.4px;
+            /* 20px * 0.67 */
             flex-grow: 1;
-
         }
 
         .moves9 table {
@@ -277,7 +309,8 @@
 
         .moves9 table th,
         .moves9 table td {
-            padding: 5px;
+            padding: 3.35px;
+            /* 5px * 0.67 */
             text-align: left;
         }
 
@@ -298,7 +331,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 10px;
+            padding-top: 6.7px;
+            /* 10px * 0.67 */
             border-top: 1px solid #444;
         }
 
@@ -308,11 +342,13 @@
         }
 
         .footer9 div i {
-            margin-right: 5px;
+            margin-right: 3.35px;
+            /* 5px * 0.67 */
         }
 
         .footer9 div span {
-            font-size: 14px;
+            font-size: 9.38px;
+            /* 14px * 0.67 */
         }
 
         .footer9 .actions9 {
@@ -321,7 +357,8 @@
         }
 
         .footer9 .actions9 i {
-            margin: 0 5px;
+            margin: 0 3.35px;
+            /* 0 5px * 0.67 */
             cursor: pointer;
         }
 
@@ -330,8 +367,10 @@
         }
 
         .new-game9 {
-            margin-top: 20px;
-            font-size: 14px;
+            margin-top: 13.4px;
+            /* 20px * 0.67 */
+            font-size: 9.38px;
+            /* 14px * 0.67 */
         }
 
         .new-game9 span {
@@ -339,14 +378,18 @@
         }
 
         .new-game9 i {
-            margin-left: 5px;
+            margin-left: 3.35px;
+            /* 5px * 0.67 */
         }
 
         .chat9 {
-            margin-top: 20px;
+            margin-top: 13.4px;
+            /* 20px * 0.67 */
             background-color: rgba(43, 43, 43, 0.1);
-            padding: 10px;
-            border-radius: 5px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -354,30 +397,46 @@
 
         .chat9 .messages9 {
             flex-grow: 1;
-
-            margin-bottom: 10px;
+            margin-bottom: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .chat9 .messages9 .message9 {
-            margin-bottom: 5px;
+            margin-bottom: 3.35px;
+            /* 5px * 0.67 */
         }
 
         .chat9 .messages9 .message9 span {
             font-weight: bold;
+
+        }
+
+        .chat9 .chat-status9 {
+            font-size: 20px;
+            margin-top: 10px;
+            margin-bottom: 20px;
         }
 
         .chat9 input[type="text"] {
-            width: calc(100% - 50px);
-            padding: 5px;
+            width: calc(100% - 33.5px);
+            /* 100% - 50px * 0.67 */
+            padding: 3.35px;
+            /* 5px * 0.67 */
             border: none;
-            border-radius: 5px;
-            margin-right: 5px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            margin-right: 3.35px;
+            /* 5px * 0.67 */
         }
 
+
+
         .chat9 button {
-            padding: 5px 10px;
+            padding: 3.35px 6.7px;
+            /* 5px 10px * 0.67 */
             border: none;
-            border-radius: 5px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             background-color: #555;
             color: #fff;
             cursor: pointer;
@@ -387,12 +446,14 @@
             background-color: #777;
         }
 
-        /* Dropdown styles */
         .theme-selector {
-            margin-top: 10px;
+            margin-top: 6.7px;
+            /* 10px * 0.67 */
             background-color: #333;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -401,26 +462,20 @@
         .theme-selector select {
             background-color: #444;
             color: #fff;
-            padding: 5px;
+            padding: 3.35px;
+            /* 5px * 0.67 */
             border: none;
-            border-radius: 5px;
-            font-size: 14px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            font-size: 9.38px;
+            /* 14px * 0.67 */
         }
 
         .theme-selector label {
-            font-size: 14px;
+            font-size: 9.38px;
+            /* 14px * 0.67 */
         }
 
-
-
-
-
-
-
-
-
-
-        /* Ẩn mặc định */
         #overlay {
             display: none;
             position: fixed;
@@ -429,12 +484,8 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.9);
-            /* Làm mờ nền */
             z-index: 1;
-            /* Đặt overlay phía trên */
         }
-
-
 
         .body_profile {
             display: none;
@@ -442,58 +493,79 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            padding: 20px;
+            width: 402px;
+            /* 600px * 0.67 */
+            height: 402px;
+            /* 600px * 0.67 */
+            padding: 13.4px;
+            /* 20px * 0.67 */
             text-align: center;
             z-index: 2;
-            /* Đặt popup phía trên overlay */
-            border-radius: 10px;
+            border-radius: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .container_profile {
             background-color: rgba(43, 43, 43, 0.1);
             border: 2px solid #302E2B;
-            border-radius: 10px;
-            width: 400px;
-            padding: 30px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border-radius: 6.7px;
+            /* 10px * 0.67 */
+            width: 268px;
+            /* 400px * 0.67 */
+            padding: 20.1px;
+            /* 30px * 0.67 */
+            box-shadow: 0 0 6.7px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
 
         .header_profile {
             background-color: #5c4b4b;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 20px;
-            font-size: 24px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            padding: 6.7px;
+            /*  10px * 0.67 */
+            margin-bottom: 13.4px;
+            /* 20px * 0.67 */
+            font-size: 16.08px;
+            /* 24px * 0.67 */
         }
 
         .profile-pic {
-            width: 70px;
-            height: 70px;
+            width: 46.9px;
+            /* 70px * 0.67 */
+            height: 46.9px;
+            /* 70px * 0.67 */
             border-radius: 50%;
             background-color: #fff;
-            margin: 20px auto;
+            margin: 13.4px auto;
+            /* 20px * 0.67 */
         }
 
         .info_profile {
             background-color: #5c4b4b;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 18px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            padding: 10.05px;
+            /* 15px * 0.67 */
+            margin-bottom: 13.4px;
+            /* 20px * 0.67 */
+            font-size: 12.06px;
+            /* 18px * 0.67 */
         }
 
         .info_profile i {
-            margin-right: 10px;
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .progress-bar_profile {
             background-color: #f0e6d2;
-            border-radius: 5px;
-            height: 15px;
-            margin: 20px 0;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            height: 10.05px;
+            /* 15px * 0.67 */
+            margin: 13.4px 0;
+            /* 20px * 0.67 */
             position: relative;
         }
 
@@ -501,14 +573,17 @@
             background-color: #f0a500;
             height: 100%;
             width: 50%;
-            border-radius: 5px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
         }
 
         .stats {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 20px;
-            font-size: 18px;
+            margin-bottom: 13.4px;
+            /* 20px * 0.67 */
+            font-size: 12.06px;
+            /* 18px * 0.67 */
         }
 
         .stats div {
@@ -521,30 +596,36 @@
             justify-content: space-around;
         }
 
-     
         .buttons button {
             background-color: #a67c52;
             border: none;
-            border-radius: 5px;
-            padding: 15px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            padding: 10.05px;
+            /* 15px * 0.67 */
             color: #fff;
             cursor: pointer;
-            width: 45%;
-            font-size: 18px;
+            width: 30.15%;
+            /* 45% * 0.67 */
+            font-size: 12.06px;
+            /* 18px * 0.67 */
         }
 
-        .close-popup{
-           
-            
+        .close-popup {
             background-color: #a67c52;
             border: none;
-            border-radius: 5px;
-            height: 50px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            height: 33.5px;
+            /* 50px * 0.67 */
             color: #fff;
             cursor: pointer;
-            width: 200px;
-            font-size: 18px;
-            margin-left: -120px;
+            width: 134px;
+            /* 200px * 0.67 */
+            font-size: 12.06px;
+            /* 18px * 0.67 */
+            margin-left: -80.6px;
+            /* -120px * 0.67 */
         }
     </style>
 </head>
@@ -571,7 +652,7 @@
                 <button>Cập nhật</button>
                 <button>Ván đấu</button>
             </div>
-           
+
         </div>
         <button id="close-popup" class="close-popup">Đóng</button>
     </div>
@@ -717,10 +798,11 @@
                         <input type="text" placeholder="Nhập tin nhắn...">
                         <button>Gửi</button>
                     </div>
+                    <div class="chat-status9">
+                        <span>Đã tắt chat</span>
+                    </div>
                 </div>
-                <div class="chat-status9">
-                    <span>Đã tắt chat</span>
-                </div>
+
             </div>
 
         </div>

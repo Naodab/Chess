@@ -9,7 +9,7 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background-image: url('../assets/img/background.jpg');
+           background-image: url('../assets/img/background.jpg');
             color: #fff;
         }
 
@@ -18,16 +18,20 @@
         }
 
         .sidebar {
-            width: 200px;
+            width: 134px;
+            /* 200px * 0.67 */
             height: 100vh;
             background-color: rgba(43, 43, 43, 0.1);
-            padding: 20px;
+            padding: 13.4px;
+            /* 20px * 0.67 */
             box-sizing: border-box;
         }
 
         .sidebar img {
-            width: 100px;
-            margin-bottom: 20px;
+            width: 67px;
+            /* 100px * 0.67 */
+            margin-bottom: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .sidebar ul {
@@ -36,44 +40,55 @@
         }
 
         .sidebar ul li {
-            margin: 20px 0;
+            margin: 13.4px 0;
+            /* 20px * 0.67 */
             display: flex;
             align-items: center;
         }
 
         .sidebar ul li i {
-            margin-right: 10px;
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .sidebar ul li a {
             color: #fff;
             text-decoration: none;
-            font-size: 18px;
+            font-size: 12px;
+            /* 18px * 0.67 */
         }
 
         .sidebar .search {
-            margin-top: 20px;
+            margin-top: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .sidebar .search input {
             width: 100%;
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             border: none;
-            border-radius: 5px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             box-sizing: border-box;
         }
 
         .sidebar .auth-buttons {
-            margin-top: 20px;
+            margin-top: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .sidebar .auth-buttons button {
             width: 100%;
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             border: none;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            font-size: 16px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            margin-bottom: 6.7px;
+            /* 10px * 0.67 */
+            font-size: 10.72px;
+            /* 16px * 0.67 */
             cursor: pointer;
         }
 
@@ -89,7 +104,8 @@
 
         .main-content {
             flex: 1;
-            padding: 20px;
+            padding: 13.4px;
+            /* 20px * 0.67 */
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -104,15 +120,19 @@
         }
 
         .chess-board img {
-            width: 600px;
-            height: 600px;
+            width: 402px;
+            /* 600px * 0.67 */
+            height: 402px;
+            /* 600px * 0.67 */
         }
 
         .player-info {
             display: flex;
             justify-content: space-between;
-            width: 400px;
-            margin-top: 20px;
+            width: 268px;
+            /* 400px * 0.67 */
+            margin-top: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .player {
@@ -121,14 +141,18 @@
         }
 
         .player img {
-            width: 50px;
-            height: 50px;
+            width: 33.5px;
+            /* 50px * 0.67 */
+            height: 33.5px;
+            /* 50px * 0.67 */
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .player .name {
-            font-size: 18px;
+            font-size: 12px;
+            /* 18px * 0.67 */
         }
 
         .bot-info {
@@ -137,13 +161,14 @@
             color: #fff;
             margin: 0;
             padding: 0;
-            width: 600px;
+            width: 402px;
+            /* 600px * 0.67 */
             height: 100vh;
-
         }
 
         .bot-header h1 {
-            font-size: 24px;
+            font-size: 16px;
+            /* 24px * 0.67 */
             color: #ffffff;
             margin: 0;
         }
@@ -151,132 +176,161 @@
         .bot-header {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 6.7px;
+            /* 10px * 0.67 */
         }
 
-        .bot-header img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
+        .bot -header img {
+            width: 26.8px;
+            /* 40px * 0.67 */
+            height: 26.8px;
+            /* 40px * 0.67 */
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
             border-radius: 50%;
         }
 
         .bot-name {
-            font-size: 18px;
+            font-size: 12px;
+            /* 18px * 0.67 */
             font-weight: bold;
         }
 
         .bot-rating {
-            font-size: 16px;
+            font-size: 10.72px;
+            /* 16px * 0.67 */
             margin-left: auto;
             display: flex;
             align-items: center;
         }
 
         .bot-rating i {
-            margin-left: 5px;
+            margin-left: 3.35px;
+            /* 5px * 0.67 */
         }
 
         .bot-description {
-            font-size: 14px;
-            margin: 10px 0;
+            font-size: 9.38px;
+            /* 14px * 0.67 */
+            margin: 6.7px 0;
+            /* 10px * 0.67 */
         }
 
         .bot-list {
-            margin: 10px 0;
+            margin: 6.7px 0;
+            /* 10px * 0.67 */
         }
 
         .bot-category {
             font-weight: bold;
-            font-size: 16px;
-            margin: 10px 0 5px;
-
-
+            font-size: 10.72px;
+            /* 16px * 0.67 */
+            margin: 6.7px 0 3.35px;
+            /* 10px 0 5px * 0.67 */
         }
 
         .bot-item {
             display: inline-block;
-            margin-right: 10px;
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .bot-item img {
-            width: 40px;
-            height: 40px;
+            width: 26.8px;
+            /* 40px * 0.67 */
+            height: 26.8px;
+            /* 40px * 0.67 */
             border-radius: 50%;
         }
 
         .play-button {
             text-align: center;
-            margin-top: 15px;
-
+            margin-top: 10.05px;
+            /* 15px * 0.67 */
         }
 
         .play-button button {
             background-color: #4CAF50;
             color: white;
-            padding: 10px 20px;
+            padding: 6.7px 13.4px;
+            /* 10px 20px * 0.67 */
             border: none;
-            border-radius: 5px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
             cursor: pointer;
-            width: 200px;
-            height: 50px;
+            width: 134px;
+            /* 200px * 0.67 */
+            height: 33.5px;
+            /* 50px * 0.67 */
         }
 
         .play-button button:hover {
             background-color: #45a049;
         }
 
-
         .header {
             background-color: #2a2a2a;
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             display: flex;
             align-items: center;
         }
 
         .header img {
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .header h1 {
-            font-size: 20px;
+            font-size: 13.4px;
+            /* 20px * 0.67 */
             margin: 0;
         }
 
         .content {
-            padding: 20px;
+            padding: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .profile {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 13.4px;
+            /* 20px * 0.67 */
         }
 
         .profile img {
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .profile .quote {
             background-color: #3a3a3a;
-            padding: 10px;
-            border-radius: 5px;
-            margin-left: 10px;
+            padding: 5px;
+            /* 10px * 0.67 */
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            margin-left: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .profile .quote p {
             margin: 0;
+            font-size: 10px;
         }
 
         .profile .details {
-            margin-left: 20px;
+            margin-left: 10px;
+            font-size: 10px;
+            /* 20px * 0.67 */
         }
 
         .profile .details h2 {
             margin: 0;
-            font-size: 24px;
+            font-size: 10px;
+            /* 24px * 0.67 */
         }
 
         .profile .details .rating {
@@ -285,34 +339,43 @@
         }
 
         .profile .details .rating i {
-            margin-left: 5px;
+            margin-left: 3.35px;
+            /* 5px * 0.67 */
         }
 
         .profile .details p {
-            margin: 5px 0 0 0;
+            margin: 3.35px 0 0 0;
+            /* 5px 0 0 0 * 0.67 */
         }
 
         .bot-category {
             background-color: #2a2a2a;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            margin-bottom: 6.7px;
+            /* 10px * 0. 67 */
         }
 
         .bot-category h3 {
             margin: 0;
-            font-size: 18px;
+            font-size: 12px;
+            /* 18px * 0.67 */
         }
 
         .bot-category .bots {
             display: flex;
-            margin-top: 10px;
+            margin-top: 6.7px;
+            /* 10px * 0.67 */
             overflow-x: auto;
         }
 
         .bot-category .bots img {
-            border-radius: 5px;
-            margin-right: 10px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
             border: 2px solid transparent;
             cursor: pointer;
         }
@@ -323,7 +386,8 @@
 
         .footer {
             background-color: #2a2a2a;
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -332,10 +396,13 @@
         .footer .play-button {
             background-color: #00ff00;
             color: #000;
-            padding: 10px 20px;
+            padding: 6.7px 13.4px;
+            /* 10px 20px * 0.67 */
             border: none;
-            border-radius: 5px;
-            font-size: 18px;
+            border-radius: 3.4px;
+            /* 5px * 0.67 */
+            font-size: 12px;
+            /* 18px * 0.67 */
             cursor: pointer;
         }
 
@@ -346,54 +413,61 @@
 
         .footer .play-as img {
             border-radius: 50%;
-            margin-right: 5px;
+            margin-right: 3.35px;
+            /* 5px * 0.67 */
         }
 
-
-
-
         .sidebar3 {
-            width: 600px;
+            width: 402px;
+            /* 600px * 0.67 */
             background-color: rgba(43, 43, 43, 0.1);
             display: flex;
             flex-direction: column;
             height: 100vh;
         }
 
-
         .header3 {
             background-color: rgba(43, 43, 43, 0.1);
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .header3 img {
-            width: 30px;
-            height: 30px;
-            margin-right: 10px;
+            width: 20.1px;
+            /* 30px * 0.67 */
+            height: 20.1px;
+            /* 30px * 0.67 */
+            margin-right: 6.7px;
+            /* 10px * 0.67 */
         }
 
         .header3 h1 {
-            font-size: 20px;
+            font-size: 13.4px;
+            /* 20px * 0.67 */
             margin: 0;
         }
 
         .content3 {
-            padding: 20px;
+            padding: 13.4px;
+            /* 20px * 0.67 */
             text-align: center;
             flex-grow: 1;
         }
 
         .content3 img {
-            width: 100px;
-            height: 100px;
+            width: 67px;
+            /* 100px * 0.67 */
+            height: 67px;
+            /* 100px * 0.67 */
             border-radius: 50%;
         }
 
         .moves3 {
-            margin-top: 20px;
+            margin-top: 13.4px;
+            /* 20px * 0.67 */
             text-align: left;
         }
 
@@ -404,7 +478,8 @@
 
         .moves3 th,
         .moves3 td {
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             border-bottom: 1px solid #333333;
         }
 
@@ -418,7 +493,8 @@
 
         .footer3 {
             background-color: rgba(43, 43, 43, 0.1);
-            padding: 10px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
             display: flex;
             justify-content: space-around;
             align-items: center;
@@ -428,13 +504,16 @@
             background-color: #333333;
             border: none;
             color: #ffffff;
-            padding: 10px;
-            font-size: 20px;
+            padding: 6.7px;
+            /* 10px * 0.67 */
+            font-size: 13.4px;
+            /* 20px * 0.67 */
             cursor: pointer;
         }
 
         .footer3 button i {
-            margin-right: 5px;
+            margin-right: 3.35px;
+            /* 5px * 0.67 */
         }
 
         .footer3 .accept3 {
@@ -443,7 +522,8 @@
         }
 
         .footer3 .accept3 i {
-            margin-right: 5px;
+            margin-right: 3.35px;
+            /* 5px * 0.67 */
         }
     </style>
 </head>
@@ -535,7 +615,7 @@
                         <img alt="Bot 3" height="50" src="https://placehold.co/50x50" width="50" />
                     </div>
                 </div>
-                <div class="bot-category">
+                <!-- <div class="bot-category">
                     <h3>Coach <span>5 bots</span></h3>
                     <div class="bots">
                         <img alt="Bot 1" height="50" src="https://placehold.co/50x50" width="50" />
@@ -544,7 +624,7 @@
                         <img alt="Bot 4" height="50" src="https://placehold.co/50x50" width="50" />
                         <img alt="Bot 5" height="50" src="https://placehold.co/50x50" width="50" />
                     </div>
-                </div>
+                </div> -->
             </div>
 
 
