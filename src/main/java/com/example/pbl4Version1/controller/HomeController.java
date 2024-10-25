@@ -1,4 +1,5 @@
-package com.example.pbl4Version1.controller.page;
+package com.example.pbl4Version1.controller;
+
 import com.example.pbl4Version1.repository.UserRepository;
 import com.example.pbl4Version1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.extern.slf4j.Slf4j;
-
-import jakarta.servlet.http.HttpSession;
 
 @Slf4j
 @Controller
@@ -42,4 +41,5 @@ public class HomeController {
     public String playWithBot() {
         return "user/index";
     }
+
 }
