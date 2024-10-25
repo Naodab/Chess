@@ -77,7 +77,7 @@ public class RoomService {
 		Room room = roomRepository.findById(id).orElseThrow(
 				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
 		Set<RoomUser> roomUsers = room.getRoomUsers();
-		Set<User> viewers = new HashSet<>();
+		//Set<User> viewers = new HashSet<>();
 		User host = userRepository.findById(request.getHostId())
 				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 		roomUsers.add(RoomUser.builder().room(room).user(host).role(Mode.HOST).build());

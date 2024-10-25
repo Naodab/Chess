@@ -42,7 +42,7 @@
 		});
 		document.getElementById('signup').addEventListener('click', event => {
 			event.preventDefault();
-			
+			window.location.href = "../public/play-with-people/choose-room";
 		});
     </script>
 </body>

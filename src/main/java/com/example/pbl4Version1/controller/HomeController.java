@@ -33,4 +33,9 @@ public class HomeController {
     public String playWithBot() {
     	return "user/index";
     }
+    
+    @GetMapping("/play-with-people/choose-room")
+    public String chooseRoom() {
+    	return "user/choose-room";
+    }
 }
