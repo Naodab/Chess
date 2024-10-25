@@ -33,4 +33,18 @@ public class HomeController {
     public String playWithBot() {
     	return "user/index";
     }
+    @GetMapping("/playonl")
+    public String playonl() {
+    	return "user/playonl";
+    }
+    @GetMapping("/selectplay")
+    public String selectplay() {
+    	return "user/selectplay";
+    }
+    @GetMapping("/playbot")
+    public String playbot() {
+    	return "user/playbot";
+    }
+    
+    
 }
