@@ -46,7 +46,7 @@
                 <span class="defeated-pieces "></span>
             </div>
         </div>
-        <!-- MAYBE CHAT BOX HERE -->
+
     </div>
     <script type="module" src="../assets/js/chessjs/index.js"></script>
 </body>

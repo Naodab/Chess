@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.servlet.ModelAndView;
 
 @Slf4j
 @Controller
@@ -24,6 +25,13 @@ public class HomeController {
     @GetMapping("/login")
     public String login() {
         return "login";
+    }
+
+    @GetMapping("/signup")
+    public ModelAndView signup() {
+        ModelAndView modelAndView = new ModelAndView("login");
+        modelAndView.addObject("isSignup", true);
+        return modelAndView;
     }
     
     @GetMapping("/forgot")
@@ -52,6 +60,4 @@ public class HomeController {
     public String playbot() {
     	return "user/playbot";
     }
-
-
 }
