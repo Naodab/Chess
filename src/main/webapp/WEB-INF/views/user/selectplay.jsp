@@ -1,26 +1,32 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-    <title>Chess Online</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-          background-image: url('../assets/img/background.jpg');
+            background-image: url('./img/background.jpg');
             color: #fff;
             display: flex;
             height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         .sidebar {
-            width: 134px;
-            /* 200px * 0.67 */
+            width: 10%;
+            /* Chiếm 20% chiều ngang màn hình */
             background-color: rgba(43, 43, 43, 0.4);
             padding: 13.4px;
-            /* 20px * 0.67 */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -28,50 +34,40 @@
 
         .sidebar img {
             width: 100px;
-            /* 150px * 0.67 */
+            /* Giữ nguyên kích thước hình ảnh */
             margin-bottom: 13.4px;
-            /* 20px * 0.67 */
         }
 
         .sidebar a {
             color: #fff;
             text-decoration: none;
             margin: 6.7px 0;
-            /* 10px * 0.67 */
             display: flex;
             align-items: center;
             font-size: 12px;
-            /* 18px * 0.67 */
         }
 
         .sidebar a i {
             margin-right: 6.7px;
-            /* 10px * 0.67 */
         }
 
         .sidebar .search {
             margin: 13.4px 0;
-            /* 20px * 0.67 */
         }
 
         .sidebar .search input {
             width: 100%;
             padding: 6.7px;
-            /* 10px * 0.67 */
             border: none;
             border-radius: 3.4px;
-            /* 5px * 0.67 */
         }
 
         .sidebar .button {
             width: 100%;
             padding: 6.7px;
-            /* 10px * 0.67 */
             margin: 6.7px 0;
-            /* 10px * 0.67 */
             text-align: center;
             border-radius: 3.4px;
-            /* 5px * 0.67 */
             cursor: pointer;
         }
 
@@ -92,27 +88,29 @@
 
         .main-content {
             flex-grow: 1;
+            /* Chiếm 50% chiều ngang màn hình */
             display: flex;
             justify-content: center;
             align-items: center;
+            width: 60%;
+            /* Chiếm 50% chiều ngang màn hình */
         }
 
         .main-content .chess-board {
-            width: 268px;
-            /* 400px * 0.67 */
-            height: 268px;
-            /* 400px * 0.67 */
+            width: 80%;
+            /* Sử dụng 80% chiều rộng */
+            height: auto;
+            /* Tự động điều chỉnh chiều cao */
             background-image: url('https://placehold.co/600x600');
             background-size: cover;
         }
 
         .container {
             width: 100%;
-            max-width: 536px;
-            /* 800px * 0.67 */
+            max-width: 100%;
+            /* Sử dụng 100% chiều rộng của container */
             margin: 0 auto;
             padding: 13.4px;
-            /* 20px * 0.67 */
         }
 
         .header {
@@ -120,19 +118,15 @@
             justify-content: space-between;
             align-items: center;
             padding: 13.4px 0;
-            /* 20px * 0.67 */
-            width: 603px;
-            /* 900px * 0.67 */
+            width: 100%;
+            /* Sử dụng 100% chiều rộng */
         }
 
         .header button {
             padding: 6.7px 13.4px;
-            /* 10px 20px * 0.67 */
             border: none;
             border-radius: 3.4px;
-            /* 5px * 0.67 */
             font-size: 10.7px;
-            /* 16px * 0.67 */
             cursor: pointer;
         }
 
@@ -143,19 +137,15 @@
         }
 
         .table {
-            width: 603px;
-            /* 900px * 0.67 */
+            width: 100%;
+            /* Sử dụng 100% chiều rộng */
             border-collapse: collapse;
             margin-top: 13.4px;
-            /* 20px * 0.67 */
-            height: 402px;
-            /* 600px * 0.67 */
         }
 
         .table th,
         .table td {
             padding: 6.7px;
-            /* 10px * 0.67 */
             text-align: center;
         }
 
@@ -174,9 +164,7 @@
         .table .room-id {
             background-color: rgba(43, 43, 43, 0.1);
             border-radius: 3.4px;
-            /* 5px * 0.67 */
             padding: 6.7px;
-            /* 10px * 0.67 */
         }
 
         .table .main-btn {
@@ -184,9 +172,7 @@
             color: white;
             border: none;
             border-radius: 3.4px;
-            /* 5px * 0.67 */
             padding: 6.7px 13.4px;
-            /* 10px 20px * 0.67 */
             cursor: pointer;
         }
 
@@ -195,28 +181,26 @@
             justify-content: space-around;
             align-items: center;
             padding: 13.4px 0;
-            /* 20px * 0.67 */
+            width: 100%;
+            /* Sử dụng 100% chiều rộng */
         }
 
         .profile {
             display: flex;
             align-items: center;
             padding: 6.7px 0;
-            /* 10px * 0.67 */
         }
 
         .profile img {
             border-radius: 50%;
             margin-right: 6.7px;
-            /* 10px * 0.67 */
         }
 
         .right-panel {
-            width: 201px;
-            /* 300px * 0.67 */
+            width: 30%;
+            /* Chiếm 30% chiều ngang màn hình */
             background-color: rgba(43, 43, 43, 0.4);
             padding: 53.6px;
-            /* 80px * 0.67 */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -226,32 +210,24 @@
 
         .right-panel .title {
             font-size: 30.15px;
-            /* 45px * 0.67 */
             margin-bottom: 6.7px;
-            /* 10px * 0.67 */
             text-align: center;
         }
 
         .right-panel .stats {
             font-size: 12px;
-            /* 18px * 0.67 */
             margin-bottom: 13.4px;
-            /* 20px * 0.67 */
             text-align: center;
         }
 
         .right-panel .button {
             width: 100%;
             padding: 13.4px;
-            /* 20px * 0.67 */
             margin: 6.7px 0;
-            /* 10px * 0.67 */
             text-align: center;
             border-radius: 3.4px;
-            /* 5px * 0.67 */
             cursor: pointer;
             font-size: 12px;
-            /* 18px * 0.67 */
         }
 
         .right-panel .button.play-online {
@@ -266,20 +242,17 @@
 
         .right-panel::-webkit-scrollbar {
             width: 5.36px;
-            /* 8px * 0.67 */
         }
 
         .right-panel::-webkit-scrollbar-thumb {
             background-color: #000;
             border-radius: 2.68px;
-            /* 4px * 0.67 */
         }
 
         .player {
             display: flex;
             align-items: center;
             padding: 6.7px;
-            /* 10px * 0.67 */
             border-bottom: 1px solid #444;
             width: 100%;
         }
@@ -290,12 +263,9 @@
 
         .player img {
             width: 20.1px;
-            /* 30px * 0.67 */
             height: 20.1px;
-            /* 30px * 0.67 */
             border-radius: 50%;
             margin-right: 6.7px;
-            /* 10px * 0.67 */
         }
 
         .player .info {
@@ -306,19 +276,16 @@
 
         .player .info .name {
             font-size: 9.38px;
-            /* 14px * 0.67 */
             font-weight: bold;
         }
 
         .player .info .rating {
             font-size: 8.04px;
-            /* 12px * 0.67 */
             color: #ccc;
         }
 
         .player .status {
             font-size: 8.04px;
-            /* 12px * 0.67 */
             color: #ccc;
         }
 
@@ -332,24 +299,17 @@
 
         .player .flag {
             width: 13.4px;
-            /* 20px * 0.67 */
             height: 10.05px;
-            /* 15px * 0.67 */
             margin-left: 3.35px;
-            /* 5px * 0.67 */
         }
 
         .player .title {
             background-color: #ff0000;
             color: #ffffff;
             padding: 1.34px 2.68px;
-            /* 2px 4px * 0.67 */
             border-radius: 2.01px;
-            /* 3px * 0.67 */
             font-size: 8.04px;
-            /* 12px * 0.67 */
             margin-right: 3.35px;
-            /* 5px * 0.67 */
         }
 
         #overlay {
@@ -369,16 +329,16 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 402px;
-            /* 600px * 0.67 */
-            height: 402px;
-            /* 600px * 0.67 */
+            width: 80%;
+            /* Sử dụng 80% chiều rộng */
+            max-width: 402px;
+            /* Giới hạn chiều rộng tối đa */
+            height: auto;
+            /* Tự động điều chỉnh chiều cao */
             padding: 13.4px;
-            /* 20px * 0.67 */
             text-align: center;
             z-index: 2;
             border-radius: 6.7px;
-            /* 10px * 0.67 */
         }
 
         .popup-create-room h2,
@@ -388,7 +348,6 @@
 
         .popup-create-room button {
             padding: 6.7px;
-            /* 10px * 0.67 */
             background-color: white;
             border: none;
             cursor: pointer;
@@ -396,41 +355,32 @@
 
         .container1 {
             max-width: 402px;
-            /* 600px * 0.67 */
+            /* Giới hạn chiều rộng tối đa */
             margin: 0 auto;
             background-color: #302E2B;
             padding: 13.4px;
-            /* 20px * 0.67 */
             border-radius: 6.7px;
-            /* 10px * 0.67 */
             box-shadow: 0 0 6.7px rgba(0, 0, 0, 0.5);
-            /* 10px * 0.67 */
         }
 
         .header1 {
             font-size: 16.08px;
-            /* 24px * 0.67 */
             margin-bottom: 13.4px;
-            /* 20px * 0.67 */
         }
 
         .button-group1 {
             display: flex;
             justify-content: space-between;
             margin-bottom: 13.4px;
-            /* 20px * 0.67 */
         }
 
         .button-group1 button {
             background-color: #D3BFA7;
             border: none;
             padding: 6.7px 13.4px;
-            /* 10px 20px * 0.67 */
             color: black;
             font-size: 10.72px;
-            /* 16px * 0.67 */
             border-radius: 3.4px;
-            /* 5px * 0.67 */
             cursor: pointer;
         }
 
@@ -440,23 +390,18 @@
 
         .section {
             margin-bottom: 13.4px;
-            /* 20px * 0.67 */
         }
 
         .section-title {
             font-size: 12.06px;
-            /* 18px * 0.67 */
             margin-bottom: 6.7px;
-            /* 10px * 0.67 */
         }
 
         .betting-box,
         .time-box {
             background-color: #5a4a3a;
             padding: 6.7px;
-            /* 10px * 0.67 */
             border-radius: 3.4px;
-            /* 5px * 0.67 */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -465,13 +410,11 @@
         .betting-box span,
         .time-box span {
             font-size: 10.72px;
-            /* 16px * 0.67 */
         }
 
         .betting-box .value,
         .time-box .value {
             font-size: 12.06px;
-            /* 18px * 0.67 */
             font-weight: bold;
         }
 
@@ -479,19 +422,15 @@
             display: flex;
             justify-content: space-between;
             margin-top: 6.7px;
-            /* 10px * 0.67 */
         }
 
         .control-buttons button {
             background-color: #7a6a5a;
             border: none;
             padding: 6.7px;
-            /* 10px * 0.67 */
             color: #d3b18a;
             font-size: 10.72px;
-            /* 16px * 0.67 */
             border-radius: 3.4px;
-            /* 5px * 0.67 */
             cursor: pointer;
         }
 
@@ -499,13 +438,10 @@
             background-color: #b37a3a;
             border: none;
             padding: 10.05px 20.1px;
-            /* 15px 30px * 0.67 */
             color: #3a2a1a;
             font-size: 12.06px;
-            /* 18px * 0.67 */
             font-weight: bold;
             border-radius: 3.4px;
-            /* 5px * 0.67 */
             cursor: pointer;
         }
 
@@ -513,17 +449,12 @@
             background-color: #a67c52;
             border: none;
             border-radius: 3.4px;
-            /* 5px * 0.67 */
             height: 33.5px;
-            /* 50px * 0.67 */
             color: black;
             cursor: pointer;
             width: 134px;
-            /* 200px * 0.67 */
             font-size: 12.06px;
-            /* 18px * 0.67 */
             margin-left: -13.4px;
-            /* -20px * 0.67 */
         }
 
         .taoban {
@@ -535,7 +466,6 @@
             display: flex;
             position: absolute;
             bottom: 26.8px;
-            /* 40px * 0.67 */
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
@@ -544,16 +474,12 @@
         .extra-buttons button {
             display: block;
             width: 67px;
-            /* 100px * 0.67 */
             margin: 3.35px 0;
-            /* 5px * 0.67 */
             padding: 5.36px;
-            /* 8px * 0.67 */
             background-color: #2ecc71;
             color: white;
             border: none;
             border-radius: 3.4px;
-            /* 5px * 0.67 */
             cursor: pointer;
         }
 
@@ -565,7 +491,6 @@
             transition: opacity 0.3s ease;
             opacity: 0;
             gap: 6.7px;
-            /* 10px * 0.67 */
         }
 
         .taoban:hover .extra-buttons {
@@ -574,7 +499,6 @@
 
         .search {
             margin-right: 13.4px;
-            /* 20px * 0.67 */
         }
 
         .search-room {
@@ -584,29 +508,22 @@
 
         .search-room input {
             padding: 5.36px;
-            /* 8px * 0.67 */
             font-size: 10.72px;
-            /* 16px * 0.67 */
-            width: 134px;
-            /* 200px * 0.67 */
+            width: 80%;
+            /* Sử dụng 80% chiều rộng */
             border: 1px solid #ccc;
             border-radius: 2.68px;
-            /* 4px * 0.67 */
             margin-right: 13.4px;
-            /* 20px * 0.67 */
         }
 
         .search-room button {
             padding: 5.36px 8.04px;
-            /* 8px 12px * 0.67 */
             font-size: 10.72px;
-            /* 16px * 0.67 */
             cursor: pointer;
             border: none;
             background-color: #4CAF50;
             color: white;
             border-radius: 2.68px;
-            /* 4px * 0.67 */
         }
     </style>
 </head>
@@ -641,17 +558,12 @@
         <button id="close-popup" class="close-popup">Đóng</button>
     </div>
 
-
-
-
-
-
     <div class="sidebar">
         <img alt="Chess.com logo"
-            src="https://oaidalleapiprodscus.blob.core.windows.net/private/org-LmQ09WWGIGwOeeA4ArnRw0x5/user-uJPET5fjNenSso8wCETWVNOp/img-Qd3FxrBNS31HwV7wA9Aaf7S0.png?st=2024-09-17T11%3A18%3A12Z&se=2024-09-17T13%3A18%3A12Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2024-09-16T23%3A13%3A37Z&ske=2024-09-17T23%3A13%3A37Z&sks=b&skv=2024-08-04&sig=peMWZS7vf0zeUn%2BBgo9S5KlpoZNddHeADtofLdDYA7s%3D"
-            width="150" height="50" />
-       <a href="/chess/public/playonl"><i class="fas fa-chess"></i> Play Online</a>
-        <a href="/chess/public/playbot"><i class="fas fa-puzzle-piece"></i> Play Computer</a>
+            src="./img/icon.jpg"
+            width="150" height="100" />
+        <a href="playonline.html"><i class="fas fa-chess"></i> Play Online</a>
+        <a href="playonline.html"><i class="fas fa-puzzle-piece"></i> Play Computer</a>
 
         <div class="search">
             <input type="text" placeholder="Search" />
