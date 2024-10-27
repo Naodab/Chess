@@ -38,4 +38,9 @@ public class HomeController {
     public String chooseRoom() {
     	return "user/choose-room";
     }
+    
+    @GetMapping("play-with-people/new-room")
+    public String newRoom() {
+    	return "user/new-room";
+    }
 }

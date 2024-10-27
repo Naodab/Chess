@@ -51,6 +51,16 @@ public class RoomController {
 				.build();
 	}
 	
+//	@GetMapping("/{roomId}")
+//	int getPlayerCount(@PathVariable("roomId") Long id) {
+//		return roomService.getPlayerCount(id);
+//	}
+//	
+//	@GetMapping("/{roomId}")
+//	int getViewerCount(@PathVariable("roomId") Long id) {
+//		return roomService.getViewerCount(id);
+//	}
+	
 	@PutMapping("/{roomId}")
 	ApiResponse<RoomResponse> update(@PathVariable("roomId") Long id, 
 			@RequestBody RoomUpdateRequest request) {

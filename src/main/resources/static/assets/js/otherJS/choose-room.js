@@ -1,76 +1,75 @@
 function onClickFunc() {
 	alert("Bạn đã nhấn chọn phòng chơi mới!");
-	//window.location.href = "/new-room.html";
+	window.location.href = "../public/play-with-people/new-room";
 }
 
 function onExitFunc() {
-	alert("Bạn đã nhấn thoát, okeee 123!");
-	//window.location.href = "/login-chess.html";
+	alert("Bạn đã nhấn thoát, cảm ơn bạn đã tham gia chơi!");
+	window.location.href = "../public/login";
 }
 
 function joinRoom() {
-	/*
-	const username = new URLSearchParams(window.location.search).get("username");
-	fetch(`/hxh/join-room?roomId=${encodeURIComponent(roomID)}&username=${encodeURIComponent(username)}`, {
-		method: "POST",
-	}).then (response => response.text())
-	.then (message => {
-		alert(message);
-		if (message.includes("người chơi")) {
-			window.location.href = `/enter-game.html?roomID=${encodeURIComponent(roomID)}&username=${encodeURIComponent(username)}&role=player`;
-		}
-		else if (message.includes("người xem")) {
-			window.location.href = `/enter-game.html?roomID=${encodeURIComponent(roomID)}&username=${encodeURIComponent(username)}&role=viewer`;
-		}
-		loadRoom();
-	}).catch(error => {
-		console.error("Lỗi khi vào phòng!");
-		alert("Có lỗi xảy ra rồi!");
-	})
-	*/
+	alert("Bạn đang chuẩn bị vào phòng chơi mới!");
 }
 
 function loadRoom() {
-	alert("Load form");
-	fetch("/hxh/get-rooms").then(response => response.json()).then(rooms => {
-		console.log(rooms.length);
-		
-		const tableBody = document.querySelector(".table-container table tbody");
-		tableBody.innerHTML = "";
-
-		rooms.forEach(room => {
-			const row = document.createElement("tr");
-
-			const cell_roomID = document.createElement("td");
-			cell_roomID.textContent = room.roomID;
-			row.appendChild(cell_roomID);
-
-			const cell_numberOfPlayer = document.createElement("td");
-			const playerCount = room.playerList ? room.playerList.length : 0;
-			cell_numberOfPlayer.textContent = playerCount;
-			row.appendChild(cell_numberOfPlayer);
-
-			const cell_numberOfViewer = document.createElement("td");
-			const viewerCount = room.viewerList ? room.viewerList.length : 0;
-			cell_numberOfViewer.textContent = viewerCount;
-			row.appendChild(cell_numberOfViewer);
-
-			const cell_action = document.createElement("td");
-			const joinButton = document.createElement("button");
-			joinButton.textContent = "Vào game!";
-			joinButton.classList.add("action-button");
-			joinButton.addEventListener("click", joinRoom);
-			cell_action.appendChild(joinButton);
-			row.appendChild(cell_action);
-
-			tableBody.appendChild(row);
-		})
-	}).catch(error => {
-		console.error("Lỗi khi truyền tải dữ liệu!", error);
+	alert("Danh sách các phòng chơi đang được load lên!");
+	fetch("../api/rooms", {
+		//method: 
 	})
+		.then(response => {
+			if (!response.ok) throw new Error("Có chuyện xảy ra rồi!");
+			return response.json();
+		})
+		.then(data => {
+			const rooms = data.result || [];
+			console.log("Số phòng được load lên: " + rooms.length);
+
+			const tableBody = document.querySelector(".table-container table tbody");
+			tableBody.innerHTML = "";
+
+			rooms.forEach(room => {
+				const roomID = room.id;
+				fetch('../api/rooms/${roomID}')
+					.then(response => {
+						if (!response.ok) throw new Error("Không tìm thấy được phòng");
+						return response.json();
+					})
+					.then(roomData => {
+						const res = roomData.result;
+						
+						const row = document.createElement("tr");
+						
+						const cell_roomID = document.createElement("td");
+						cell_roomID.textContent = res.id;
+						row.appendChild(cell_roomID);
+						
+						const cell_host = document.createElement("td");
+						cell_host.textContent = res.host;
+						row.appendChild(cell_host);
+						
+						const cell_player = document.createElement("td");
+						cell_player.textContent = res.player;
+						row.appendChild(cell_player);
+						
+						const cell_numberOfViewer = document.createElement("td");
+						cell_numberOfViewer.textContent = res.viewers ? res.viewer.length : 0;
+						row.appendChild(cell_numberOfViewer);
+						
+						const cell_action = document.createElement("td");
+						const joinButton = document.createElement("button");
+						joinButton.textContent = "Vào game";
+						cell_action.appendChild(joinButton);
+						row.appendChild(cell_action);
+						
+						tableBody.appendChild(row);
+					})
+			})
+		}).catch(error => {
+			console.error("Lỗi khi truyền tải dữ liệu!", error);
+		})
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-	//loadRoom();
-	alert("Phòng đã được load lên thành công!");
+	loadRoom();
 });

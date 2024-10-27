@@ -34,6 +34,4 @@ public class SocketConnectionHandler extends TextWebSocketHandler{
 			webSocketSession.sendMessage(message);
 		}
 	}
-	
-	
 }
