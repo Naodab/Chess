@@ -2,6 +2,7 @@ package com.example.pbl4Version1.controller;
 
 import java.text.ParseException;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,9 +48,14 @@ public class AuthenticationController {
 	}
 	
 	@PostMapping("/token")
-	ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
+	ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request,
+													 HttpSession session) {
+		AuthenticationResponse authenticationResponse =
+				authenticationService.authenticate(request);
+		session.setAttribute("token", authenticationResponse.getToken());
+		session.setAttribute("username", request.getUsername());
 		return ApiResponse.<AuthenticationResponse>builder()
-				.result(authenticationService.authenticate(request))
+				.result(authenticationResponse)
 				.build();
 	}
 	
@@ -61,12 +67,14 @@ public class AuthenticationController {
 				.message("Logout success")
 				.build();
 	}
-	
+
 	@PostMapping("/refresh")
-	ApiResponse<AuthenticationResponse> refresh(@RequestBody RefreshRequest request) 
-			throws JOSEException, ParseException {
+	ApiResponse<AuthenticationResponse> refresh(@RequestBody RefreshRequest request,
+			HttpSession session) throws JOSEException, ParseException {
+		AuthenticationResponse response = authenticationService.refreshToken(request);
+		session.setAttribute("token", response.getToken());
 		return ApiResponse.<AuthenticationResponse>builder()
-				.result(authenticationService.refreshToken(request))
+				.result(response)
 				.build();
 	}
 	

@@ -2,6 +2,7 @@ import { globalState } from "../index.js";
 import { calculateLegalMoves } from "../event/global.js";
 
 let cloneGlobalState;
+let transitionGlobalState;
 
 function getPieceAtPosition(position) {
     console.log(position);
@@ -14,12 +15,12 @@ function getPieceAtPosition(position) {
     }
 }
 
-function checkPieceOfOpponentOnElement(id, color) {
-    const flatData = globalState.flat();
+function checkPieceOfOpponentOnElement(id, color, data = globalState) {
+    const flatData = data.flat();
     if (color) {
         const opponentColor = color === "white" ? "BLACK" : "WHITE";
         for (let element of flatData) {
-            if (element.id == id && element.piece) {
+            if (element.id === id && element.piece) {
                 if (element.piece.piece_name.includes(opponentColor)) {
                     return true;
                 }
@@ -27,7 +28,7 @@ function checkPieceOfOpponentOnElement(id, color) {
         }
     } else {
         for (let element of flatData) {
-            if (element.id == id && element.piece) {
+            if (element.id === id && element.piece) {
                 return true;
             }
         }
@@ -36,32 +37,26 @@ function checkPieceOfOpponentOnElement(id, color) {
 }
 
 function checkPieceOfOpponentOnElementOnClone(id, color) {
-    const flatData = cloneGlobalState.flat();
-    if (color) {
-        const opponentColor = color === "white" ? "BLACK" : "WHITE";
-        for (let element of flatData) {
-            if (element.id == id && element.piece) {
-                if (element.piece.piece_name.includes(opponentColor)) {
-                    return true;
-                }
-            }
-        }
-    } else {
-        for (let element of flatData) {
-            if (element.id == id && element.piece) {
-                return true;
-            }
-        }
-    }
-    return false;
+    return checkPieceOfOpponentOnElement(id, color, cloneGlobalState);
 }
 
-function willBeInCheck(piece, id) {
-    cloneGlobalState = JSON.parse(JSON.stringify(globalState));
+function checkPieceOfOpponentOnElementOnTransition(id, color) {
+    return checkPieceOfOpponentOnElement(id, color, transitionGlobalState);
+}
+
+function isValidPosition(position) {
+    const colIndex = position.charCodeAt(0);
+    const rowIndex = Number(position.slice(1));
+
+    return colIndex >= 97 && colIndex <= 104 && rowIndex > 0 && rowIndex < 9;
+}
+
+function willBeInCheck(piece, id, board = globalState) {
+    cloneGlobalState = JSON.parse(JSON.stringify(board));
     const flatData = cloneGlobalState.flat();
 
-    const from = flatData.find(el => el.id == piece.current_position);
-    const to = flatData.find(el => el.id == id);
+    const from = flatData.find(el => el.id === piece.current_position);
+    const to = flatData.find(el => el.id === id);
 
     from.piece.current_position = id;
     from.piece.moved = true;
@@ -81,8 +76,8 @@ function willBeInCheck(piece, id) {
     const opponentLegalMoves = calculateLegalMoves(opponentColor, cloneGlobalState,
         checkPieceOfOpponentOnElementOnClone);
 
-    const result = opponentLegalMoves.attack.includes(posKing);
-    if (result) {
+    const result = opponentLegalMoves.attack.find(move => move.destination === posKing);
+    if (result && !piece.piece_name.includes("KING")) {
         const squareKing = document.getElementById(posKing).querySelector('.piece');
         squareKing.classList.add('shake');
 
@@ -93,4 +88,57 @@ function willBeInCheck(piece, id) {
     return result;
 }
 
-export { checkPieceOfOpponentOnElement, willBeInCheck, getPieceAtPosition };
+function getKing(color, board = globalState) {
+    const nameKing = color.toUpperCase() + "_KING";
+    for (let row of board) {
+        for (let square of row) {
+            if (square.piece && square.piece.piece_name.includes(nameKing)) {
+                return square.piece;
+            }
+        }
+    }
+}
+
+function moveStatus(color) {
+    transitionGlobalState = JSON.parse(JSON.stringify(globalState));
+    const opponentColor = color.includes("white") ? "black" : "white";
+
+    const king = getKing(color, transitionGlobalState);
+    const opponentLegalMoves = calculateLegalMoves(opponentColor,
+        transitionGlobalState, checkPieceOfOpponentOnElementOnTransition);
+
+    let inCheck = false;
+    if (opponentLegalMoves.attack.find(move =>
+        move.destination === king.current_position)) {
+        inCheck = true;
+    }
+
+    const legalMoves = calculateLegalMoves(color, transitionGlobalState,
+        checkPieceOfOpponentOnElementOnTransition);
+
+    let isStaleMate = true;
+    for (let move of legalMoves.normal.concat(legalMoves.attack)) {
+        if (isValidPosition(move.destination) &&
+            !willBeInCheck(move.piece, move.destination,
+                transitionGlobalState)) {
+            isStaleMate = false;
+            break;
+        }
+    }
+
+    if (isStaleMate && inCheck)
+        return "CHECK_MATE";
+    if (isStaleMate)
+        return "STALE_MATE";
+    if (inCheck)
+        return "IN_CHECK";
+    return "";
+}
+
+export {
+    checkPieceOfOpponentOnElement,
+    willBeInCheck,
+    getPieceAtPosition,
+    getKing,
+    moveStatus
+};

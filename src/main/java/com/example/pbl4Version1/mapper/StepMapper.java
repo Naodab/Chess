@@ -1,5 +1,7 @@
 package com.example.pbl4Version1.mapper;
 
+import com.example.pbl4Version1.entity.MatchWithBot;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.example.pbl4Version1.dto.request.StepRequest;
@@ -9,6 +11,9 @@ import com.example.pbl4Version1.entity.Step;
 
 @Component
 public class StepMapper {
+	@Autowired
+	MatchMapper matchMapper;
+
 	public Step toStep(StepRequest request) {
 		return Step.builder()
 				.from(request.getFrom())
@@ -21,8 +26,9 @@ public class StepMapper {
 		return StepResponse.builder()
 				.from(step.getFrom())
 				.to(step.getTo())
-				.matchId(step.getMatch().getId())
+				.match(matchMapper.toMatchWithBotResponse((MatchWithBot) step.getMatch()))
 				.fen(step.getBoardState())
+				.name(step.getName())
 				.build();
 	}
 	
@@ -31,6 +37,7 @@ public class StepMapper {
 				.boardState(request.getFen())
 				.from(request.getFrom())
 				.to(request.getTo())
+				.name(request.getName())
 				.build();
 	}
 }

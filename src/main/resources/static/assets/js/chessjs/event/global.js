@@ -1,5 +1,9 @@
-import { ROOT_DIV, SQUARE_SELECTOR } from "../helper/constants.js"
-import { globalState } from "../index.js";
+import {
+    ROOT_DIV,
+    SQUARE_SELECTOR,
+    PROMPT_PIECE
+} from "../helper/constants.js"
+import { globalState, ALLIANCE, OPPONENT } from "../index.js";
 import {
     selfHighlight,
     clearPreviousSelfHighlight,
@@ -7,30 +11,56 @@ import {
     clearHighlight,
     globalStateRender,
     deletePiece,
-    generateFen
-}
-    from "../render/main.js";
-import { checkPieceOfOpponentOnElement, willBeInCheck, getPieceAtPosition } from "../helper/commonHelper.js";
+    generateFen,
+    beginPromotionPawn,
+    finishPromotionPawn
+} from "../render/main.js";
+import {
+    checkPieceOfOpponentOnElement,
+    willBeInCheck,
+    getPieceAtPosition,
+    moveStatus
+} from "../helper/commonHelper.js";
 
 let highlight_state = false;
 let previousHighlight = null;
 let moveState = null;
 let turnWhite = true;
-let enpassantPawn;
-let enpassantMove;
+let enPassantPawn;
+let enPassantMove;
 let turn = 0;
+let nameMove = "";
 
-//TODO: enpassthan pawn, nhap thanh, vua, chuot toi cuoi duong
+function pushXToNameMove() {
+    nameMove = 'x' + nameMove;
+}
+
 function clearHighlightLocal() {
     clearHighlight();
     highlight_state = false;
+}
+
+function changeTurn(turn) {
+    turnWhite = turn;
+}
+
+function setTurnNumber(num) {
+    turn = num;
+}
+
+function setEnPassantMove(position) {
+    enPassantMove = position;
+    if (position.includes("3") || position.includes("6")) {
+        console.log(getPieceAtPosition(position));
+        enPassantPawn = getPieceAtPosition(position);
+    }
 }
 
 function highlightLocal(legalMoves) {
     legalMoves.normal.forEach(element => {
         globalState.forEach(row => {
             row.forEach(ele => {
-                if (ele.id === element) {
+                if (ele.id === element.destination) {
                     ele.highlight = true;
                 }
             });
@@ -38,10 +68,10 @@ function highlightLocal(legalMoves) {
     });
 
     legalMoves.attack.forEach(dest => {
-        document.getElementById(dest).classList.add("capturedColor");
+        document.getElementById(dest.destination).classList.add("capturedColor");
         globalState.forEach(row => {
             row.forEach(ele => {
-                if (ele.id === dest) {
+                if (ele.id === dest.destination) {
                     ele.highlightCaptured = true;
                     ele.highlight = true;
                 }
@@ -50,19 +80,20 @@ function highlightLocal(legalMoves) {
     });
 }
 
-function calculatePawnLegalMove({ current_position }, color, check = checkPieceOfOpponentOnElement) {
+function calculatePawnLegalMove(piece, color, check = checkPieceOfOpponentOnElement) {
     const m = (color === "white") ? 1 : -1;
     const firstRow = (color === "white") ? "2" : "7";
     const normal = [];
     const attack = [];
 
+    const current_position = piece.current_position;
     const candidate = `${current_position[0]}${Number(current_position[1]) + m}`;
     if (!check(candidate)) {
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
         if (current_position[1] === firstRow) {
             const doubleCandidate = `${current_position[0]}${Number(current_position[1]) + 2 * m}`;
             if (!check(doubleCandidate))
-                normal.push(doubleCandidate);
+                normal.push({ piece, destination: doubleCandidate});
         }
     }
 
@@ -73,16 +104,17 @@ function calculatePawnLegalMove({ current_position }, color, check = checkPieceO
 
     captureIds.forEach(col => {
         if (check(col, color))
-            attack.push(col);
+            attack.push({ piece, destination: col});
     });
 
     return { normal, attack };
 }
 
-function calculateRookLegalMove({ current_position }, color, check = checkPieceOfOpponentOnElement) {
+function calculateRookLegalMove(piece, color, check = checkPieceOfOpponentOnElement) {
     const normal = [];
     const attack = [];
 
+    const current_position = piece.current_position;
     const col = current_position.charCodeAt(0);
     const row = Number(current_position[1]);
 
@@ -90,53 +122,54 @@ function calculateRookLegalMove({ current_position }, color, check = checkPieceO
         let candidate = `${String.fromCharCode(i)}${row}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     for (let i = col - 1; i >= 97; i--) {
         let candidate = `${String.fromCharCode(i)}${row}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     for (let i = row + 1; i <= 8; i++) {
         let candidate = `${String.fromCharCode(col)}${i}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     for (let i = row - 1; i > 0; i--) {
         let candidate = `${String.fromCharCode(col)}${i}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     return { normal, attack };
 }
 
-function calculateKnightLegalMove({ current_position }, color, check = checkPieceOfOpponentOnElement) {
+function calculateKnightLegalMove(piece, color, check = checkPieceOfOpponentOnElement) {
     const normal = [];
     const attack = [];
 
+    const current_position = piece.current_position;
     const col = current_position.charCodeAt(0);
     const row = Number(current_position[1]);
 
@@ -152,10 +185,10 @@ function calculateKnightLegalMove({ current_position }, color, check = checkPiec
             candidates.forEach(candidate => {
                 if (check(candidate)) {
                     if (check(candidate, color)) {
-                        attack.push(candidate);
+                        attack.push({ piece, destination: candidate});
                     }
                 } else {
-                    normal.push(candidate);
+                    normal.push({ piece, destination: candidate});
                 }
             });
         });
@@ -164,10 +197,11 @@ function calculateKnightLegalMove({ current_position }, color, check = checkPiec
     return { normal, attack };
 }
 
-function calculateBishopLegalMove({ current_position }, color, check = checkPieceOfOpponentOnElement) {
+function calculateBishopLegalMove(piece, color, check = checkPieceOfOpponentOnElement) {
     const normal = [];
     const attack = [];
 
+    const current_position = piece.current_position;
     const col = current_position.charCodeAt(0);
     const row = Number(current_position[1]);
 
@@ -175,53 +209,54 @@ function calculateBishopLegalMove({ current_position }, color, check = checkPiec
         let candidate = `${String.fromCharCode(i)}${j}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     for (let i = col + 1, j = row - 1; i <= 104 && j > 0; i++, j--) {
         let candidate = `${String.fromCharCode(i)}${j}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     for (let i = col - 1, j = row + 1; i >= 97 && j <= 8; i--, j++) {
         let candidate = `${String.fromCharCode(i)}${j}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     for (let i = col - 1, j = row - 1; i >= 97 && j > 0; i--, j--) {
         let candidate = `${String.fromCharCode(i)}${j}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     return { normal, attack };
 }
 
-function calculateQueenLegalMove({ current_position }, color, check = checkPieceOfOpponentOnElement) {
+function calculateQueenLegalMove(piece, color, check = checkPieceOfOpponentOnElement) {
     const normal = [];
     const attack = [];
 
+    const current_position = piece.current_position;
     const col = current_position.charCodeAt(0);
     const row = Number(current_position[1]);
 
@@ -229,88 +264,88 @@ function calculateQueenLegalMove({ current_position }, color, check = checkPiece
         let candidate = `${String.fromCharCode(i)}${j}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     for (let i = col + 1, j = row - 1; i <= 104 && j > 0; i++, j--) {
         let candidate = `${String.fromCharCode(i)}${j}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     for (let i = col - 1, j = row + 1; i >= 97 && j <= 8; i--, j++) {
         let candidate = `${String.fromCharCode(i)}${j}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     for (let i = col - 1, j = row - 1; i >= 97 && j > 0; i--, j--) {
         let candidate = `${String.fromCharCode(i)}${j}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     for (let i = col + 1; i <= 104; i++) {
         let candidate = `${String.fromCharCode(i)}${row}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     for (let i = col - 1; i >= 97; i--) {
         let candidate = `${String.fromCharCode(i)}${row}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     for (let i = row + 1; i <= 8; i++) {
         let candidate = `${String.fromCharCode(col)}${i}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     for (let i = row - 1; i > 0; i--) {
         let candidate = `${String.fromCharCode(col)}${i}`;
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
             break;
         }
-        normal.push(candidate);
+        normal.push({ piece, destination: candidate});
     }
 
     return { normal, attack };
@@ -337,10 +372,10 @@ function calculateKingLegalMove(piece, color, check = checkPieceOfOpponentOnElem
     candidates.forEach(candidate => {
         if (check(candidate)) {
             if (check(candidate, color)) {
-                attack.push(candidate);
+                attack.push({ piece, destination: candidate});
             }
         } else {
-            normal.push(candidate);
+            normal.push({ piece, destination: candidate});
         }
     });
 
@@ -385,7 +420,7 @@ function whitePawnClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite) {
+    if (!turnWhite || ALLIANCE === "BLACK") {
         return;
     }
 
@@ -399,10 +434,10 @@ function whitePawnClick({ piece }) {
     previousHighlight = piece;
     const legalMoves = calculatePawnLegalMove(piece, "white");
 
-    if (enpassantPawn && enpassantPawn.piece_name.includes("BLACK")
-        && Math.abs(enpassantPawn.current_position.charCodeAt(0) - piece.current_position.charCodeAt(0)) === 1
-        && enpassantPawn.current_position.includes(piece.current_position[1])) {
-        legalMoves.attack.push(enpassantMove);
+    if (enPassantPawn && enPassantPawn.piece_name.includes("BLACK")
+        && Math.abs(enPassantPawn.current_position.charCodeAt(0) - piece.current_position.charCodeAt(0)) === 1
+        && enPassantPawn.current_position.includes(piece.current_position[1])) {
+        legalMoves.attack.push({piece, deletePiece: enPassantMove});
     }
 
     highlightLocal(legalMoves);
@@ -417,7 +452,7 @@ function whiteRookClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite) {
+    if (!turnWhite || ALLIANCE === "BLACK") {
         return;
     }
 
@@ -442,7 +477,7 @@ function whiteKnightClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite) {
+    if (!turnWhite || ALLIANCE === "BLACK") {
         return;
     }
 
@@ -467,7 +502,7 @@ function whiteBishopClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite) {
+    if (!turnWhite || ALLIANCE === "BLACK") {
         return;
     }
 
@@ -492,7 +527,7 @@ function whiteQueenClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite) {
+    if (!turnWhite || ALLIANCE === "BLACK") {
         return;
     }
 
@@ -517,7 +552,7 @@ function whiteKingClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite) {
+    if (!turnWhite || ALLIANCE === "BLACK") {
         return;
     }
 
@@ -562,9 +597,9 @@ function whiteKingClick({ piece }) {
             }
             if (accepted) {
                 if (queenSide) {
-                    legalMoves.normal.push('c1');
+                    legalMoves.normal.push({piece, destination: 'c1'});
                 } else {
-                    legalMoves.normal.push('g1');
+                    legalMoves.normal.push({piece, destination: 'g1'});
                 }
             }
         });
@@ -582,7 +617,7 @@ function blackPawnClick({ piece }) {
             return;
         }
     }
-    if (turnWhite) {
+    if (turnWhite || ALLIANCE === "WHITE") {
         return;
     }
 
@@ -596,10 +631,10 @@ function blackPawnClick({ piece }) {
     previousHighlight = piece;
     const legalMoves = calculatePawnLegalMove(piece, "black");
 
-    if (enpassantPawn && enpassantPawn.piece_name.includes("WHITE")
-        && Math.abs(enpassantPawn.current_position.charCodeAt(0) - piece.current_position.charCodeAt(0)) === 1
-        && enpassantPawn.current_position.includes(piece.current_position[1])) {
-        legalMoves.attack.push(enpassantMove);
+    if (enPassantPawn && enPassantPawn.piece_name.includes("WHITE")
+        && Math.abs(enPassantPawn.current_position.charCodeAt(0) - piece.current_position.charCodeAt(0)) === 1
+        && enPassantPawn.current_position.includes(piece.current_position[1])) {
+        legalMoves.attack.push({piece, deletePiece: enPassantMove});
     }
 
     highlightLocal(legalMoves);
@@ -614,7 +649,7 @@ function blackRookClick({ piece }) {
             return;
         }
     }
-    if (turnWhite) {
+    if (turnWhite || ALLIANCE === "WHITE") {
         return;
     }
 
@@ -639,7 +674,7 @@ function blackKnightClick({ piece }) {
             return;
         }
     }
-    if (turnWhite) {
+    if (turnWhite || ALLIANCE === "WHITE") {
         return;
     }
 
@@ -664,7 +699,7 @@ function blackBishopClick({ piece }) {
             return;
         }
     }
-    if (turnWhite) {
+    if (turnWhite || ALLIANCE === "WHITE") {
         return;
     }
 
@@ -689,7 +724,7 @@ function blackQueenClick({ piece }) {
             return;
         }
     }
-    if (turnWhite) {
+    if (turnWhite || ALLIANCE === "WHITE") {
         return;
     }
 
@@ -714,7 +749,7 @@ function blackKingClick({ piece }) {
             return;
         }
     }
-    if (turnWhite) {
+    if (turnWhite || ALLIANCE === "WHITE") {
         return;
     }
 
@@ -759,9 +794,9 @@ function blackKingClick({ piece }) {
             }
             if (accepted) {
                 if (queenSide) {
-                    legalMoves.normal.push('c8');
+                    legalMoves.normal.push({piece, destination: 'c8'});
                 } else {
-                    legalMoves.normal.push('g8');
+                    legalMoves.normal.push({piece, destination: 'g8'});
                 }
             }
         });
@@ -778,30 +813,32 @@ function prepareForMoving(piece, id) {
         if (fromCol - toCol === -2) {
             const rook = getPieceAtPosition(`h${id[1]}`);
             const desRook = `f${id[1]}`;
+            nameMove = "O-O";
             moveElement(rook, desRook);
         } else if (fromCol - toCol === 2) {
             const rook = getPieceAtPosition(`a${id[1]}`);
             const desRook = `d${id[1]}`;
+            nameMove = "O-O-O";
             moveElement(rook, desRook);
         }
     } else if (piece.piece_name.includes("PAWN")) {     // EN PASSANT
         const rowFrom = Number(piece.current_position[1]);
         const rowTo = Number(id[1]);
         if (Math.abs(rowFrom - rowTo) === 2) {
-            enpassantPawn = piece;
+            enPassantPawn = piece;
             const direction = piece.piece_name.includes("WHITE") ? 1 : -1;
-            enpassantMove = `${piece.current_position[0]}${Number(piece.current_position[1]) + direction}`;
-        } else if (enpassantMove && id.includes(enpassantMove)) {
-            deletePiece(enpassantPawn);
-            enpassantMove = null;
-            enpassantPawn = null;
+            enPassantMove = `${piece.current_position[0]}${Number(piece.current_position[1]) + direction}`;
+        } else if (enPassantMove && id.includes(enPassantMove)) {
+            deletePiece(enPassantPawn);
+            enPassantMove = null;
+            enPassantPawn = null;
         } else {
-            enpassantPawn = null;
-            enpassantMove = null;
+            enPassantMove = null;
+            enPassantPawn = null;
         }
     } else {
-        enpassantPawn = null;
-        enpassantMove = null;
+        enPassantPawn = null;
+        enPassantMove = null;
     }
 }
 
@@ -813,9 +850,31 @@ function moveOrCancelMove(square) {
             turnWhite = !turnWhite;
             turn++;
             prepareForMoving(moveState, square.id);
+            const oldMove = moveState.current_position;
             moveElement(moveState, square.id);
+            if (!nameMove || nameMove === 'x') {
+                if (!moveState.piece_name.includes("PAWN")) {
+                    nameMove = moveState.piece_signal + nameMove;
+                }
+                nameMove += square.id;
+            }
+
+            const status = moveStatus(OPPONENT.toLowerCase());
+            if (status === "CHECK_MATE" || status === "STALE_MATE") {
+                nameMove += "#";
+                // TODO: ANNOUNCE WINNER
+            } else if (status === "IN_CHECK") {
+                nameMove += "+";
+            }
+            // TODO: HANDLE NAME MOVE
+            console.log(nameMove);
+            nameMove = "";
+            if (moveState.piece_name.includes("PAWN") &&
+                (square.id.includes("8") || square.id.includes("1"))) {
+                beginPromotionPawn(moveState);
+            }
             // TODO: send Step API to Server
-            sendStepToServer(moveState.current_position, square.id);
+            sendStepToServer(oldMove, square.id);
         } else {
             clearPreviousSelfHighlight(previousHighlight);
         }
@@ -876,10 +935,15 @@ function globalEvent() {
             moveOrCancelMove(square);
         }
     });
+    PROMPT_PIECE.forEach(piece => {
+        piece.addEventListener('click', () => {
+            const name = piece.getAttribute("name");
+            finishPromotionPawn(name);
+        });
+    });
 }
 
 const  matchID = localStorage.getItem('MATCH_ID');
-
 async function sendStepToServer(from, to) {
     const fen = generateFen();
     try {
@@ -889,15 +953,23 @@ async function sendStepToServer(from, to) {
               "Content-Type": "application/json",
               "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
             },
-            body: JSON.stringify({ matchId: matchID, fen: fen, from: from, to: to }),
+            body: JSON.stringify({ matchId: matchID, fen: fen, from: from, to: to, name: nameMove }),
             redirect: "follow"
         });
         if (response.ok) {
             const data = await response.json();
+            nameMove = data.result.name;
+            console.log(nameMove);
+            nameMove = "";
             const piece = getPieceAtPosition(data.result.from);
-            // TODO: handling fen received from server
             prepareForMoving(piece, data.result.to);
             moveElement(piece, data.result.to);
+            const status = moveStatus(ALLIANCE.toLowerCase());
+            if (status === "CHECK_MATE" || status === "STALE_MATE") {
+                alert(status);
+            } else if (status === "IN_CHECK") {
+                alert(status);
+            }
             turnWhite = !turnWhite;
             turn++;
         }
@@ -905,4 +977,14 @@ async function sendStepToServer(from, to) {
     }
 }
 
-export { globalEvent, calculateLegalMoves, turnWhite, enpassantMove, turn }
+export {
+    globalEvent,
+    calculateLegalMoves,
+    changeTurn,
+    setEnPassantMove,
+    setTurnNumber,
+    pushXToNameMove,
+    turnWhite,
+    enPassantMove,
+    turn
+}

@@ -24,6 +24,7 @@ public class Step {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	Long id;
+	String name;
 
 	@ManyToOne(cascade = CascadeType.ALL)
 	Match match;
@@ -40,5 +41,5 @@ public class Step {
 	// numberOfDrawSteps thStep
 	@Column(columnDefinition = "TEXT")
 	@Builder.Default
-	String boardState = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+	String boardState = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
 }

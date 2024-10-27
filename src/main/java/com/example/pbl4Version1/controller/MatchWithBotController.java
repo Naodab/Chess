@@ -1,10 +1,6 @@
 package com.example.pbl4Version1.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.pbl4Version1.dto.request.MatchBotCreationRequest;
 import com.example.pbl4Version1.dto.response.ApiResponse;
@@ -35,6 +31,13 @@ public class MatchWithBotController {
 	ApiResponse<MatchWithBotResponse> createBoard() {
 		return ApiResponse.<MatchWithBotResponse>builder()
 				.result(matchWithBotService.playWithBot())
+				.build();
+	}
+
+	@GetMapping("/{matchID}")
+	ApiResponse<MatchWithBotResponse> getMatchWithBot(@PathVariable("matchID") Long matchID) {
+		// TODO: handle get match data and fen to generate for frontend
+		return ApiResponse.<MatchWithBotResponse>builder()
 				.build();
 	}
 }

@@ -10,15 +10,11 @@ import com.example.pbl4Version1.dto.request.MatchBotCreationRequest;
 import com.example.pbl4Version1.dto.request.MatchCreationRequest;
 import com.example.pbl4Version1.dto.response.MatchWithBotResponse;
 import com.example.pbl4Version1.dto.response.MatchWithHumanResponse;
-import com.example.pbl4Version1.dto.response.StepResponse;
 import com.example.pbl4Version1.entity.MatchWithBot;
 import com.example.pbl4Version1.entity.MatchWithHuman;
 
 @Component
 public class MatchMapper {
-	@Autowired
-	StepMapper stepMapper;
-	
 	@Autowired
 	UserMapper userMapper;
 	
@@ -34,20 +30,12 @@ public class MatchMapper {
 	}
 	
 	public MatchWithBotResponse toMatchWithBotResponse(MatchWithBot match) {
-		Set<StepResponse> steps = new HashSet<StepResponse>();
-		if (match.getSteps() != null) {
-			match.getSteps().stream()
-				.map(stepMapper::toStepResponse)
-				.forEach(steps::add);
-		}
-		
 		String winner = null;
 		if (match.getWinner() != null) {
 			winner = match.getWinner().name();
 		}
 		
 		return MatchWithBotResponse.builder()
-				.steps(steps)
 				.winner(winner)
 				.player(userMapper.toUserResponse(match.getPlayer()))
 				.id(match.getId())
@@ -55,13 +43,6 @@ public class MatchMapper {
 	}
 	
 	public MatchWithHumanResponse toMatchWithHumanResponse(MatchWithHuman match) {
-		Set<StepResponse> steps = new HashSet<StepResponse>();
-		if (match.getSteps() != null) {
-			match.getSteps().stream()
-				.map(stepMapper::toStepResponse)
-				.forEach(steps::add);
-		}
-		
 		String winner = null;
 		if (match.getWinner() != null) {
 			winner = match.getWinner().name();
@@ -72,7 +53,6 @@ public class MatchMapper {
 				.black(userMapper.toUserResponse(match.getBlackPlayer()))
 				.white(userMapper.toUserResponse(match.getWhitePlayer()))
 				.id(match.getId())
-				.steps(steps)
 				.winner(winner)
 				.build();
 	}

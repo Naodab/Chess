@@ -18,5 +18,4 @@ public class MatchWithBotResponse {
 	Long id;
 	UserResponse player;
 	String winner;
-	Set<StepResponse> steps;
 }

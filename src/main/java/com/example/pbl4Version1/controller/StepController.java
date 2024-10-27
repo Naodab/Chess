@@ -1,9 +1,6 @@
 package com.example.pbl4Version1.controller;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.pbl4Version1.dto.request.StepRequest;
 import com.example.pbl4Version1.dto.request.StepToBotRequest;
@@ -35,6 +32,13 @@ public class StepController {
 	public ApiResponse<StepResponse> createBotStep(@RequestBody StepToBotRequest request) {
 		return ApiResponse.<StepResponse>builder()
 				.result(stepService.toBot(request))
+				.build();
+	}
+
+	@GetMapping("/bot/{matchID}")
+	public ApiResponse<StepResponse> getNewestBotStep(@PathVariable Long matchID) {
+		return ApiResponse.<StepResponse>builder()
+				.result(stepService.getNewestStepOfMatchWithBot(matchID))
 				.build();
 	}
 }
