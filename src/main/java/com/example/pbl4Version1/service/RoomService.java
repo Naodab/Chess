@@ -8,6 +8,8 @@ import com.example.pbl4Version1.dto.request.JoinRoomRequest;
 import com.example.pbl4Version1.entity.RoomUser;
 import com.example.pbl4Version1.enums.Mode;
 import com.example.pbl4Version1.repository.RoomUserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +48,7 @@ public class RoomService {
 		User host = userRepository
 				.findById(request.getHostId()).orElseThrow(
 						() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
+		log.info(host.getId() + "/" + host.getUsername());
 		RoomUser roomUser = RoomUser.builder()
 				.user(host)
 				.room(room)
@@ -56,12 +58,11 @@ public class RoomService {
 		Set<RoomUser> roomUsers = new HashSet<>();
 		roomUsers.add(roomUser);
 		room.setRoomUsers(roomUsers);
-
 		return roomMapper.toRoomResponse(room);
 	}
 	
 	public List<RoomResponse> getAll() {
-		return roomRepository.findAll()
+		return roomRepository.findAllWithUsers()
 				.stream()
 				.map(roomMapper::toRoomResponse)
 				.toList();
@@ -112,13 +113,19 @@ public class RoomService {
 		return roomMapper.toRoomResponse(room);
 	}
 
+	//value of "id" here is the "id" of the room to join
+	//wait, testing web socket activates well
 	public RoomResponse joinRoom(Long id, JoinRoomRequest request) {
 		Room room = roomRepository.findById(id).orElseThrow(
 				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
-
 		User viewer = userRepository.findByUsername(request.getUsername())
 				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-		room.getRoomUsers().add(RoomUser.builder().room(room).user(viewer).role(Mode.VIEWER).build());
+		if (room.getRoomUsers().size() < 2) {
+			room.getRoomUsers().add(RoomUser.builder().room(room).user(viewer).role(Mode.PLAYER).build());
+		}
+		else {
+			room.getRoomUsers().add(RoomUser.builder().room(room).user(viewer).role(Mode.VIEWER).build());
+		}
 		room = roomRepository.save(room);
 		return roomMapper.toRoomResponse(room);
 	}

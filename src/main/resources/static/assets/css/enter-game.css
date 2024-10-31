@@ -1,0 +1,91 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f4f7;
+}
+
+.container {
+    display: flex;
+    width: 80%;
+    height: 80vh;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Phần bảng bên trái */
+.left-panel {
+    flex: 1;
+    border-right: 1px solid #ddd;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.left-panel h2 {
+    font-size: 24px;
+    color: #333;
+}
+
+/* Phần bên phải */
+.right-panel {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Khu vực chính của phần bên phải */
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Thanh nhập liệu và nút ở dưới cùng */
+.bottom-bar {
+    display: flex;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+.text-input {
+    flex: 4;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.submit-btn {
+    flex: 1;
+    padding: 10px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: #2980b9;
+}
+
+img {
+    width: 610px;
+}

@@ -32,6 +32,7 @@ public class RoomController {
 	
 	@PostMapping
 	ApiResponse<RoomResponse> create(@RequestBody RoomCreateRequest request) {
+		log.info(request.getHostId() + "/" + request.getPassword());
 		return ApiResponse.<RoomResponse>builder()
 				.result(roomService.create(request))
 				.build();
@@ -40,7 +41,7 @@ public class RoomController {
 	@GetMapping
 	ApiResponse<List<RoomResponse>> getAll() {
 		return ApiResponse.<List<RoomResponse>>builder()
-				.result(roomService.getAll())
+				.result(roomService.getAllActive())
 				.build();
 	}
 
@@ -57,16 +58,6 @@ public class RoomController {
 				.result(roomService.getRoom(id))
 				.build();
 	}
-	
-//	@GetMapping("/{roomId}")
-//	int getPlayerCount(@PathVariable("roomId") Long id) {
-//		return roomService.getPlayerCount(id);
-//	}
-//	
-//	@GetMapping("/{roomId}")
-//	int getViewerCount(@PathVariable("roomId") Long id) {
-//		return roomService.getViewerCount(id);
-//	}
 	
 	@PutMapping("/{roomId}")
 	ApiResponse<RoomResponse> update(@PathVariable("roomId") Long id, 
