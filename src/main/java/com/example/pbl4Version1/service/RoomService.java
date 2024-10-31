@@ -66,6 +66,18 @@ public class RoomService {
 				.map(roomMapper::toRoomResponse)
 				.toList();
 	}
+
+	public List<RoomResponse> getAllActive() {
+		return roomRepository.findAllByActive(true)
+				.stream()
+				.map(room -> {
+					Set<RoomUser> roomUsers =
+							new HashSet<>(roomUserRepository.findByRoomId(room.getId()));
+					room.setRoomUsers(roomUsers);
+					return roomMapper.toRoomResponse(room);
+				})
+				.toList();
+	}
 	
 	public RoomResponse getRoom(Long id) {
 		Room room = roomRepository.findById(id).orElseThrow(

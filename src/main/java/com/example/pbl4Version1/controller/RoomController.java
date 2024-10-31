@@ -43,6 +43,13 @@ public class RoomController {
 				.result(roomService.getAll())
 				.build();
 	}
+
+	@GetMapping("/active")
+	ApiResponse<List<RoomResponse>> getAllActive() {
+		return ApiResponse.<List<RoomResponse>>builder()
+				.result(roomService.getAllActive())
+				.build();
+	}
 	
 	@GetMapping("/{roomId}")
 	ApiResponse<RoomResponse> getRoom(@PathVariable("roomId") Long id) {
