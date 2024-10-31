@@ -70,4 +70,9 @@ public class HomeController {
     public String newRoom() {
     	return "user/new-room";
     }
+
+    @GetMapping("/play-with-people/enter-game")
+    public String enterGame() {
+        return "user/enter-game";
+    }
 }
