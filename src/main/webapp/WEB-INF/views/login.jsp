@@ -68,97 +68,17 @@
 						type="password" placeholder="Nhập lại mật khẩu"
 						class="form-control"> <span class="form-message"></span>
 				</div>
-				<div class="form-group">
-					<input id="dob2" name="dob" type="date" class="form-control">
-					<span class="form-message"></span>
-				</div>
 				<button class="form-submit" type="submit">Đăng ký</button>
 				<div class="btn-login">Đăng nhập</div>
 			</form>
 		</div>
 	</div>
-	<script src="../assets/js/validator.js"></script>
+	<script type="module" src="../assets/js/account/login.js"></script>
 	<script>
-		const $ = document.querySelector.bind(document);
-		const $$ = document.querySelectorAll.bind(document);
-	
-		Validator({
-			form: '#form-1',
-			formGroupSelector: ".form-group",
-			errorSelector: '.form-message',
-			rules: [
-				Validator.isRequired('#username'),
-				Validator.isRequired("#password")
-			],
-			onSubmit: data => {
-				console.log(data);
-				fetch('../api/auth/token', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(data)
-				}).then(response => {
-					if (!response.ok) {
-						throw new Error('Tài khoản hoặc mật khẩu không đúng');
-					}
-					return response.json();
-				}).then(data2 => {
-					localStorage.setItem("TOKEN", data2.result.token)
-					localStorage.setItem("USERNAME", data.username);
-					window.location.href = "../public/home";
-				}).catch(error => {
-					$("#message").innerText = error.message;
-				});
-			}
-		});
-		Validator({
-			form: '#form-2',
-			formGroupSelector: ".form-group",
-			errorSelector: '.form-message',
-			rules: [
-				Validator.isRequired('#username2'),
-				Validator.minLength('#username2', 5),
-				Validator.isRequired("#password2"),
-				Validator.minLength("#password2", 6),
-				Validator.isRequired('#email2'),
-				Validator.isEmail('#email2'),
-				Validator.isRequired('#confirm-password'),
-				Validator.isConfirmed('#confirm-password', () => {
-					return $("#password2").value;
-				}, "Mật khẩu nhập lại không chính xác"),
-				Validator.isRequired('#dob2')
-			],
-			onSubmit: data => {
-				console.log(data);
-				fetch('../api/users', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(data)
-				}).then(response => {
-					if (!response.ok) {
-						throw new Error('Username hoặc email đã tồn tại');
-					}
-					return response.json();
-				}).then(() => {
-					alert("Đăng ký thành công");
-					fetch("../public/home");
-				}).catch(error => {
-					$("#message2").innerText = error.message;
-				});
-			}
-		});
-		$(".btn-signup").addEventListener('click', () => {
-			$$('.container').forEach(container => container.classList.add('active'));
-		});
-		$(".btn-login").addEventListener('click', () => {
-			$$('.container').forEach(container => container.classList.remove('active'));
-		});
-		$("#forgot").addEventListener('click', () => {
-			fetch("../public/forgot");
-		});
+		const isSignup = "${isSignup}";
+		if (isSignup) {
+			document.querySelectorAll('.container').forEach(container => container.classList.add('active'));
+		}
 	</script>
 </body>
 

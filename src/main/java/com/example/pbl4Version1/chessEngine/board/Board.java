@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.pbl4Version1.chessEngine.Alliance;
+import com.example.pbl4Version1.chessEngine.ai.AlphaBetaWithMoveOrdering;
+import com.example.pbl4Version1.chessEngine.ai.AlphaBetaWithMoveOrderingTest;
 import com.example.pbl4Version1.chessEngine.ai.MiniMax;
 import com.example.pbl4Version1.chessEngine.ai.MoveStrategy;
 import com.example.pbl4Version1.chessEngine.piece.Bishop;
@@ -365,16 +367,16 @@ public class Board {
 
 	// TEST
 	public static void main(String[] args) {
-		String fen = "rkb1kbkr/pppp1ppp/4p3/8/8/2P3P1/PP1PBP1P/RNBQK1KR/ w KQkq - ";
+		String fen = "rnb1kbnr/pppp1ppp/4p3/8/8/2P3P1/PP1PBP1P/RNBQK1NR/ w KQkq - 0 5";
 		Board board = Board.createByFEN(fen);
 		System.out.println(board);
-		MoveStrategy minmax = new MiniMax(4);
-		Move bestMove = minmax.execute(board);
-		Board after = board.getCurrentPlayer().makeMove(bestMove).getTransitionBoard();
-		String from = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate());
-		String to = BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
-		System.out.println(after);
-		System.out.println(from + " " + to);
-		System.out.println(after.generateFen());
+		MoveStrategy minmax2 = new AlphaBetaWithMoveOrderingTest(4);
+		MoveStrategy minmax3 = new AlphaBetaWithMoveOrdering(4);
+
+		Move bm2 = minmax2.execute(board);
+		Move bm3 = minmax3.execute(board);
+
+		System.out.println(board.currentPlayer.makeMove(bm2).getTransitionBoard() + " " + bm2.toString());
+		System.out.println(board.currentPlayer.makeMove(bm3).getTransitionBoard() + " " + bm3.toString());
 	}
 }

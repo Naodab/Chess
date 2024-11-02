@@ -140,3 +140,5 @@ Validator.isConfirmed = (selector, getConfirmedValue, message) => {
 		}
 	}
 }
+
+export default Validator;

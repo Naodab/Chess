@@ -1,5 +1,6 @@
 package com.example.pbl4Version1.service;
 
+import com.example.pbl4Version1.chessEngine.ai.AlphaBetaWithMoveOrdering;
 import com.example.pbl4Version1.enums.GameStatus;
 import com.example.pbl4Version1.enums.PlayerType;
 import org.springframework.stereotype.Service;
@@ -76,7 +77,7 @@ public class StepService {
 					.build();
 		}
 
-		MoveStrategy minmax = new MiniMax(4);
+		MoveStrategy minmax = new AlphaBetaWithMoveOrdering(4);
 		Move bestMove = minmax.execute(board);
         Board executeBoard = board.getCurrentPlayer().makeMove(bestMove).getTransitionBoard();
 
@@ -103,6 +104,7 @@ public class StepService {
 				.to(to)
 				.match(mwb)
 				.boardState(fen)
+				.name(bestMove.toString())
 				.build();
 
 		stepRepository.save(stepAI);
@@ -118,15 +120,12 @@ public class StepService {
 	public StepResponse getNewestStepOfMatchWithBot(Long matchID) {
 		MatchWithBot mwb = matchWithBotRepository.findById(matchID)
 				.orElseThrow(() -> new AppException(ErrorCode.MATCH_NOT_EXISTED));
+
 		List<Step> steps = stepRepository.findByMatchId(matchID);
-		log.info("getNewestStepOfMatchWithBot: " + steps.isEmpty());
 		if (!steps.isEmpty()) {
 			int size = steps.size();
-			log.info("size: " + size);
 			for (Step step : steps) {
-				log.info("step: " + step.getBoardState().split(" ")[5]);
 				if (size ==  Integer.parseInt(step.getBoardState().split(" ")[5])) {
-					log.info("fen: " + step.getBoardState());
 					return stepMapper.toStepResponse(step);
 				}
 			}

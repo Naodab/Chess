@@ -9,7 +9,15 @@ public class StandardBoardEvaluator implements BoardEvaluator {
 	private static final int CHECK_MATE_BONUS = 10000;
 	private static final int DEPTH_BONUS = 100;
 	private static final int CASTLE_BONUS = 60;
-	
+
+	private static final StandardBoardEvaluator INSTANCE = new StandardBoardEvaluator();
+
+	private StandardBoardEvaluator() {}
+
+	public static StandardBoardEvaluator get() {
+		return INSTANCE;
+	}
+
 	@Override
 	public int evaluate(Board board, int depth) {
 		return scorePlayer(board, board.getWhitePlayer(), depth) 

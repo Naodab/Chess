@@ -14,10 +14,21 @@
         <nav class="main-nav">
         </nav>
         <div class="play-area">
-            <div class="player-info-container alliance-black">
-                <div class="avatar avatar-1"></div>
-                <span class="name name-1">Computer(200)</span>
-                <span class="defeated-pieces"></span>
+            <div class="player-info-container">
+                <div class="player-info">
+                    <div class="avatar"></div>
+                    <span class="content">
+                        <span class="name">Computer</span>
+                        <span class="elo">200</span>
+                    </span>
+                </div>
+                <div class="player-info">
+                    <span class="content">
+                        <span class="name">Computer</span>
+                        <span class="elo">200</span>
+                    </span>
+                    <div class="avatar"></div>
+                </div>
             </div>
 
             <div class="game-board-container">
@@ -30,32 +41,13 @@
                 </div>
             </div>
 
-            <div class="player-info-container alliance-white">
-                <div class="avatar avatar-2"></div>
-                <span class="name" id="name-2"></span>
+            <div class="defeated-pieces-container">
                 <span class="defeated-pieces"></span>
+                <span class="defeated-pieces "></span>
             </div>
         </div>
-        <!-- MAYBE CHAT BOX HERE -->
+
     </div>
     <script type="module" src="../assets/js/chessjs/index.js"></script>
-    <script>
-        const gbContainer = document.querySelector(".game-board-container");
-        for (let i = 8; i >= 1; i--) {
-            const digit = document.createElement('div');
-            digit.innerText = i;
-            digit.classList.add('game-board-container-digit');
-            gbContainer.appendChild(digit);
-        }
-        const characters = document.createElement('div');
-        characters.classList.add('game-board-container-character');
-        for (let i = "a".charCodeAt(0); i <= "h".charCodeAt(0); i++) {
-            const character = document.createElement('div');
-            character.innerText = String.fromCharCode(i);
-            character.classList.add('character');
-            characters.appendChild(character);
-        }
-        gbContainer.appendChild(characters);
-    </script>
 </body>
 </html>

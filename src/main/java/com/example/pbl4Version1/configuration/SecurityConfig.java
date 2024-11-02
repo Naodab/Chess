@@ -36,6 +36,7 @@ public class SecurityConfig {
 					.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
 					.requestMatchers(FRONTEND_ENDPOINTS).permitAll()
 					.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+					.requestMatchers("/web-socket/**").permitAll()
 					.anyRequest().authenticated();
 			});
 		
