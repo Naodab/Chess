@@ -1,0 +1,628 @@
+@charset "UTF-8";
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-image: url('../assets/img/background.jpg');
+    color: #fff;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    /* Đảm bảo container chiếm toàn bộ chiều cao màn hình */
+}
+
+.sidebar {
+    width: 10%;
+    /* Chiếm 20% chiều ngang màn hình */
+    background-color: rgba(43, 43, 43, 0.4);
+    padding: 13.4px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.settings-link {
+    position: absolute;
+    bottom: 20px;
+    /* Khoảng cách từ đáy */
+    left: 20px;
+    /* Điều chỉnh khoảng cách từ bên trái */
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.sidebar img {
+    width: 100px;
+    border-radius: 50%;
+    /* Giữ nguyên kích thước hình ảnh */
+    margin-bottom: 13.4px;
+}
+
+.sidebar a {
+    color: #fff;
+    text-decoration: none;
+    margin: 6.7px 0;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+}
+
+.sidebar a i {
+    margin-right: 6.7px;
+}
+
+.sidebar .search {
+    margin: 13.4px 0;
+
+}
+
+.sidebar .search input {
+    width: 100%;
+    padding: 6.7px;
+    border: none;
+    border-radius: 3.4px;
+}
+
+.sidebar .button {
+    width: 100%;
+    padding: 6.7px;
+    margin: 6.7px 0;
+    text-align: center;
+    border-radius: 3.4px;
+    cursor: pointer;
+}
+
+.sidebar .button:hover {
+    transform: scale(1.1);
+
+}
+
+.sidebar .button.signup {
+    background-color: #f8ba4d;
+    color: #fff;
+    margin-top: 250px;
+}
+
+.sidebar .button.login {
+    background-color: #524845;
+    color: #fff;
+}
+
+.sidebar .footer {
+    margin-top: auto;
+    text-align: center;
+}
+
+
+.main-content {
+    flex: 0 0 60%;
+    /* Chiếm 60% chiều ngang màn hình */
+    padding: 13.4px;
+    /* Padding bên trong */
+    box-sizing: border-box;
+    /* Để padding không làm tăng chiều rộng tổng thể */
+    display: flex;
+    /* Hiển thị flex */
+    flex-direction: column;
+    /* Căn theo chiều dọc */
+    align-items: center;
+    /* Căn giữa */
+}
+
+.chess-board {
+    display: flex;
+    /* Hiển thị flex */
+    justify-content: center;
+    /* Căn giữa theo chiều ngang */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+    flex-direction: column;
+    /* Căn theo chiều dọc */
+}
+
+.chess-board img {
+    width: 80%;
+    /* Đặt kích thước ảnh là 80% chiều rộng của .main-content */
+    height: auto;
+}
+
+.player-info {
+    display: flex;
+    /* Hiển thị flex */
+    justify-content: space-between;
+    /* Căn giữa các phần tử */
+    width: 268px;
+    /* Chiều rộng */
+    margin-top: 13.4px;
+    /* Khoảng cách trên */
+}
+
+.player {
+    display: flex;
+    /* Hiển thị flex */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+}
+
+.player img {
+    width: 33.5px;
+    /* Giữ nguyên kích thước hình ảnh */
+    height: 33.5px;
+    /* Giữ nguyên kích thước hình ảnh */
+    border-radius: 50%;
+    /* Bo góc hình tròn */
+    margin-right: 6.7px;
+    /* Khoảng cách bên phải */
+}
+
+.player .name {
+    font-size: 12px;
+    /* Kích thước chữ */
+}
+
+.bot-info {
+    flex: 0 0 30%;
+    /* Chiếm 30% chiều ngang màn hình */
+    font-family: Arial, sans-serif;
+    /* Font chữ */
+    background-color: rgba(43, 43, 43, 0.1);
+    /* Màu nền */
+    color: #fff;
+    /* Màu chữ */
+    margin: 0;
+    /* Không có margin */
+    padding: 0;
+    /* Không có padding */
+    width: 100%;
+    /* Chiếm toàn bộ chiều rộng */
+    height: 100vh;
+    /* Chiều cao 100% */
+}
+
+.bot-header h1 {
+    font-size: 16px;
+    /* Kích thước chữ */
+    color: #ffffff;
+    /* Màu chữ */
+    margin: 0;
+    /* Không có margin */
+}
+
+.bot-header {
+    display: flex;
+    /* Hiển thị flex */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+    margin-bottom: 6.7px;
+    /* Khoảng cách dưới cùng */
+}
+
+.bot-header img {
+    width: 26.8px;
+    /* Giữ nguyên kích thước hình ảnh */
+    height: 26.8px;
+    /* Giữ nguyên kích thước hình ảnh */
+    margin-right: 6.7px;
+    /* Khoảng cách bên phải */
+    border-radius: 50%;
+    /* Bo góc hình tròn */
+}
+
+.bot-name {
+    font-size: 12px;
+    /* Kích thước chữ */
+    font-weight: bold;
+    /* Đậm chữ */
+}
+
+.bot-rating {
+    font-size: 10.72px;
+    /* Kích thước chữ */
+    margin-left: auto;
+    /* Căn phải */
+    display: flex;
+    /* Hiển thị flex */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+}
+
+.bot-rating i {
+    margin-left: 3.35px;
+    /* Khoảng cách bên trái */
+}
+
+.bot-description {
+    font-size: 9.38px;
+    /* Kích thước chữ */
+    margin: 6.7px 0;
+    /* Khoảng cách trên và dưới */
+}
+
+.bot-list {
+    margin: 6.7px 0;
+    /* Khoảng cách trên và dưới */
+}
+
+.bot-category {
+    font-weight: bold;
+    /* Đậm chữ */
+    font-size: 10.72px;
+    /* Kích thước chữ */
+    margin: 6.7px 0 3.35px;
+    /* Khoảng cách trên, dưới và trái */
+}
+
+.bot-item {
+    display: inline-block;
+    /* Hiển thị theo dòng */
+    margin-right: 6.7px;
+    /* Khoảng cách bên phải */
+}
+
+.bot-item img {
+    width: 26.8px;
+    /* Giữ nguyên kích thước hình ảnh */
+    height: 26.8px;
+    /* Giữ nguyên kích thước hình ảnh */
+    border-radius: 50%;
+    /* Bo góc hình tròn */
+}
+
+.play-button {
+    text-align: center;
+    /* Căn giữa */
+    color: #f8ba4d;
+    margin-top: 10.05px;
+    /* Khoảng cách trên */
+}
+
+.play-button button {
+    background-color:#f8ba4d;
+    /* Màu nền */
+    color: white;
+    /* Màu chữ */
+    padding: 6.7px 13.4px;
+    /* Padding bên trong */
+    border: none;
+    /* Không đường viền */
+    border-radius: 3.4px;
+    /* Bo góc */
+    cursor: pointer;
+    /* Con trỏ khi di chuột qua */
+    width: 134px;
+    /* Chiều rộng */
+    height: 33.5px;
+    /* Chiều cao */
+}
+
+.play-button button:hover {
+    background-color:#f8ba4d;
+    transform: scale(1.1);
+
+}
+
+.header {
+    background-color: #2a2a2a;
+    /* Màu nền */
+    padding: 6.7px;
+    /* Padding bên trong */
+    display: flex;
+    /* Hiển thị flex */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+}
+
+.header img {
+    border-radius: 50%;
+    /* Bo góc hình tròn */
+    margin-right: 6.7px;
+    /* Khoảng cách bên phải */
+}
+
+.header h1 {
+    font-size: 13.4px;
+    /* Kích thước chữ */
+    margin: 0;
+    /* Không có margin */
+}
+
+.content {
+    padding: 13.4px;
+    /* Padding bên trong */
+}
+
+.profile {
+    display: flex;
+    /* Hiển thị flex */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+    margin-bottom: 13.4px;
+    /* Khoảng cách dưới cùng */
+}
+
+.profile img {
+    border-radius: 50%;
+    /* Bo góc hình tròn */
+    margin-right: 6.7px;
+    /* Khoảng cách bên phải */
+}
+
+.profile .quote {
+    background-color: #3a3a3a;
+    /* Màu nền */
+    padding: 5px;
+    /* Padding bên trong */
+    border-radius: 3.4px;
+    /* Bo góc */
+    margin-left: 6.7px;
+    /* Khoảng cách bên trái */
+}
+
+.profile .quote p {
+    margin: 0;
+    /* Không có margin */
+    font-size: 10px;
+    /* Kích thước chữ */
+}
+
+.profile .details {
+    margin-left: 10px;
+    /* Khoảng cách bên trái */
+    font-size: 10px;
+    /* Kích thước chữ */
+}
+
+.profile .details h2 {
+    margin: 0;
+    /* Không có margin */
+    font-size: 10px;
+    /* Kích thước chữ */
+}
+
+.profile .details .rating {
+    display: flex;
+    /* Hiển thị flex */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+}
+
+.profile .details .rating i {
+    margin-left: 3.35px;
+    /* Khoảng cách bên trái */
+}
+
+.profile .details p {
+    margin: 3.35px 0 0 0;
+    /* Khoảng cách trên, dưới, trái và phải */
+}
+
+.bot-category {
+    background-color: #2a2a2a;
+    /* Màu nền */
+    padding: 6.7px;
+    /* Padding bên trong */
+    border-radius: 3.4px;
+    /* Bo góc */
+    margin-bottom: 6.7px;
+    /* Khoảng cách dưới cùng */
+}
+
+.bot-category h3 {
+    margin: 0;
+    /* Không có margin */
+    font-size: 12px;
+    /* Kích thước chữ */
+}
+
+.bot-category .bots {
+    display: flex;
+    /* Hiển thị flex */
+    margin-top: 6.7px;
+    /* Khoảng cách trên */
+    overflow-x: auto;
+    /* Cho phép cuộn ngang */
+}
+
+.bot-category .bots img {
+    border-radius: 3.4px;
+    /* Bo góc */
+    margin-right: 6.7px;
+    /* Khoảng cách bên phải */
+    border: 2px solid transparent;
+    /* Đường viền trong suốt */
+    cursor: pointer;
+    /* Con trỏ khi di chuột qua */
+}
+
+.bot-category .bots img.selected {
+    border-color: #00ff00;
+    /* Màu đường viền khi chọn */
+}
+
+.footer {
+    background-color: #2a2a2a;
+    /* Màu nền */
+    padding: 6.7px;
+    /* Padding bên trong */
+    display: flex;
+    /* Hiển thị flex */
+    justify-content: space-between;
+    /* Căn giữa các phần tử */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+}
+
+.footer .play-button {
+    background-color: #f8ba4d;
+    /* Màu nền */
+    color: #f8ba4d;
+    /* Màu chữ */
+    padding: 6.7px 13.4px;
+    /* Padding bên trong */
+    border: none;
+    /* Không đường viền */
+    border-radius: 3.4px;
+    /* Bo góc */
+    font-size: 12px;
+    /* Kích thước chữ */
+    cursor: pointer;
+    /* Con trỏ khi di chuột qua */
+}
+
+.footer .play-as {
+    display: flex;
+    /* Hiển thị flex */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+}
+
+.footer .play-as img {
+    border-radius: 50%;
+    /* Bo góc hình tròn */
+    margin-right: 3.35px;
+    /* Khoảng cách bên phải */
+}
+
+.sidebar3 {
+    flex: 0 0 30%;
+    /* Chiều rộng */
+    background-color: rgba(43, 43, 43, 0.1);
+    /* Màu nền */
+    display: flex;
+    /* Hiển thị flex */
+    flex-direction: column;
+    /* Căn theo chiều dọc */
+
+    overflow-y: scroll;
+    height: 100vh;
+}
+
+.header3 {
+    background-color: rgba(43, 43, 43, 0.1);
+    /* Màu nền */
+
+    padding: 6.7px;
+    /* Padding bên trong */
+    display: flex;
+    /* Hiển thị flex */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+    justify-content: center;
+    /* Căn giữa */
+}
+
+.header3 img {
+    width: 20.1px;
+    /* Chiều rộng hình ảnh */
+    height: 20.1px;
+    /* Chiều cao hình ảnh */
+    margin-right: 6.7px;
+    /* Khoảng cách bên phải */
+}
+
+.header3 h1 {
+    font-size: 13.4px;
+    /* Kích thước chữ */
+    margin: 0;
+    /* Không có margin */
+}
+
+.content3 {
+    padding: 13.4px;
+    /* Padding bên trong */
+    text-align: center;
+    /* Căn giữa */
+    flex-grow: 1;
+    /* Tăng trưởng để chiếm không gian còn lại */
+}
+
+.content3 img {
+    width: 67px;
+    /* Chiều rộng hình ảnh */
+    height: 67px;
+    /* Chiều cao hình ảnh */
+    border-radius: 50%;
+    /* Bo góc hình tròn */
+}
+
+.moves3 {
+    margin-top: 13.4px;
+    /* Khoảng cách trên */
+    text-align: left;
+    /* Căn trái */
+}
+
+.moves3 table {
+    width: 100%;
+    /* Chiềm toàn bộ chiều rộng */
+    border-collapse: collapse;
+    /* Gộp các đường viền */
+}
+
+.moves3 th,
+.moves3 td {
+    padding: 6.7px;
+    /* Padding bên trong */
+    border-bottom: 1px solid #333333;
+    /* Đường viền dưới */
+}
+
+.moves3 th {
+    text-align: left;
+    /* Căn trái */
+}
+
+.moves3 td {
+    text-align: center;
+    /* Căn giữa */
+}
+
+.footer3 {
+    background-color: rgba(43, 43, 43, 0.1);
+
+    padding: 6.7px;
+    /* Padding bên trong */
+    display: flex;
+    /* Hiển thị flex */
+    justify-content: space-around;
+    /* Căn giữa các phần tử */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+}
+
+.footer3 button {
+    background-color: #333333;
+    /* Màu nền */
+    border: none;
+    /* Không đường viền */
+    color: #ffffff;
+    /* Màu chữ */
+    padding: 6.7px;
+    /* Padding bên trong */
+    font-size: 13.4px;
+    /* Kích thước chữ */
+    cursor: pointer;
+    /* Con trỏ khi di chuột qua */
+}
+
+.footer3 button i {
+    margin-right: 3.35px;
+    /* Khoảng cách bên phải */
+}
+
+.footer3 .accept3 {
+    display: flex;
+    /* Hiển thị flex */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+}
+
+.footer3 .accept3 i {
+    margin-right: 3.35px;
+    /* Khoảng cách bên phải */
+}

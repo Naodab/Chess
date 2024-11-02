@@ -1,0 +1,508 @@
+@charset "UTF-8";
+  body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-image: url('../assets/img/background.jpg');
+      background-size: cover;
+      background-position: center;
+
+      /* Điều chỉnh độ mờ */
+      color: #fff;
+      display: flex;
+      min-height: 100vh;
+  }
+
+  /* Sidebar1 - Chiếm 10% chiều ngang của trang */
+  .sidebar1 {
+      width: 10%;
+      /* Chiếm 20% chiều ngang màn hình */
+      background-color: rgba(43, 43, 43, 0.4);
+      padding: 13.4px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+  .sidebar1 img {
+      width: 100px;
+      border-radius: 50%;
+      /* Giữ nguyên kích thước hình ảnh */
+      margin-bottom: 13.4px;
+  }
+
+  .settings-link {
+      position: absolute;
+      bottom: 20px;
+      /* Khoảng cách từ đáy */
+      left: 20px;
+      /* Điều chỉnh khoảng cách từ bên trái */
+      color: #fff;
+      text-decoration: none;
+      font-size: 16px;
+  }
+
+  .sidebar1 a {
+      color: #fff;
+      text-decoration: none;
+      margin: 6.7px 0;
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+  }
+
+  .sidebar1 a i {
+      margin-right: 6.7px;
+  }
+
+  .sidebar .sidebar1 .search {
+      margin: 13.4px 0;
+
+  }
+
+  .sidebar1 .search input {
+      width: 100%;
+      padding: 6.7px;
+      border: none;
+      border-radius: 3.4px;
+  }
+
+  .sidebar1 .button {
+      width: 100%;
+      padding: 6.7px;
+      margin: 6.7px 0;
+      text-align: center;
+      border-radius: 3.4px;
+      cursor: pointer;
+  }
+  .sidebar1 .button:hover{
+    transform: scale(1.1);
+
+  }
+
+  .sidebar1 .button.signup {
+      background-color: #f8ba4d;
+      color: #fff;
+      margin-top: 250px;
+  }
+
+  .sidebar1 .button.login {
+      background-color: #524845;
+      color: #fff;
+  }
+
+  .sidebar1 .footer {
+      margin-top: auto;
+      text-align: center;
+  }
+
+  /* Container - Chiếm 90% chiều ngang của trang */
+  .container {
+      width: 90%;
+      display: flex;
+      margin-left: 10%;
+      border-radius: 5px;
+      background-color: rgba(43, 43, 43, 0.1);
+      min-height: 100vh;
+  }
+
+  /* Sidebar trong container - Chiếm 30% chiều ngang của container */
+  .sidebar {
+      flex-basis: 30%;
+      background-color: rgba(43, 43, 43, 0.1);
+      padding: 20px;
+      box-sizing: border-box;
+  }
+
+  .sidebar ul {
+      list-style: none;
+      padding: 0;
+  }
+
+  .sidebar li {
+      padding: 10px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      color: #fff;
+      font-size: 1em;
+  }
+
+  .sidebar li:hover {
+      color: #ffd700;
+  }
+
+  /* Replace trong container - Chiếm 70% chiều ngang của container */
+  .replace {
+      flex-basis: 70%;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.1);
+      box-sizing: border-box;
+      overflow-y: auto;
+  }
+
+  /* Content trong replace */
+  .profile-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+  }
+
+  .profile-header img {
+      border-radius: 50%;
+      margin-right: 15px;
+  }
+
+  .profile-info h2 {
+      font-size: 1.5em;
+      margin: 0;
+  }
+
+  .profile-info p {
+      margin: 5px 0;
+      font-size: 1em;
+  }
+
+  .status {
+      display: flex;
+      align-items: center;
+      font-size: 0.9em;
+      color: #ffeb3b;
+  }
+
+  .status i {
+      color: #4caf50;
+      margin-right: 5px;
+  }
+
+  /* Form trong profile */
+  .profile-form {
+      display: flex;
+      flex-direction: column;
+  }
+
+  .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+  }
+
+  .form-container {
+      display: flex;
+      justify-content: space-around;
+      /* Space out each form group */
+      align-items: flex-start;
+      /* Align items at the top */
+  }
+
+  .form-group3 {
+      display: flex;
+      flex-direction: column;
+      /* Stack the label and input vertically */
+      text-align: center;
+      margin: 0 10px;
+      /* Adjust spacing between form groups */
+  }
+
+  .form-group3 label:first-child {
+      font-weight: bold;
+      /* Optional: Make the top label bold */
+  }
+
+  .form-group4 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    width: 95%; /* Set a fixed width */
+    height: auto; /* Height will automatically adjust based on content */
+    text-align: center;
+    margin: 0 auto; /* Center container horizontally */
+}
+
+.form-group4 label {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 10px; /* Space between label and images */
+}
+
+.image-container {
+    display: flex;
+    gap: 10px; /* Space between images */
+    justify-content: center; /* Center images within container */
+}
+
+.form-group4 img {
+    border-radius: 5px;
+    transition: transform 0.2s ease;
+}
+
+.form-group4 img:hover {
+    transform: scale(1.1);
+}
+
+  .form-group label {
+      font-size: 0.9em;
+      color: #fff;
+      margin-bottom: 5px;
+  }
+
+  .form-group input {
+      padding: 8px;
+      font-size: 1em;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+      background-color: rgba(43, 43, 43, 0.8);
+      color: white;
+      box-sizing: border-box;
+  }
+
+
+
+  .container9 {
+      width: 650px;
+      margin: 0 auto;
+      background-color: rgba(43, 43, 43, 0.1);
+      padding: 20px;
+      border-radius: 8px;
+  }
+
+  h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+  }
+
+  .form-group9 {
+      margin-bottom: 15px;
+  }
+
+  .form-group9 label {
+      display: block;
+      margin-bottom: 5px;
+  }
+
+
+  .form-group9 input[type="checkbox"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      background-color: rgba(43, 43, 43, 0.1);
+      color: #ffffff;
+  }
+
+  .form-group9 select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      background-color: rgba(43, 43, 43, 0.8);
+      color: #ffffff;
+  }
+
+  .form-group9 input[type="checkbox"] {
+      width: auto;
+      margin-right: 10px;
+  }
+
+  .form-group9 .toggle-switch {
+      display: flex;
+      align-items: center;
+  }
+
+  .form-group9 .toggle-switch input {
+      margin-right: 10px;
+  }
+
+  .form-group9 .toggle-switch label {
+      margin: 0;
+  }
+
+  .chess-board9 {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+  }
+
+  .chess-board9 img {
+      width: 40px;
+      height: 40px;
+      margin: 2px;
+  }
+
+  .save-button9 {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #4caf50;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+  }
+
+  .save-button9:hover {
+      background-color: #45a049;
+  }
+
+  .container10 {
+      padding: 20px;
+      width: 650px;
+  }
+
+  .section {
+      margin-bottom: 20px;
+  }
+
+  .section-title {
+      font-size: 18px;
+      margin-bottom: 10px;
+  }
+
+  .option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+  }
+
+  .option img {
+      width: 50px;
+      height: 50px;
+      margin-left: 10px;
+  }
+
+  .option.selected {
+      font-weight: bold;
+  }
+
+  .option.selected::before {
+
+      margin-right: 10px;
+  }
+
+  .halloween {
+      background-image: url('../assets/img/halowend.png');
+      background-size: cover;
+      background-position: center;
+      padding: 10px;
+  }
+
+  .go {
+      background-image: url('../assets/img/background.jpg');
+      background-size: cover;
+      background-position: center;
+      padding: 10px;
+  }
+
+  .thuytinh {
+      background-image: url('../assets/img/thuytinh.jpg');
+      background-size: cover;
+      background-position: center;
+      padding: 10px;
+  }
+
+  .sky {
+      background-image: url('../assets/img/sky.png');
+      background-size: cover;
+      background-position: center;
+      padding: 10px;
+  }
+
+  .space {
+      background-image: url('../assets/img/space.png');
+      background-size: cover;
+      background-position: center;
+      padding: 10px;
+  }
+
+
+  .container11 {
+      background-color: rgba(43, 43, 43, 0.1);
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      width: 650px;
+  }
+
+  h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+  }
+
+  .form-group11 {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
+
+  .form-group11 label {
+      width: 250px;
+      margin-right: 20px;
+  }
+
+  .form-group11 input {
+      width: 450px;
+      padding: 10px;
+      border: 1px solid #444;
+      border-radius: 5px;
+      background-color: rgba(43, 43, 43, 0.1);
+
+      color: #fff;
+      font-size: 16px;
+  }
+
+  .form-group11 .input-wrapper {
+      position: relative;
+      width: 100%;
+  }
+
+
+  .form-group11 .input-wrapper i {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #888;
+  }
+  .form-group11 .input-wrapper {
+    position: relative;
+}
+
+.form-group11 .toggle-password {
+    position: absolute;
+    right: 10px; /* khoảng cách so với bên phải */
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666; /* màu biểu tượng */
+}
+
+.form-group11 .toggle-password:hover {
+    color: #333; /* thay đổi màu khi hover */
+}
+
+
+  .btn11 {
+      background-color: #F8BA4D;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+  }
+
+  .btn11:hover {
+      background-color: #F8BA4D;
+  }
+
+
+
+
+  

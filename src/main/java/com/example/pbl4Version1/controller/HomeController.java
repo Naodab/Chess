@@ -75,4 +75,22 @@ public class HomeController {
     public String enterGame() {
         return "user/enter-game";
     }
+    @GetMapping("/playonl")
+    public String playonl() {
+    	return "user/playonl";
+    }
+    @GetMapping("/selectplay")
+    public String selectplay() {
+    	return "user/selectplay";
+    }
+    @GetMapping("/playbot")
+    public String playbot() {
+    	return "user/playbot";
+    }
+    @GetMapping("/profile")
+    public String profile() {
+    	return "user/profile";
+    }
+    
+    
 }
