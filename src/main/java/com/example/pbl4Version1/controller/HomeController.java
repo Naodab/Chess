@@ -45,6 +45,10 @@ public class HomeController {
     public String playbot() {
     	return "user/playbot";
     }
+    @GetMapping("/profile")
+    public String profile() {
+    	return "user/profile";
+    }
     
     
 }
