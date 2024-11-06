@@ -1,0 +1,272 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        scale: 0;
+    }
+    to {
+        opacity: 1;
+        scale: 1;
+    }
+}
+
+@keyframes slideLeft {
+    from {
+        opacity: 0;
+        left: 0;
+    }
+    to {
+        opacity: 1;
+        left: -100%;
+    }
+}
+
+@keyframes fillLeft {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+:root {
+    --outline-bg-color: #222323;
+    --background-color: #242526;
+    --overlay-color: rgba(255, 255, 255, 0.3);
+    --closure-color: #050505;
+    --button-hover-color: rgb(241, 217, 174, 0.6);
+    --text-color: #FCD39F;
+    --text-data-color: black;
+    --first-color: #91DDC6;
+    --second-color: #ACBCFD;
+    --third-color: #FAA8CE;
+    --fourth-color: #FED5A1;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 62.5%;
+}
+
+a {
+    text-decoration: none;
+}
+
+h1 {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+}
+
+#root {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: var(--outline-bg-color);
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+}
+
+#overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: var(--overlay-color);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon {
+    border-radius: 50%;
+    box-shadow: 0 0 16px var(--text-color);
+}
+
+.modal {
+    position: relative;
+}
+
+#change-password-modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 0;
+}
+
+.form__title {
+    text-align: center;
+    color: var(--text-color);
+    font-size: 25px;
+    margin: 0 0 32px 0;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin: 8px;
+}
+
+.form-group label {
+    width: 100%;
+    text-align: left;
+    font-size: 16px;
+    color: var(--text-color);
+    margin-bottom: 4px;
+}
+
+.password-container {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+}
+
+.password-container i {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.form-group input {
+    width: 300px;
+    font-size: 16px;
+    padding: 8px 0 8px 8px;
+    outline: 0;
+    border: none;
+    font-weight: bold;
+    background-color: transparent;
+}
+
+.form-group .password-container:focus {
+    background-color: white;
+}
+
+.form-submit {
+    width: 100%;
+    margin-top: 32px;
+    text-align: center;
+}
+
+.btn-submit {
+    width: 50%;
+    font-size: 18px;
+    color: var(--closure-color);
+    background-color: var(--text-color);
+    padding: 4px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--text-color);
+}
+
+.btn-submit:hover {
+    background-color: var(--button-hover-color);
+    box-shadow: 0 0 8px var(--button-hover-color);
+}
+
+.error-message {
+    color: var(--third-color);
+    font-size: 12px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.btn-close {
+    color: var(--text-color);
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 24px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.btn-close:hover {
+    background-color: var(--overlay-color);
+}
+
+.closure {
+    border-radius: 8px;
+    background-color: var(--closure-color);
+    box-shadow: 0 0 8px black;
+    padding: 16px;
+}
+
+.closure.closure--first {
+    background-color: var(--first-color);
+}
+
+.closure.closure--first:hover,
+.closure.closure--first.active {
+    box-shadow: 0 0 16px var(--first-color);
+}
+
+.closure.closure--second {
+    background-color: var(--second-color);
+}
+
+.closure.closure--second:hover,
+.closure.closure--second.active {
+    box-shadow: 0 0 16px var(--second-color);
+}
+
+.closure.closure--third {
+    background-color: var(--third-color);
+}
+
+.closure.closure--third:hover,
+.closure.closure--third.active {
+    box-shadow: 0 0 16px var(--third-color);
+}
+
+.closure.closure--fourth {
+    background-color: var(--fourth-color);
+}
+
+.closure.closure--fourth:hover,
+.closure.closure--fourth.active {
+    box-shadow: 0 0 16px var(--fourth-color);
+}

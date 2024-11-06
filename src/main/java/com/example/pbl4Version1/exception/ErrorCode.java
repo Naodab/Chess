@@ -16,7 +16,8 @@ public enum ErrorCode {
     ROOM_NOT_EXISTED(1009, "Room not existed.", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1010, "Email existed.", HttpStatus.BAD_REQUEST), 
     INVALID_RESET_PASSWORD(1011, "Code is incorrect.", HttpStatus.BAD_REQUEST), 
-    MATCH_NOT_EXISTED(1012, "Match not existed.", HttpStatus.BAD_REQUEST)
+    MATCH_NOT_EXISTED(1012, "Match not existed.", HttpStatus.BAD_REQUEST),
+	PASSWORD_NOT_MATCH(1013, "Password does not match.", HttpStatus.BAD_REQUEST),
 	;
 	
 	private int code;

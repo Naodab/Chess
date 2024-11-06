@@ -75,11 +75,15 @@
 	</div>
 	<script type="module" src="../assets/js/account/login.js"></script>
 	<script>
+		const username = "${username}";
+		if (username) {
+			window.location.href = "../public/home";
+		}
+
 		const isSignup = "${isSignup}";
 		if (isSignup) {
 			document.querySelectorAll('.container').forEach(container => container.classList.add('active'));
 		}
 	</script>
 </body>
-
 </html>

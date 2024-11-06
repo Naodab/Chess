@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+import com.example.pbl4Version1.dto.request.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,13 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.example.pbl4Version1.dto.request.AuthenticationRequest;
-import com.example.pbl4Version1.dto.request.ConfirmChangePasswordRequest;
-import com.example.pbl4Version1.dto.request.ForgotRequest;
-import com.example.pbl4Version1.dto.request.IntrospectRequest;
-import com.example.pbl4Version1.dto.request.LogoutRequest;
-import com.example.pbl4Version1.dto.request.RefreshRequest;
-import com.example.pbl4Version1.dto.request.VerifyPasswordTokenRequest;
 import com.example.pbl4Version1.dto.response.AuthenticationResponse;
 import com.example.pbl4Version1.dto.response.IntrospectResponse;
 import com.example.pbl4Version1.dto.response.VerifyPasswordResponse;
@@ -212,13 +206,20 @@ public class AuthenticationService {
 		userRepository.save(user);
 		return "Success";
 	}
-	
-	public boolean isTokenValid(String token) {
-        PasswordResetToken resetToken = passwordResetTokenRepository
-        		.findByToken(token).orElseThrow(
-        				() -> new AppException(ErrorCode.INVALID_RESET_PASSWORD));
-        return resetToken != null && resetToken.getExpiryDate().after(new Date());
-    }
+
+	public String changePassword(ChangPasswordRequest request) {
+		String username = SecurityContextHolder.getContext()
+				.getAuthentication().getName();
+		User user = userRepository.findByUsername(username)
+				.or(() -> userRepository.findByEmail(username))
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+		if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+			throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
+		}
+		user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+		userRepository.save(user);
+		return "Success";
+	}
 
     public PasswordResetToken getByToken(String token) {
         return passwordResetTokenRepository

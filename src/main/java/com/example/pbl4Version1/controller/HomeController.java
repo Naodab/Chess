@@ -27,6 +27,11 @@ public class HomeController {
         return "login";
     }
 
+    @GetMapping("/admin")
+    public String admin() {
+        return "admin/index";
+    }
+
     @GetMapping("/signup")
     public ModelAndView signup() {
         ModelAndView modelAndView = new ModelAndView("login");
@@ -48,14 +53,17 @@ public class HomeController {
     public String playWithBot() {
         return "user/index";
     }
+
     @GetMapping("/playonl")
     public String playonl() {
     	return "user/playonl";
     }
+
     @GetMapping("/selectplay")
     public String selectplay() {
     	return "user/selectplay";
     }
+
     @GetMapping("/playbot")
     public String playbot() {
     	return "user/playbot";
@@ -75,10 +83,9 @@ public class HomeController {
     public String enterGame() {
         return "user/enter-game";
     }
+
     @GetMapping("/profile")
     public String profile() {
     	return "user/profile";
     }
-    
-    
 }

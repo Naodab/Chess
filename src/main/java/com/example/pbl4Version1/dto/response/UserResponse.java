@@ -25,6 +25,7 @@ public class UserResponse {
 	int battleNumber;
 	int winNumber;
 	int drawNumber;
+	float percent;
 	Set<RoleResponse> roles;
 	Set<AchievementResponse> achievements;
 	String rank;

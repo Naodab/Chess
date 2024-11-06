@@ -2,19 +2,13 @@ package com.example.pbl4Version1.controller;
 
 import java.text.ParseException;
 
+import com.example.pbl4Version1.dto.request.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.pbl4Version1.dto.request.AuthenticationRequest;
-import com.example.pbl4Version1.dto.request.ConfirmChangePasswordRequest;
-import com.example.pbl4Version1.dto.request.ForgotRequest;
-import com.example.pbl4Version1.dto.request.IntrospectRequest;
-import com.example.pbl4Version1.dto.request.LogoutRequest;
-import com.example.pbl4Version1.dto.request.RefreshRequest;
-import com.example.pbl4Version1.dto.request.VerifyPasswordTokenRequest;
 import com.example.pbl4Version1.dto.response.ApiResponse;
 import com.example.pbl4Version1.dto.response.AuthenticationResponse;
 import com.example.pbl4Version1.dto.response.IntrospectResponse;
@@ -60,9 +54,13 @@ public class AuthenticationController {
 	}
 	
 	@PostMapping("/logout")
-	ApiResponse<?> logout(@RequestBody LogoutRequest request) 
+	ApiResponse<?> logout(@RequestBody LogoutRequest request,
+						  HttpSession session)
 			throws JOSEException, ParseException {
 		authenticationService.logout(request);
+		session.removeAttribute("token");
+		session.removeAttribute("username");
+		session.invalidate();
 		return ApiResponse.builder()
 				.message("Logout success")
 				.build();
@@ -109,6 +107,13 @@ public class AuthenticationController {
 			ConfirmChangePasswordRequest request) {
 		return ApiResponse.<String>builder()
 				.result(authenticationService.confirmChangePassword(request))
+				.build();
+	}
+
+	@PostMapping("/changePassword")
+	public ApiResponse<String> changePassword(@RequestBody ChangPasswordRequest request) {
+		return ApiResponse.<String>builder()
+				.result(authenticationService.changePassword(request))
 				.build();
 	}
 }
