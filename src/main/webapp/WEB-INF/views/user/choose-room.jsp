@@ -28,6 +28,12 @@
 			onclick="onClickFunc()">Tạo phòng chơi mới</button>
 		<button class="action-button" id="exit-button" onclick="onExitFunc()">Thoát</button>
 	</div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+	<script>
+		console.log("SockJS loaded:", typeof SockJS !== 'undefined');
+		console.log("STOMP loaded:", typeof Stomp !== 'undefined');
+	</script>
 	<script src="${pageContext.request.contextPath}/assets/js/otherJS/choose-room.js"></script>
 </body>
 </html>
