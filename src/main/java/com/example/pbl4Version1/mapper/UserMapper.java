@@ -58,9 +58,11 @@ public class UserMapper {
 				.drawNumber(user.getDrawNumber())
 				.roles(roles)
 				.achievements(achievements)
+				.percent(user.getBattleNumber() != 0 ? (float)user.getWinNumber() / user.getBattleNumber() : 0)
 				.rank(rank)
 				.latestLogin(user.getLatestLogin())
 				.createDate(user.getCreateDate())
+				.avatar(user.getAvatar())
 				.build();
 	}
 

@@ -29,4 +29,5 @@ public class UserResponse {
 	Set<RoleResponse> roles;
 	Set<AchievementResponse> achievements;
 	String rank;
+	String avatar;
 }

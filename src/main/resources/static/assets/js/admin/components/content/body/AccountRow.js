@@ -8,7 +8,8 @@ const color = [
 
 function AccountRow({ row, index }) {
     return html`
-        <tr style="background-color: ${ index % 2 === 0 && color[0] || color[1]}">
+        <tr style="background-color: ${ index % 2 === 0 && color[0] || color[1]}"
+            onclick="dispatch('openPersonalPage', ${index} )">
             <td>${row.id}</td>
             <td>${row.username}</td>
             <td>${row.email}</td>

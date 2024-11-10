@@ -1,0 +1,453 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        scale: 0;
+    }
+    to {
+        opacity: 1;
+        scale: 1;
+    }
+}
+
+:root {
+    --primary: rgb(252, 211, 159);
+    --text-color: rgb(252, 211, 159);
+    --text-color-dark: rgb(5, 5, 5);
+    --closure-color: rgb(5, 5, 5);
+    --green-color: rgb(145, 221, 198);
+    --blue-color: rgb(172, 188, 253);
+    --pink-color: rgb(250, 168, 206);
+    --yellow-color: rgb(252, 211, 159);
+    --overlay-color: rgba(255, 255, 255, 0.5);
+    --closure-background-color: rgba(240, 240, 240, 0.6);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+}
+
+html {
+    font-family: 'Montserrat', sans-serif;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    color: var(--text-color);
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    padding: 8px 16px;
+    position: relative;
+}
+
+a {
+    text-decoration: none;
+}
+
+#overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--overlay-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: -10;
+}
+
+#overlay.active {
+    z-index: 2;
+}
+
+#coating {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    z-index: -1;
+}
+
+#background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../../img/background.jpg') no-repeat center center / cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: -2;
+}
+
+.closure {
+    background-color: var(--closure-color);
+    border-radius: 8px;
+    box-shadow: 0 0 10px black;
+    padding: 16px;
+}
+
+.modal {
+    position: relative;
+    display: none;
+}
+
+.modal.active {
+    display: block;
+}
+
+.modal__title {
+    text-align: center;
+    color: var(--text-color);
+    font-size: 25px;
+    margin: 0 0 32px 0;
+}
+
+.btn-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    font-size: 24px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.btn-icon:hover {
+    background-color: var(--overlay-color);
+}
+
+.btn-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
+.btn {
+    cursor: pointer;
+    border-radius: 8px;
+    color: var(--text-color-dark);
+    background-color: var(--primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sidebar-header {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.sidebar-header img {
+    width: 75px;
+    height: 75px;
+    margin-top: 16px;
+    margin-bottom: 32px;
+    border-radius: 50%;
+    box-shadow: 0 0 16px white;
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.sidebar-header img:hover {
+    box-shadow: 0 0 16px var(--text-color);
+}
+
+.sidebar-header a {
+    width: 100%;
+    margin-bottom: 16px;
+    color: var(--text-color);
+    font-weight: 500;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all .3s ease;
+}
+
+.sidebar-header a:hover {
+    background-color: var(--text-color);
+    color: var(--closure-color);
+}
+
+.sidebar-header a i {
+    font-size: 20px;
+    margin-right: 16px;
+    min-width: 23px;
+}
+
+.sidebar-body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.sidebar-body .btn {
+    width: 100%;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 8px 0;
+    margin-bottom: 8px;
+}
+
+.settings-link {
+    color: var(--text-color);
+    font-size: 12px;
+}
+
+.settings-link i {
+    margin-right: 8px;
+}
+
+.btn:hover {
+    box-shadow: 0 0 10px var(--primary);
+}
+
+.btn.btn--green,
+.closure.closure--green {
+    background-color: var(--green-color);
+    color: var(--closure-color);
+}
+
+.btn.btn--green:hover {
+    background-color: var(--green-color);
+    box-shadow: 0 0 16px var(--green-color);
+}
+
+.btn.btn--blue,
+.closure.closure--blue {
+    background-color: var(--blue-color);
+    color: var(--closure-color);
+}
+
+.btn.btn--blue:hover {
+    background-color: var(--blue-color);
+    box-shadow: 0 0 16px var(--blue-color);
+}
+
+.btn.btn--yellow,
+.closure.closure--yellow {
+    background-color: var(--yellow-color);
+    color: var(--closure-color);
+}
+
+.btn.btn--yellow:hover {
+    background-color: var(--yellow-color);
+    box-shadow: 0 0 16px var(--yellow-color);
+}
+
+.btn.btn--pink,
+.closure.closure--pink  {
+    background-color: var(--pink-color);
+}
+
+.btn.btn--pink:hover {
+    background-color: var(--pink-color);
+    box-shadow: 0 0 16px var(--pink-color);
+}
+
+.scrollable-element {
+    overflow-y: auto;
+}
+
+.scrollable-element::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollable-element::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 10px;
+}
+
+.scrollable-element::-webkit-scrollbar-thumb {
+    background-color: var(--text-color);
+    border-radius: 10px;
+}
+
+.scrollable-element::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
+
+.main-modal {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-item {
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.modal__avatar {
+    margin-top: -8px;
+    width: 200px;
+    height: 200px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 1);
+    margin-bottom: 2px;
+    transition: box-shadow .3s ease;
+    border-radius: 50%;
+}
+
+.modal__avatar:hover {
+    box-shadow: 0 0 16px var(--text-color);
+}
+
+.modal__username {
+    font-size: 30px;
+    margin-bottom: 4px;
+}
+
+.modal__email {
+    font-size: 12px;
+    font-weight: 300;
+    margin-bottom: 4px;
+}
+
+.modal__elo {
+    font-size: 20px;
+}
+
+.modal__numbers {
+    width: 100%;
+    display: flex;
+    margin-bottom: 16px;
+}
+
+.number-item {
+    flex: 1;
+    margin-right: 8px;
+    min-width: 120px;
+    min-height: 60px;
+    color: var(--closure-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.number__title {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.end {
+    margin-right: 0;
+}
+
+.achievements-container {
+    width: 100%;
+    height: 150px;
+    border-radius: 8px;
+    background-color: var(--overlay-color);
+    margin-bottom: 16px;
+}
+
+.modal__function {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.modal__btn {
+    margin: 0 auto;
+    width: 150px;
+    height: 40px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.modal__btn:hover {
+    box-shadow: 0 0 10px var(--text-color);
+}
+
+#update-avatar {
+    min-width: 400px;
+}
+
+.top--margin {
+    margin-top: 32px;
+}
+
+#avatarInput {
+    display: none;
+}
+
+
+#change-password {
+    min-width: 400px;
+}
+
+.modal input {
+    background-color: transparent;
+    outline: none;
+    border: none;
+}
+
+.password-item {
+    width: 100%;
+}
+
+.password-container {
+    background-color: white;
+    border-radius: 16px;
+    overflow: hidden;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.password__input {
+    font-size: 16px;
+    padding: 8px 8px;
+    flex: 1;
+    font-weight: bold;
+}
+
+.password-container i {
+    color: var(--closure-color);
+    cursor: pointer;
+}
+
+.password-container .off {
+    display: none;
+}
+
+.password-container.active .on {
+    display: none;
+}
+
+.password-container.active .off {
+    display: block;
+}
+
+.error-message {
+    color: var(--pink-color);
+    font-size: 14px;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 8px;
+}

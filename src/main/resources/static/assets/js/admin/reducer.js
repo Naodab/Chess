@@ -1,6 +1,7 @@
 import logout from "../account/logout.js";
 import changePassword from "../account/changePassword.js";
 import {getUsers} from "./api/user.js";
+import {getAccountData} from "./api/traffic.js";
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
@@ -70,6 +71,9 @@ const init = {
         notify: {
             message: ""
         },
+        personalPage: {
+            user: null,
+        },
         activeModal: ""
     },
     content: {
@@ -113,6 +117,38 @@ const init = {
                 },
                 table: {
                     id: "account__table",
+                    recordSize: 0,
+                    sortFields: [
+                        {
+                            name: "Tài khoản",
+                            value: "username"
+                        },
+                        {
+                            name: "Elo",
+                            value: "elo"
+                        },
+                        {
+                            name: "Số trận đấu",
+                            value: "battleNumber"
+                        }
+                    ],
+                    activeSort: 0,
+                    activeSortType: 0,
+                    lookupFields: [
+                        {
+                            name: "Tài khoản",
+                            value: "username"
+                        },
+                        {
+                            name: "Email",
+                            value: "email"
+                        },
+                        {
+                            name: "Elo",
+                            value: "elo"
+                        }
+                    ],
+                    activeLookup: 0,
                     columns: [
                         {
                             title: "Mã",
@@ -128,7 +164,7 @@ const init = {
                             width: "20%"
                         },
                         {
-                            title: "Mức độ truy cập",
+                            title: "Tỉ lệ thắng",
                         },
                         {
                             title: "Elo",
@@ -153,9 +189,40 @@ const init = {
         match: {
 
         },
-        activeItem: "account"
+        activeItem: "account",
+        sortTypes: [
+            {
+                value: "asc",
+                icon: "fa-solid fa-up-long",
+            },
+            {
+                value: "desc",
+                icon: "fa-solid fa-down-long"
+            },
+            {
+                value: ""
+            }
+        ],
+        sortFields: [],
+        lookupFields: []
     },
     avatar: "../assets/img/avatar/1.jpg",
+}
+
+init.content.sortFields = init.content.account.detail.table.sortFields;
+init.content.lookupFields = init.content.account.detail.table.lookupFields;
+
+window.onload = () => {
+    console.log(1)
+    getAccountData().then(data => {
+        init.content.account.dataList[0].quantity = data.userSize;
+        init.content.account.dataList[1].quantity = data.onlineSize;
+        init.content.account.dataList[2].quantity = data.trafficSize;
+        init.content.account.dataList[3].quantity = data.newMemberSize;
+        dispatch('rerender');
+    })
+
+    //TODO: draw do thi
 }
 
 function saveDataPasswordChangeModal (modal) {
@@ -173,13 +240,17 @@ const actions = {
     },
     changeDetail: ({ content }) => {
         let detail = content[content.activeItem].detail;
-        detail.table.rows = [];
-        getUsers(window.token).then(data => {
-            console.log(data);
-            data.forEach(user => detail.table.rows.push(user));
-            detail.activeDetail = "table";
-            dispatch('rerender');
-        });
+        if (detail.activeDetail === "chart") {
+            detail.table.rows = [];
+
+            getUsers(window.token).then(data => {
+                data.forEach(user => detail.table.rows.push(user));
+                detail.activeDetail = "table";
+                dispatch('rerender');
+            });
+        } else {
+            detail.activeDetail = "chart";
+        }
     },
     executeActivity: ({modal}, index) => {
         if (index === 0) logout(window.token);
@@ -189,6 +260,11 @@ const actions = {
     },
     openActivityList: ({activity}) => {
         activity.active = !activity.active;
+    },
+    openPersonalPage: ({ modal, content }, index) => {
+        console.log(1)
+        modal.activeModal = "personalPage";
+        modal.personalPage.user = content.account.detail.table.rows[index];
     },
     submitChangePassword: ({modal}) => {
         saveDataPasswordChangeModal(modal);

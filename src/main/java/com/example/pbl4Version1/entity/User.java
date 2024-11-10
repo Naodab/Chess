@@ -62,5 +62,7 @@ public class User {
 	
 	@ManyToMany
 	Set<Achievement> achievements;
-	String avatar;
+
+	@Builder.Default
+	String avatar = "https://res.cloudinary.com/dcggh7awq/image/upload/v1730984438/ooa4rt3qrsuyoeotc1va.jpg";
 }

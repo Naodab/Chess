@@ -12,8 +12,8 @@
     <link rel="stylesheet" href="../assets/css/selectplay.css">
     <style>
     body{
-    background-image: url('../assets/img/background.jpg');
-}
+        background-image: url('../assets/img/background.jpg');
+    }
     </style>
 </head>
 
@@ -25,7 +25,6 @@
                 <i id="close-btn_profile" class="fas fa-times">
                 </i>
             </div>
-
 
             <div class="section">
                 <div class="section-title">THỜI LƯỢNG</div>
@@ -167,22 +166,16 @@
         </div>
     </div>
 
-
-
-
-
     <div class="sidebar">
         <img alt="Chess.com logo" src="../assets/img/icon.jpg" width="150" height="100" />
-        <a href="playonline.html"><i class="fas fa-chess"></i> Play Online</a>
-        <a href="playbots.html"><i class="fas fa-puzzle-piece"></i> Play Computer</a>
-
+        <a href=""><i class="fas fa-chess"></i> Play Online</a>
+        <a href=""><i class="fas fa-puzzle-piece"></i> Play Computer</a>
 
         <button id="form-signup" class="button signup">Sign Up</button>
         <button id="form-login" class="button login">Log In</button>
-        <a class="settings-link" href="profile.html"><i class="fas fa-cog"></i>Cài đặt</a>
-
-
+        <a class="settings-link" href=""><i class="fas fa-cog"></i>Cài đặt</a>
     </div>
+
     <div class="main-content">
         <div class="container">
             <div class="header">
@@ -198,127 +191,6 @@
                 </button>
             </div>
             <table class="table">
-                <!-- <thead>
-                    <tr>
-                        <th>
-                            Phòng
-                        </th>
-                        <th>
-                            Thời gian
-                        </th>
-                        <th>
-                            Số người
-                        </th>
-
-                        <th>
-                            Trạng thái
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="room-id">
-                            <label for="">33008</label>
-                        </td>
-                        <td>
-                            10 phút
-                        </td>
-                        <td>
-                            2
-                        </td>
-
-                        <td>
-
-                            <div class="taoban">
-                                <button class="main-btn">Tham gia</button>
-                                <button class="screen">Xem</button>
-
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="room-id">
-                            9783992
-                        </td>
-                        <td>
-                            30 phút
-                        </td>
-                        <td>
-                            2
-                        </td>
-
-                        <td>
-                            <div class="taoban">
-                                <button class="main-btn">Tham gia</button>
-                                <button class="screen">Xem</button>
-
-                            </div>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="room-id">
-                            9831609
-                        </td>
-                        <td>
-                            5 phút
-                        </td>
-                        <td>
-                            2
-                        </td>
-
-                        <td>
-
-                            <div class="taoban">
-                                <button class="main-btn">Tham gia</button>
-                                <button class="screen">Xem</button>
-
-                            </div>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="room-id">
-                            9851036
-                        </td>
-                        <td>
-                            20 phút
-                        </td>
-                        <td>
-                            2
-                        </td>
-
-                        <td>
-
-                            <div class="taoban">
-                                <button class="main-btn">Tham gia</button>
-                                <button class="screen">Xem</button>
-
-                            </div>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="room-id">
-                            9847615
-                        </td>
-                        <td>
-                            15 phút
-                        </td>
-                        <td>
-                            2
-                        </td>
-
-                        <td>
-                            <div class="taoban">
-                                <button class="main-btn">Tham gia</button>
-                                <button class="screen">Xem</button>
-
-                            </div>
-                        </td>
-                    </tr>
-                </tbody> -->
-
                 <thead>
                     <tr>
                         <th>Phòng</th>

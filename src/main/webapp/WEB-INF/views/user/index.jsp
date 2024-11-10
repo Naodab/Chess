@@ -4,15 +4,28 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<link rel="stylesheet" href="../assets/css/user/base.css">
 <link rel="stylesheet" href="../assets/css/chess.css">
-<title>Insert title here</title>
+<title>Chess</title>
 </head>
 <body>
-    <div class="background"></div>
-    <div class="overlay"></div>
+    <div id="background"></div>
+    <div id="coating"></div>
+    <div id="overlay"></div>
     <div class="container">
-        <nav class="main-nav">
-        </nav>
+        <div class="sidebar closure">
+            <div class="sidebar-header">
+                <img alt="Chess.com logo" src="../assets/img/icon.jpg" width="150" height="100" />
+                <a href=""><i class="fas fa-chess"></i>Chơi online</a>
+                <a href=""><i class="fas fa-puzzle-piece"></i>Chơi với máy</a>
+            </div>
+            <div class="sidebar-body">
+                <button class="btn btn--pink logout">Đăng xuất</button>
+            </div>
+            <a class="settings-link" href=""><i class="fas fa-cog"></i>Cài đặt</a>
+        </div>
+
         <div class="play-area">
             <div class="player-info-container">
                 <div class="player-info">
@@ -47,6 +60,14 @@
             </div>
         </div>
 
+        <div class="right-panel">
+            <div class="closure chat-container">
+
+            </div>
+            <div class="closure steps-container">
+
+            </div>
+        </div>
     </div>
     <script type="module" src="../assets/js/chessjs/index.js"></script>
 </body>

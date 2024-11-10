@@ -19,7 +19,7 @@ public class HomeController {
 
     @GetMapping(value = {"/", "/home"})
 	public String index() {
-		return "home";
+		return "user/home";
 	}
 
     @GetMapping("/login")
@@ -37,6 +37,11 @@ public class HomeController {
         ModelAndView modelAndView = new ModelAndView("login");
         modelAndView.addObject("isSignup", true);
         return modelAndView;
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        return "user/home";
     }
     
     @GetMapping("/forgot")

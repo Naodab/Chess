@@ -129,8 +129,8 @@ public class StepService {
 					return stepMapper.toStepResponse(step);
 				}
 			}
-
 		}
+
 		return stepMapper.toStepResponse(Step.builder().match(mwb).build());
 	}
 }

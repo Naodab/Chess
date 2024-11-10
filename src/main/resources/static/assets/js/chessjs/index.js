@@ -81,7 +81,7 @@ document.body.onload = async function () {
         if (res.ok) {
             return res.json();
         }
-        throw new Error("Match has been deleted or already played");
+        throw new Error("Match has been deleted or already finished");
     }).then(data => {
         loadPageFunction(ALLIANCE);
         fen = data.result.fen;

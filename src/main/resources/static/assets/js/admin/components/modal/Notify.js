@@ -1,7 +1,7 @@
 import { connect } from "../../store.js";
 import html from "../../core.js";
 
-function ChangePasswordModal(notify) {
+function Notify(notify) {
     return html`
         <h1 class="form__title">Thông báo</h1>
         <div id="change-password-modal">
@@ -19,4 +19,4 @@ function ChangePasswordModal(notify) {
     `;
 }
 
-export default connect()(ChangePasswordModal);
+export default connect()(Notify);

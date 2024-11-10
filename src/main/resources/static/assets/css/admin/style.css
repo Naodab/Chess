@@ -263,6 +263,7 @@
     top: 0;
     display: flex;
     flex-direction: column;
+    animation: fadeIn .3 ease-in-out;
 }
 
 .detail__chart {
@@ -334,6 +335,89 @@
     box-shadow: 0 0 8px var(--text-color);
 }
 
+.table__function {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px;
+}
+
+.function__title {
+    font-size: 18px;
+    color: var(--text-color);
+    padding: 0;
+    margin-right: 8px;
+    font-style: italic;
+}
+
+.selection {
+    background-color: var(--text-color);
+    font-size: 16px;
+    margin: 0 4px;
+    min-width: 120px;
+    border-radius: 4px;
+}
+
+.table__function .function__sort {
+    display: flex;
+    align-items: center;
+}
+
+.table__function .function__sort .sort__type-container {
+    margin-left: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.sort__type-container .sort-group {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: var(--text-color);
+    margin: 0 8px;
+}
+
+.sort-group label {
+    margin-left: 4px;
+}
+
+.function__lookup {
+    display: flex;
+    align-items: center;
+}
+
+.lookup__search-bar {
+    background-color: white;
+    padding: 2px 8px;
+    min-width: 250px;
+    display: flex;
+    border-radius: 16px;
+}
+
+.lookup__search-bar input {
+    background-color: transparent;
+    outline: none;
+    border: none;
+    flex: 1;
+    font-size: 14px;
+}
+
+.lookup__search-bar .lookup__icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.lookup__search-bar .lookup__icon:hover {
+    background-color: #333;
+    color: var(--text-color);
+    animation: fadeIn .3s ease;
+}
 
 .table {
     margin-top: 8px;
@@ -344,6 +428,7 @@
     border-collapse: separate;
     border-spacing: 2px 4px;
     padding: 0;
+    animation: fadeIn .3s ease-in-out;
 }
 
 .table tr {
@@ -402,4 +487,31 @@
 .table tr:hover {
     background-color: var(--overlay-color);
     box-shadow: 0 0 4px white;
+}
+
+.detail__pages {
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page {
+    margin: 4px;
+    padding: 4px 8px;
+    border: 1px solid var(--text-color);
+    border-radius: 8px;
+    font-size: 16px;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.page:hover {
+    box-shadow: 0 0 8px var(--text-color);
+}
+
+.page.active {
+    color: var(--closure-color);
+    background-color: var(--text-color);
+    box-shadow: 0 0 8px var(--text-color);
 }

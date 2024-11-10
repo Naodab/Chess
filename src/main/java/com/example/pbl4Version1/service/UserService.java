@@ -100,10 +100,6 @@ public class UserService {
 		userRepository.save(user);
 		return userMapper.toUserResponse(user);
 	}
-
-	public void getData() {
-
-	}
 	
 	@PreAuthorize("hasRole('ADMIN')")
 	public void delete(String id) {

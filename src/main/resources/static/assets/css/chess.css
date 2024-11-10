@@ -67,38 +67,6 @@
     --highlight-yellow: #fefbfb;
 }
 
-* {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    font-family: 'Montserrat', sans-serif;
-}
-
-body {
-    width: 100vw;
-    height: 100vh;
-}
-
-.background {
-    position: absolute;
-    background: #2b2b2b url(../img/background.jpg) no-repeat center center/cover;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -2;
-}
-
-.overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: -1;
-}
-
 .container {
     height: 100%;
     width: 100%;
@@ -106,17 +74,12 @@ body {
     flex-direction: row;
 }
 
-.main-nav {
-    width: 80px;
-    margin-right: 16px;
-    height: 100%;
-}
-
 .play-area {
     width: 640px;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
+    margin-left: 16px;
 }
 
 .player-info-container {
@@ -263,15 +226,16 @@ body {
 .game-board-container {
     width: 640px;
     height: 640px;
-    background: conic-gradient(from 90deg,
-        rgba(94, 123, 111, 0.5),
-        rgba(196, 154, 104, 0.5),
-        rgba(94, 123, 111, 0.5),
-        rgba(196, 154, 104, 0.5),
-        rgba(94, 123, 111, 0.5));
+    /*background: conic-gradient(from 90deg,*/
+    /*    rgba(94, 123, 111, 0.5),*/
+    /*    rgba(196, 154, 104, 0.5),*/
+    /*    rgba(94, 123, 111, 0.5),*/
+    /*    rgba(196, 154, 104, 0.5),*/
+    /*    rgba(94, 123, 111, 0.5));*/
+    background-color: var(--closure-color);
     position: relative;
     border-radius: 16px;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 10px var(--text-color);
     padding-top: 20px;
     display: flex;
     flex-direction: column;
