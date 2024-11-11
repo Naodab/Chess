@@ -2,6 +2,8 @@ package com.example.pbl4Version1.controller;
 
 import java.util.List;
 
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,5 +75,11 @@ public class RoomController {
 		return ApiResponse.builder()
 				.message("Room + " + id + " has been deleted.")
 				.build();
+	}
+
+	@MessageMapping("/join-room")
+	@SendTo("/topic/public")
+	public String joinRoom() {
+		return "abc join";
 	}
 }

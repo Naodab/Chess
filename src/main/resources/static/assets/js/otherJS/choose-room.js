@@ -7,8 +7,35 @@ function onExitFunc() {
 }
 
 function joinRoom(roomID) {
-    alert("Bạn đang chuẩn bị vào phòng chơi mới!" + " Và roomID = " + roomID);
-    window.location.href = "../play-with-people/enter-game";
+    alert("Bạn đang chuẩn bị vào phòng chơi mới! Room ID = " + roomID);
+    const token = localStorage.getItem("TOKEN");
+    console.log(token);
+    const socket = new SockJS('/chess/websocket', {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+    const stompClient = Stomp.over(socket);
+    console.log("chuan bi");
+    stompClient.connect({
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+        }, (frame) => {
+        console.log("aa");
+        console.log("Connected: " + frame);
+        stompClient.subscribe('/topic/public', (message) => {
+            const notification = JSON.parse(message);
+            console.log(notification);
+            alert(notification); //khúc ni là khúc chuẩn bị cập nhật lại giao diện!
+        });
+        const massage = "Nguoi dung muon tham gia room: " + roomID;
+        stompClient.send('/app/join-room', {}, JSON.stringify(massage));
+        alert("Request sent to join room: " + roomID);
+        }, (error) => {
+        console.error("Error connecting to WebSocket:", error);
+        }
+    );
 }
 
 function loadRoom() {
@@ -35,7 +62,7 @@ function loadRoom() {
 
             rooms.forEach(room => {
                 const roomID = room.id;
-				console.log(roomID);
+                console.log(roomID);
                 const res = room;
 
                 const row = document.createElement("tr");
@@ -65,7 +92,7 @@ function loadRoom() {
 
                 tableBody.appendChild(row);
             })
-            })
+        })
         .catch(error => {
             console.error("Lỗi khi truyền tải dữ liệu!", error);
         });
