@@ -13,7 +13,8 @@ import {
     deletePiece,
     generateFen,
     beginPromotionPawn,
-    finishPromotionPawn
+    finishPromotionPawn,
+    handleNameMove
 } from "../render/main.js";
 import {
     checkPieceOfOpponentOnElement,
@@ -866,8 +867,7 @@ function moveOrCancelMove(square) {
             } else if (status === "IN_CHECK") {
                 nameMove += "+";
             }
-            // TODO: HANDLE NAME MOVE
-            console.log(nameMove);
+            handleNameMove(nameMove);
             nameMove = "";
             if (moveState.piece_name.includes("PAWN") &&
                 (square.id.includes("8") || square.id.includes("1"))) {
@@ -881,6 +881,7 @@ function moveOrCancelMove(square) {
         moveState = null;
     } else {
         clearPreviousSelfHighlight(previousHighlight);
+        nameMove = "";
     }
     previousHighlight = null;
     clearHighlightLocal();
@@ -959,7 +960,8 @@ async function sendStepToServer(from, to) {
         if (response.ok) {
             const data = await response.json();
             nameMove = data.result.name;
-            console.log(nameMove);
+            turn++;
+            handleNameMove(nameMove);
             nameMove = "";
             const piece = getPieceAtPosition(data.result.from);
             prepareForMoving(piece, data.result.to);
@@ -971,7 +973,6 @@ async function sendStepToServer(from, to) {
                 alert(status);
             }
             turnWhite = !turnWhite;
-            turn++;
         }
     } catch (error) {
     }

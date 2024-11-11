@@ -56,7 +56,7 @@ public class HomeController {
 
     @GetMapping("/play-with-bot")
     public String playWithBot() {
-        return "user/index";
+        return "user/play_with_bot";
     }
 
     @GetMapping("/playonl")

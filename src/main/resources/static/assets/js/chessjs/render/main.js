@@ -1,5 +1,5 @@
 import * as pieces from "../data/piece.js";
-import { ROOT_DIV } from "../helper/constants.js";
+import {ROOT_DIV, STEPS_CONTAINER} from "../helper/constants.js";
 import { globalState, ALLIANCE } from "../index.js";
 import {
 	turnWhite,
@@ -15,7 +15,7 @@ import {
 	WHITE_DEFEATED_PIECES,
 	GB_CONTAINER,
 	OVERLAY,
-	PROMPT_PIECES,
+	PROMPT_PIECES
 } from "../helper/constants.js";
 
 const blackPieces = [];
@@ -272,6 +272,36 @@ function finishPromotionPawn(name) {
 		let index = blackPieces.findIndex(ele => ele.current_position === promotionPiece.current_position);
 		blackPieces.splice(index, 1);
 		blackPieces.push(newPiece);
+	}
+}
+
+function renderStepItem(nameMove, index) {
+	const div = document.createElement("div");
+	div.classList.add("step-item");
+	div.innerHTML = `
+		<div class="step-index">${index}</div>
+		<div class="step-container">
+			<div class="step">${nameMove}</div>
+		</div>
+		<div class="step-container">
+			<div class="step"></div>
+		</div>
+	`;
+	STEPS_CONTAINER.appendChild(div);
+}
+
+function renderStep(nameMove) {
+	const steps = document.querySelectorAll('.step');
+	const lastStep = steps[steps.length - 1];
+	lastStep.innerHTML = nameMove;
+}
+
+function handleNameMove(nameMove) {
+	const index = Math.ceil(turn / 2);
+	if (turn % 2 === 1) {
+		renderStepItem(nameMove, index);
+	} else {
+		renderStep(nameMove);
 	}
 }
 
@@ -550,5 +580,6 @@ export {
 	generateFen,
 	deletePiece,
 	beginPromotionPawn,
-	finishPromotionPawn
+	finishPromotionPawn,
+	handleNameMove
 };

@@ -53,13 +53,19 @@ function loadPageFunction(alliance) {
         }
         gbContainer.appendChild(characters);
     }
+    resize();
+}
+
+function resize() {
+    const gbContainer = document.querySelector(".game-board-container");
+    const playerInfoContainer = document.querySelector(".player-info-container");
+    const defeatedPiecesContainer = document.querySelector(".defeated-pieces-container");
+    playerInfoContainer.style.width = gbContainer.offsetHeight + "px";
+    defeatedPiecesContainer.style.width = gbContainer.offsetHeight + "px";
     gbContainer.style.width = gbContainer.offsetHeight + 'px';
 }
 
-window.onresize = function() {
-    const gbContainer = document.querySelector(".game-board-container");
-    gbContainer.style.width = gbContainer.offsetHeight + 'px';
-}
+window.onresize = resize;
 
 // will be useful when game ends
 const globalState = initGame();

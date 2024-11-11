@@ -181,7 +181,8 @@ a {
     transition: all .3s ease;
 }
 
-.sidebar-header a:hover {
+.sidebar-header a:hover,
+.sidebar-header a.active{
     background-color: var(--text-color);
     color: var(--closure-color);
 }
@@ -281,6 +282,28 @@ a {
 }
 
 .scrollable-element::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
+
+.scrollable-element-x {
+    overflow-x: auto;
+}
+
+.scrollable-element-x::-webkit-scrollbar {
+    height: 8px;
+}
+
+.scrollable-element-x::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 10px;
+}
+
+.scrollable-element-x::-webkit-scrollbar-thumb {
+    background-color: var(--text-color);
+    border-radius: 10px;
+}
+
+.scrollable-element-x::-webkit-scrollbar-thumb:hover {
     background-color: #555;
 }
 
