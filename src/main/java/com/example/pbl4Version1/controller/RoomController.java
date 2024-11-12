@@ -34,7 +34,6 @@ public class RoomController {
 	
 	@PostMapping
 	ApiResponse<RoomResponse> create(@RequestBody RoomCreateRequest request) {
-		log.info(request.getHostId() + "/" + request.getPassword());
 		return ApiResponse.<RoomResponse>builder()
 				.result(roomService.create(request))
 				.build();
