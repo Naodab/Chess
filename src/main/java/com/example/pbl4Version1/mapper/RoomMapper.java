@@ -22,6 +22,7 @@ public class RoomMapper {
 	public Room toRoom(RoomCreateRequest request) {
 		return Room.builder()
 				.password(request.getPassword())
+				.time(request.getTime())
 				.build();
 	}
 
@@ -49,6 +50,7 @@ public class RoomMapper {
 				.id(room.getId())
 				.host(host)
 				.player(player)
+				.time(room.getTime())
 				.viewers(viewers)
 				.playDay(room.getPlayDay())
 				.build();

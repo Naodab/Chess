@@ -36,8 +36,8 @@ public class MatchWithBotController {
 
 	@GetMapping("/{matchID}")
 	ApiResponse<MatchWithBotResponse> getMatchWithBot(@PathVariable("matchID") Long matchID) {
-		// TODO: handle get match data and fen to generate for frontend
 		return ApiResponse.<MatchWithBotResponse>builder()
+				.result(matchWithBotService.getMatch(matchID))
 				.build();
 	}
 }

@@ -2,6 +2,7 @@ package com.example.pbl4Version1.service;
 
 import java.util.List;
 
+import com.example.pbl4Version1.entity.Room;
 import org.springframework.stereotype.Service;
 
 import com.example.pbl4Version1.dto.request.MatchBotCreationRequest;
@@ -39,10 +40,12 @@ public class MatchWithHumanService {
 		
 		match.setWhitePlayer(userRepository.findById(request.getWhitePlayerId())
 				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
-		
-		match.setRoom(roomRepository.findById(request.getRoomId())
-				.orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_EXISTED)));
-		
+		Room room = roomRepository.findById(request.getRoomId())
+				.orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
+		match.setRoom(room);
+		match.setTimeBlackUser(room.getTime());
+		match.setTimeWhiteUser(room.getTime());
+
 		match = matchRepository.save(match);
 		return matchMapper.toMatchWithHumanResponse(match);
 	}

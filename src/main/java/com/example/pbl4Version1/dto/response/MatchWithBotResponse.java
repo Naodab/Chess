@@ -1,5 +1,6 @@
 package com.example.pbl4Version1.dto.response;
 
+import java.util.List;
 import java.util.Set;
 
 import lombok.AccessLevel;
@@ -18,4 +19,5 @@ public class MatchWithBotResponse {
 	Long id;
 	UserResponse player;
 	String winner;
+	List<StepResponse> steps;
 }

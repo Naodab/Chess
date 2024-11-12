@@ -87,6 +87,13 @@ public class UserService {
 				() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 		return userMapper.toUserResponse(user);
 	}
+
+	public UserResponse getUserByUsernameOrEmail(String username) {
+		User user = userRepository.findByUsername(username)
+				.or(() -> userRepository.findByEmail(username))
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+		return userMapper.toUserResponse(user);
+	}
 	
 	public UserResponse update(String id, UserUpdateRequest request) {
 		User user = userRepository.findById(id).orElseThrow(

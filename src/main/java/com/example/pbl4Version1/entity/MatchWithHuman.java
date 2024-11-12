@@ -31,15 +31,20 @@ public class MatchWithHuman extends Match {
 	@ManyToOne
 	@JoinColumn(name = "black_player_id")
 	User blackPlayer;
+
+	float timeWhiteUser;
+	float timeBlackUser;
 	
 	public MatchWithHuman() {}
 
 	public MatchWithHuman(Long id, GameStatus gameStatus, 
 			PlayerType turn, PlayerType winner, Set<Step> steps, 
-			Room room, User whitePlayer, User blackPlayer) {
+			Room room, User whitePlayer, User blackPlayer, int time) {
 		super(id, gameStatus, turn, winner, steps);
 		this.room = room;
 		this.whitePlayer = whitePlayer;
 		this.blackPlayer = blackPlayer;
+		this.timeWhiteUser = time;
+		this.timeBlackUser = time;
 	}
 }

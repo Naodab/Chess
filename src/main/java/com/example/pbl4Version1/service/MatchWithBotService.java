@@ -1,7 +1,9 @@
 package com.example.pbl4Version1.service;
 
+import java.util.HashSet;
 import java.util.List;
 
+import com.example.pbl4Version1.repository.StepRepisitory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MatchWithBotService {
 	MatchWithBotRepository matchRepository;
 	UserRepository userRepository;
+	StepRepisitory stepRepisitory;
 	MatchMapper matchMapper;
 	
 	public MatchWithBotResponse create(MatchBotCreationRequest request) {
@@ -50,6 +53,7 @@ public class MatchWithBotService {
 	public MatchWithBotResponse getMatch(Long id) {
 		MatchWithBot match = matchRepository.findById(id)
 				.orElseThrow(() -> new AppException(ErrorCode.MATCH_NOT_EXISTED));
+		match.setSteps(new HashSet<>(stepRepisitory.findByMatchId(match.getId())));
 		return matchMapper.toMatchWithBotResponse(match);
 	}
 	

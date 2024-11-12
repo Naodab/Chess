@@ -39,4 +39,6 @@ public class Room {
 	
 	@OneToMany(mappedBy = "room")
 	Set<MatchWithHuman> matches;
+
+	int time;
 }

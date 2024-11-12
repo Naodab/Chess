@@ -54,6 +54,7 @@ public class StepService {
 				.orElseThrow(() -> new AppException(ErrorCode.MATCH_NOT_EXISTED));
 		
 		Step stepUser = stepMapper.toStep(request);
+		log.info(stepUser.toString());
 		stepUser.setMatch(mwb);
 		stepRepository.save(stepUser);
 
@@ -103,10 +104,12 @@ public class StepService {
 				.from(from)
 				.to(to)
 				.match(mwb)
+				.name(bestMove.toString())
 				.boardState(fen)
 				.name(bestMove.toString())
 				.build();
 
+		log.info(bestMove.toString());
 		stepRepository.save(stepAI);
 		matchWithBotRepository.save(mwb);
 

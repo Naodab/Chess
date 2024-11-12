@@ -1,12 +1,14 @@
 import { initGame } from "./data/data.js";
 import { initGameRender, initGameFromFenRender } from "./render/main.js";
 import { globalEvent } from "./event/global.js";
+import { STEPS_CONTAINER } from "./helper/constants.js";
 
 const playerInfo = document.querySelectorAll(".player-info");
 const defeatedPieces = document.querySelectorAll(".defeated-pieces");
 const gbContainer = document.querySelector(".game-board-container");
 
 let ALLIANCE = "WHITE";
+let ROLE = "PLAYER";
 let OPPONENT = "BLACK";
 
 function loadPageFunction(alliance) {
@@ -72,35 +74,71 @@ const globalState = initGame();
 
 const matchID = localStorage.getItem("MATCH_ID");
 
-let fen = "";
-let apiBot = "/chess/api/steps/bot/" + matchID;
-let apiHuman = "/chess/api/steps/human/" + matchID;
+let apiBot = "/chess/api/matches/bot/" + matchID;
+let apiHuman = "/chess/api/matches/human/" + matchID;
 
 document.body.onload = async function () {
-    await fetch("/chess/api/steps/bot/" + matchID, {
-        method: 'GET',
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
-        }
-    }).then(res => {
-        if (res.ok) {
-            return res.json();
-        }
-        throw new Error("Match has been deleted or already finished");
-    }).then(data => {
-        loadPageFunction(ALLIANCE);
-        fen = data.result.fen;
-        const allianceWhite = document.querySelector(".player-info.alliance-white");
-        const nameWhite = allianceWhite.querySelector(".name");
-        const eloWhite = allianceWhite.querySelector(".elo");
-        nameWhite.innerText = data.result.match.player.username;
-        eloWhite.innerText = data.result.match.player.elo;
-        initGameFromFenRender(globalState, fen);
-        globalEvent();
-    }).catch(error => {
-        alert(error.message);
-    })
+    if (MODE === "PLAY_WITH_BOT") {
+        await fetch(apiBot, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+            }
+        }).then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            throw new Error("Match has been deleted or already finished");
+        }).then(data => data.result)
+        .then(data => {
+            console.log(data);
+            loadPageFunction(ALLIANCE);
+            const allianceWhite = document.querySelector(".player-info.alliance-white");
+            const nameWhite = allianceWhite.querySelector(".name");
+            const eloWhite = allianceWhite.querySelector(".elo");
+            nameWhite.innerText = data.player.username;
+            eloWhite.innerText = data.player.elo;
+            let steps = data.steps;
+            console.log(steps.length === 0);
+            if (steps.length === 0) {
+                initGameRender(globalState);
+                globalEvent();
+                return;
+            }
+            steps.sort((a, b) => {
+                const numA = parseInt(a.fen.match(/\d+$/)[0]);
+                const numB = parseInt(b.fen.match(/\d+$/)[0]);
+                return numA - numB;
+            });
+            steps.forEach((step, index) => {
+                console.log(step.name)
+                if (index % 2 === 0) {
+                    const div = document.createElement("div");
+                    div.classList.add("step-item");
+                    div.innerHTML = `
+                        <div class="step-index">${Math.floor(index / 2) + 1}</div>
+                        <div class="step-container">
+                            <div class="step">${step.name}</div>
+                        </div>
+                        <div class="step-container">
+                            <div class="step"></div>
+                        </div>
+                    `;
+                    STEPS_CONTAINER.appendChild(div);
+                } else {
+                    const steps = document.querySelectorAll('.step');
+                    const lastStep = steps[steps.length - 1];
+                    lastStep.innerHTML = step.name;
+                }
+            });
+            STEPS_CONTAINER.scrollLeft = STEPS_CONTAINER.scrollWidth;
+            const fen = steps[steps.length - 1].fen;
+            initGameFromFenRender(globalState, fen);
+            globalEvent();
+        });
+    } else {
+        // TODO: for human play render
+    }
 }
-
 export { globalState, ALLIANCE, OPPONENT };

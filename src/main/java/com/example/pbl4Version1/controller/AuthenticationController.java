@@ -3,6 +3,7 @@ package com.example.pbl4Version1.controller;
 import java.text.ParseException;
 
 import com.example.pbl4Version1.dto.request.*;
+import com.example.pbl4Version1.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthenticationController {
 	AuthenticationService authenticationService;
 	SendingEmailService sendingEmailService;
+	UserService userService;
 	
 	@PostMapping("/intro")
 	ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) 
@@ -47,7 +49,8 @@ public class AuthenticationController {
 		AuthenticationResponse authenticationResponse =
 				authenticationService.authenticate(request);
 		session.setAttribute("token", authenticationResponse.getToken());
-		session.setAttribute("username", request.getUsername());
+		session.setAttribute("user", userService
+				.getUserByUsernameOrEmail(request.getUsername()));
 		return ApiResponse.<AuthenticationResponse>builder()
 				.result(authenticationResponse)
 				.build();

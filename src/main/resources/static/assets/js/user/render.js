@@ -9,12 +9,13 @@ function html([first, ...strings], ...values) {
 
 function renderPersonalInformation(user) {
     return html`
-        <div class="modal closure" id="info-user">
+        <div class="modal closure active" id="info-user">
             <h1 class="modal__title">Thông tin cá nhân</h1>
             <i class="fa-solid fa-xmark btn-icon btn-close" id="back"></i>
             <div class="main-modal">
                 <img src="${user.avatar}" alt="avatar" class="modal__avatar">
                 <h2 class="modal__username modal-item">${user.username}</h2>
+                <h4 class="modal__email modal-item">${user.rank}</h4>
                 <h3 class="modal__elo modal-item">${user.elo}</h3>
                 <div class="modal__numbers modal-item">
                     <div class="number-item closure closure--green">
@@ -36,7 +37,6 @@ function renderPersonalInformation(user) {
             </div>
             <div class="modal__function">
                 <div class="modal__btn btn">Ván đấu</div>
-                <div class="modal__btn btn">Cập nhật</div>
             </div>
         </div>
     `;
@@ -118,4 +118,63 @@ function renderChangePassword() {
     `;
 }
 
-export { renderPersonalInformation, renderUpdateAvatar, renderConfirm, renderChangePassword }
+function renderRoom(room) {
+    return html`
+        <td>${room.id}</td>
+        <td>${room.time / 60} phút</td>
+        <td>${room.people}</td>
+        <td>
+            <div class="room-role-list">
+                <div class="btn btn--pink room-role-item">
+                    Tham gia
+                </div>
+                <div class="btn btn--pink room-role-item">
+                    Xem
+                </div>
+            </div>
+        </td>
+    `;
+}
+
+function renderCreateRoom() {
+    return html`
+        <div class="modal closure active" id="create-room-form">
+            <h1 class="modal__title">Tạo phòng</h1>
+            <i class="fa-solid fa-xmark btn-icon btn-close" id="back"></i>
+            <div class="main-modal">
+                <div class="form-selection-container modal-item">
+                    <label>Thời gian:</label>
+                    <div class="time-container">
+                        <div class="time active" data-value="3">3 phút</div>
+                        <div class="time" data-value="5">5 phút</div>
+                        <div class="time" data-value="10">10 phút</div>
+                        <div class="time" data-value="15">15 phút</div>
+                        <div class="time" data-value="30">30 phút</div>
+                    </div>
+                </div>
+                <div class="password-item">
+                    <label for="oldPassword" class="modal__label">Mật khẩu phòng</label>
+                    <div class="password-container">
+                        <input type="password" id="roomPassword" class="password__input"
+                               placeholder="Để trống nếu không cần thiết">
+                        <i class="fa-solid fa-eye on"></i>
+                        <i class="fa-solid fa-eye-slash off"></i>
+                    </div>
+                </div>
+                <div class="modal__function top--margin">
+                    <div class="btn btn--green modal__btn" id="confirm-create-room">Tạo phòng</div>
+                    <div class="btn btn--pink modal__btn" id="cancel">Hủy</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+export {
+    renderPersonalInformation,
+    renderUpdateAvatar,
+    renderConfirm,
+    renderChangePassword,
+    renderRoom,
+    renderCreateRoom
+}

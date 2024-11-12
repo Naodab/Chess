@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class StepResponse {
-	MatchWithBotResponse match;
+	Long matchId;
 	String fen;
 	String from;
 	String to;

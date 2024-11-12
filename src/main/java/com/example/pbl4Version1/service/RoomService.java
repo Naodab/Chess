@@ -10,6 +10,7 @@ import com.example.pbl4Version1.enums.Mode;
 import com.example.pbl4Version1.repository.RoomUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -45,8 +46,10 @@ public class RoomService {
 		if (request.getPassword() != null)
 			room.setPassword(passwordEncoder.encode(request.getPassword()));
 		room = roomRepository.save(room);
+		var authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName();
 		User host = userRepository
-				.findById(request.getHostId()).orElseThrow(
+				.findByUsername(username).orElseThrow(
 						() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 		log.info(host.getId() + "/" + host.getUsername());
 		RoomUser roomUser = RoomUser.builder()

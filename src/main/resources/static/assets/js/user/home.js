@@ -1,7 +1,10 @@
-import { renderPersonalInformation,
+import {
+    renderPersonalInformation,
     renderUpdateAvatar,
     renderConfirm,
-    renderChangePassword
+    renderChangePassword,
+    renderCreateRoom,
+    renderRoom
 } from "./render.js";
 
 const $ = document.querySelector.bind(document);
@@ -13,6 +16,7 @@ const activityList = $(".activity-list");
 
 function turnOnModal(renderFunction, attr) {
     overlay.style.zIndex = "100";
+    console.log(renderFunction(attr));
     overlay.innerHTML = renderFunction(attr);
 
     $("#back").onclick =  function () {
@@ -90,8 +94,22 @@ activityBtn.addEventListener("click", () => {
 
 $("#see-my-information").addEventListener("click", event => {
     event.preventDefault();
-    const user = localStorage.getItem("USER");
-    turnOnModal(renderPersonalInformation, user);
+    fetch("/chess/api/users/myInfo", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+        }
+    }).then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+    }).then(data => {
+        const user = data.result;
+        turnOnModal(renderPersonalInformation, user);
+
+        // TODO: catch event see matches
+    });
 });
 
 $("#change-avatar-btn").addEventListener("click", event => {
@@ -206,3 +224,51 @@ $("#play-with-bot").onclick = () => {
         alert(error.message);
     });
 }
+
+$("#create-room").onclick = () => {
+    turnOnModal(renderCreateRoom);
+    let timeActive = 0;
+
+    $("#cancel").onclick = () => turnOffModal();
+
+    $$(".password-container i").forEach(icon => {
+        icon.onclick = event => {
+            const pwContainer = event.target.closest(".password-container");
+            if (pwContainer && pwContainer.classList.contains("active")) {
+                pwContainer.classList.remove("active");
+                pwContainer.querySelector("input").type = "password";
+            } else if (pwContainer) {
+                pwContainer.classList.add("active");
+                pwContainer.querySelector("input").type = "text";
+            }
+        }
+    });
+
+    const times = $$(".time");
+    times.forEach((time, index) => {
+        time.onclick = () => {
+            if (index === timeActive) return;
+            times[timeActive].classList.remove("active");
+            timeActive = index;
+            times[timeActive].classList.add("active");
+        }
+    });
+
+    $("$confirm-create-room").onclick = () => {
+        const time = times[timeActive].getAttribute("data-value");
+        const password = $("#roomPassword").value;
+        const data = {time, password};
+        // TODO: create room and direct to another jsp to test
+    }
+}
+
+function addRoom(room) {
+    const tr = document.createElement("tr");
+    tr.classList.add("room");
+    tr.setAttribute("data-id", room.id);
+    tr.style.backgroundColor = "#3a3a3a";
+    tr.innerHTML = renderRoom(room);
+    $(".rooms-list").appendChild(tr);
+}
+
+// TODO: add event when load this jsp load room active to add room and use addRoom to add a room

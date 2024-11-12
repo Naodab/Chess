@@ -1,8 +1,10 @@
 package com.example.pbl4Version1.mapper;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.example.pbl4Version1.dto.response.StepResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +22,10 @@ public class MatchMapper {
 	
 	@Autowired
 	RoomMapper roomMapper;
-	
+
+    @Autowired
+    private StepMapper stepMapper;
+
 	public MatchWithHuman toMatchWithHuman(MatchCreationRequest request) {
 		return new MatchWithHuman();
 	}
@@ -34,10 +39,16 @@ public class MatchMapper {
 		if (match.getWinner() != null) {
 			winner = match.getWinner().name();
 		}
-		
+
+		ArrayList<StepResponse> steps = new ArrayList<>();
+		if (match.getSteps() != null) {
+			steps.addAll(match.getSteps().stream().map(stepMapper::toStepResponse).toList());
+		}
+
 		return MatchWithBotResponse.builder()
 				.winner(winner)
 				.player(userMapper.toUserResponse(match.getPlayer()))
+				.steps(steps)
 				.id(match.getId())
 				.build();
 	}
@@ -52,6 +63,8 @@ public class MatchMapper {
 				.roomResponse(roomMapper.toRoomResponse(match.getRoom()))
 				.black(userMapper.toUserResponse(match.getBlackPlayer()))
 				.white(userMapper.toUserResponse(match.getWhitePlayer()))
+				.timeBlack(match.getTimeBlackUser())
+				.timeWhite(match.getTimeWhiteUser())
 				.id(match.getId())
 				.winner(winner)
 				.build();

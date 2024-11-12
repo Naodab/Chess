@@ -288,6 +288,7 @@ function renderStepItem(nameMove, index) {
 		</div>
 	`;
 	STEPS_CONTAINER.appendChild(div);
+	STEPS_CONTAINER.scrollLeft = STEPS_CONTAINER.scrollWidth;
 }
 
 function renderStep(nameMove) {

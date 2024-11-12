@@ -91,15 +91,6 @@
                                     no-repeat center center / cover;"></div>
                             </div>
                         </div>
-<%--                        <div class="step-item">--%>
-<%--                            <div class="step-index">1</div>--%>
-<%--                            <div class="step-container">--%>
-<%--                                <div class="step">Qf3</div>--%>
-<%--                            </div>--%>
-<%--                            <div class="step-container">--%>
-<%--                                <div class="step">Kf8</div>--%>
-<%--                            </div>--%>
-<%--                        </div>--%>
                     </div>
                 </div>
                 <div class="step__footer">
@@ -110,6 +101,9 @@
             </div>
         </div>
     </div>
+    <script>
+        const MODE = "PLAY_WITH_BOT";
+    </script>
     <script type="module" src="../assets/js/chessjs/index.js"></script>
 </body>
 </html>

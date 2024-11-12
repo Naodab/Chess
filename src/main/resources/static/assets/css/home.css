@@ -8,6 +8,9 @@
 .content__body {
     flex: 1;
     margin-bottom: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .body__header {
@@ -83,6 +86,67 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.rooms-container {
+    width: 100%;
+    flex: 1;
+}
+
+.rooms-table {
+    border-radius: 8px;
+    width: 100%;
+    border: 1px solid #333;
+}
+
+.rooms-table th {
+    background-color: var(--text-color);
+    color: var(--closure-color);
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.rooms-table th:first-child {
+    border-radius: 8px 0 0 0;
+}
+
+.rooms-table th:last-child {
+    border-radius: 0 8px 0 0;
+}
+
+.rooms-table tr {
+    min-height: 40px;
+}
+
+.rooms-table tr:last-child td:first-child {
+    border-radius: 0 0 0 8px;
+}
+
+.rooms-table tr:last-child td:last-child {
+    border-radius: 0 0 8px 0;
+}
+
+.rooms-table td {
+    text-align: center;
+}
+
+.rooms-table td .room-role-list {
+    padding: 8px 0;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.room-role-item {
+    border-radius: 4px;
+    font-size: 16px;
+    margin: 0 4px;
+    padding: 4px 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 80px;
 }
 
 .content__footer {

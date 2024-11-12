@@ -416,6 +416,9 @@ a {
     display: none;
 }
 
+#create-room-form {
+    min-width: 400px;
+}
 
 #change-password {
     min-width: 400px;
@@ -465,6 +468,45 @@ a {
 
 .password-container.active .off {
     display: block;
+}
+
+.form-selection-container {
+    display: flex;
+    width: 100%;
+}
+
+.form-selection-container label {
+    margin-right: 16px;
+}
+
+.form-selection-container select {
+    font-size: 16px;
+}
+
+.time-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.time-container .time {
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
+    margin: 0 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.time-container .time:hover {
+    box-shadow: 0 0 4px var(--text-color);
+}
+
+.time-container .time.active {
+    background-color: var(--text-color);
+    color: var(--closure-color);
 }
 
 .error-message {

@@ -853,7 +853,7 @@ function moveOrCancelMove(square) {
             prepareForMoving(moveState, square.id);
             const oldMove = moveState.current_position;
             moveElement(moveState, square.id);
-            if (!nameMove || nameMove === 'x') {
+            if (nameMove === "" || nameMove === 'x') {
                 if (!moveState.piece_name.includes("PAWN")) {
                     nameMove = moveState.piece_signal + nameMove;
                 }
@@ -863,18 +863,17 @@ function moveOrCancelMove(square) {
             const status = moveStatus(OPPONENT.toLowerCase());
             if (status === "CHECK_MATE" || status === "STALE_MATE") {
                 nameMove += "#";
-                // TODO: ANNOUNCE WINNER
             } else if (status === "IN_CHECK") {
                 nameMove += "+";
             }
             handleNameMove(nameMove);
-            nameMove = "";
             if (moveState.piece_name.includes("PAWN") &&
                 (square.id.includes("8") || square.id.includes("1"))) {
                 beginPromotionPawn(moveState);
             }
             // TODO: send Step API to Server
             sendStepToServer(oldMove, square.id);
+            nameMove = "";
         } else {
             clearPreviousSelfHighlight(previousHighlight);
         }

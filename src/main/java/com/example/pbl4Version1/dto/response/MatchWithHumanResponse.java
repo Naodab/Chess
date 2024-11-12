@@ -19,6 +19,8 @@ public class MatchWithHumanResponse {
 	RoomResponse roomResponse;
 	UserResponse white;
 	UserResponse black;
+	float timeWhite;
+	float timeBlack;
 	String winner;
 	Set<StepResponse> steps;
 }

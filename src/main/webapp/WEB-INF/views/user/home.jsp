@@ -35,9 +35,9 @@
 <div class="main-content">
 	<div class="content__body closure">
 		<div class="body__header">
-			<h1 class="content__title">Chào mừng trở lại</h1>
+			<h1 class="content__title">Chào mừng trở lại ${user.username}</h1>
 			<div class="header__avatar"
-				 style='background: url("${avatar}") no-repeat center center / cover;'
+				 style='background: url("${user.avatar}") no-repeat center center / cover;'
 				 id="activity-btn">
 				<div class="activity-list closure">
 					<a href="#" class="activity-item" id="see-my-information">
@@ -59,10 +59,24 @@
 				</div>
 			</div>
 		</div>
+		<div class="rooms-container scrollable-element">
+			<table class="rooms-table">
+				<thead>
+					<tr>
+						<th>Phòng</th>
+						<th>Thời gian</th>
+						<th>Số người</th>
+						<th>Trạng thái</th>
+					</tr>
+				</thead>
+				<tbody class="rooms-list">
+				</tbody>
+			</table>
+		</div>
 	</div>
 	<div class="content__footer closure">
-		<div class="btn btn--green content__btn" id="create-table">Tạo bàn</div>
-		<div class="btn btn--pink content__btn" id="find-table">Tìm bàn</div>
+		<div class="btn btn--green content__btn" id="create-room">Tạo phòng</div>
+		<div class="btn btn--pink content__btn" id="find-room">Tìm phòng</div>
 		<div class="btn btn--yellow content__btn" id="play-random">Ngẫu nhiên</div>
 		<div class="btn btn--blue content__btn" id="play-with-bot">Chơi với máy</div>
 	</div>
@@ -80,6 +94,9 @@
 		</div>
 	</div>
 </div>
+<script>
+	let avatar = "${user.avatar}";
+</script>
 <script type="module" src="../assets/js/user/home.js"></script>
 </body>
 </html>
