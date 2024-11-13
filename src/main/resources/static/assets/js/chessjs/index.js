@@ -2,14 +2,26 @@ import { initGame } from "./data/data.js";
 import { initGameRender, initGameFromFenRender } from "./render/main.js";
 import { globalEvent } from "./event/global.js";
 import { STEPS_CONTAINER } from "./helper/constants.js";
+import { renderMessage } from "./opponents/message.js";
 
 const playerInfo = document.querySelectorAll(".player-info");
 const defeatedPieces = document.querySelectorAll(".defeated-pieces");
 const gbContainer = document.querySelector(".game-board-container");
 
+const globalState = initGame();
+
+const matchID = localStorage.getItem("MATCH_ID");
+
+let apiBot = "/chess/api/matches/bot/" + matchID;
+let apiHuman = "/chess/api/matches/human/" + matchID;
+
 let ALLIANCE = "WHITE";
-let ROLE = "PLAYER";
 let OPPONENT = "BLACK";
+let ROOM;
+let ROLE;
+let matchNumber = localStorage.getItem("MATCH_NUMBER") ? localStorage.getItem("MATCH_NUMBER") : 0;
+let blackPlayer;
+let whitePlayer;
 
 function loadPageFunction(alliance) {
     if (alliance === "BLACK") {
@@ -69,14 +81,6 @@ function resize() {
 
 window.onresize = resize;
 
-// will be useful when game ends
-const globalState = initGame();
-
-const matchID = localStorage.getItem("MATCH_ID");
-
-let apiBot = "/chess/api/matches/bot/" + matchID;
-let apiHuman = "/chess/api/matches/human/" + matchID;
-
 function addSteps(steps) {
     steps.forEach((step, index) => {
         console.log(step.name)
@@ -101,6 +105,37 @@ function addSteps(steps) {
     });
 }
 
+// function add message.
+// nếu nhận message từ user khác thì truyền isOther = true, nếu là của mình thì không cần truyền vì đã có mặc định
+function addMessage(user, message, isOther = false) {
+    const div = document.createElement("div");
+    div.classList.add("message");
+    if (isOther) {
+        div.classList.add("other");
+    }
+    div.innerHTML = renderMessage(user, message);
+    document.querySelector(".chat-list").appendChild(div);
+}
+
+function getRole(username) {
+    if (ROOM.host.username === username) {
+        return "HOST";
+    } else if (ROOM.player.username === username) {
+        return "PLAYER";
+    }
+    return "VIEWER";
+}
+
+function initComponent(player, color) {
+    const alliance = document.querySelector(".player-info.alliance-" + color);
+    const name = alliance.querySelector(".name");
+    const elo = alliance.querySelector(".elo");
+    const avatar = alliance.querySelector(".avatar");
+    name.innerText = player.username;
+    elo.innerText = player.elo;
+    avatar.style.background = `url('${player.avatar}') no-repeat center center / cover`;
+}
+
 document.body.onload = async function () {
     if (MODE === "PLAY_WITH_BOT") {
         await fetch(apiBot, {
@@ -118,11 +153,7 @@ document.body.onload = async function () {
         .then(data => {
             console.log(data);
             loadPageFunction(ALLIANCE);
-            const allianceWhite = document.querySelector(".player-info.alliance-white");
-            const nameWhite = allianceWhite.querySelector(".name");
-            const eloWhite = allianceWhite.querySelector(".elo");
-            nameWhite.innerText = data.player.username;
-            eloWhite.innerText = data.player.elo;
+            initComponent(data.player, "white");
             let steps = data.steps;
             console.log(steps.length === 0);
             if (steps.length === 0) {
@@ -142,7 +173,39 @@ document.body.onload = async function () {
             globalEvent();
         });
     } else {
-        // TODO: fetch room for user enter room
+        // get room from database
+        await fetch(`/chess/api/rooms/ ${localStorage.getItem("ROOM_ID")}`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+            }
+        }).then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+        }).then(data => data.result)
+        .then(data => {
+            ROOM = data;
+            ROLE = getRole(localStorage.getItem("USERNAME"));
+            if (matchNumber % 2 === 0) {
+                whitePlayer = ROOM.host;
+                blackPlayer = ROOM.player;
+                if (ROLE === "PLAYER") {
+                    ALLIANCE = "BLACK";
+                }
+            } else {
+                whitePlayer = ROOM.player;
+                blackPlayer = ROOM.host;
+                if (ROLE === "HOST" || ROLE === "VIEWER") {
+                    ALLIANCE = "BLACK";
+                }
+            }
+            loadPageFunction(ALLIANCE);
+            initComponent(whitePlayer, "white");
+            initComponent(blackPlayer, "black");
+        });
     }
 }
+
 export { globalState, ALLIANCE, OPPONENT };

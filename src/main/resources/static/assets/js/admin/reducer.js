@@ -1,6 +1,6 @@
 import logout from "../account/logout.js";
 import changePassword from "../account/changePassword.js";
-import {getPageUsers, getUsers} from "./api/user.js";
+import {getPageUsers, searchUser, countSearchUser } from "./api/user.js";
 import {getAccountData} from "./api/traffic.js";
 
 const $ = document.querySelector.bind(document);
@@ -134,21 +134,7 @@ const init = {
                     ],
                     activeSort: 0,
                     activeSortType: "",
-                    lookupFields: [
-                        {
-                            name: "Tài khoản",
-                            value: "username"
-                        },
-                        {
-                            name: "Email",
-                            value: "email"
-                        },
-                        {
-                            name: "Elo",
-                            value: "elo"
-                        }
-                    ],
-                    activeLookup: 0,
+                    lookupValue: "",
                     columns: [
                         {
                             title: "Mã",
@@ -191,22 +177,7 @@ const init = {
         match: {
 
         },
-        activeItem: "account",
-        sortTypes: [
-            {
-                value: "asc",
-                icon: "fa-solid fa-up-long",
-            },
-            {
-                value: "desc",
-                icon: "fa-solid fa-down-long"
-            },
-            {
-                value: ""
-            }
-        ],
-        sortFields: [],
-        lookupFields: []
+        activeItem: "account"
     },
     avatar: "../assets/img/avatar/1.jpg",
 }
@@ -226,6 +197,34 @@ window.onload = () => {
 
     //TODO: draw do thi
 }
+
+function debounce(func, delay) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+const debounceSearch = debounce((state, searchStr, page,
+                                 sortField, sortDirection) => {
+    const table = state.content[state.content.activeItem].detail.table;
+    table.activePage = 0;
+    countSearchUser(searchStr).then(data => {
+        table.detailPages = [];
+        for (let i = 1; i <= Math.ceil(data / 10); i++) {
+            table.detailPages.push(i);
+        }
+        dispatch('rerender');
+    });
+
+    searchUser(searchStr, page, sortField, sortDirection)
+        .then(data => {
+            table.rows = [];
+            data.forEach(user => table.rows.push(user));
+            dispatch('rerender');
+        });
+}, 500);
 
 function saveDataPasswordChangeModal (modal) {
     modal.changePassword.groups[0].value = $(`#${modal.changePassword.groups[0].name}`).value;
@@ -262,12 +261,17 @@ const actions = {
     },
     changePage: ({ content }, index) => {
         let detail = content[content.activeItem].detail;
-        detail.table.activePage = index;
-        getPageUsers(detail.table.activePage).then(data => {
-            detail.table.rows = [];
-            data.forEach(user => detail.table.rows.push(user));
-            dispatch('rerender');
-        })
+        if (!detail.table.lookupValue) {
+            detail.table.activePage = index;
+            getPageUsers(detail.table.activePage).then(data => {
+                detail.table.rows = [];
+                data.forEach(user => detail.table.rows.push(user));
+                dispatch('rerender');
+            });
+        } else {
+            let table = detail.table;
+
+        }
     },
     changeSortType: ({ content }, type) => {
         let detail = content[content.activeItem].detail;
@@ -281,6 +285,13 @@ const actions = {
         else if (index === 1) {
             modal.activeModal = "changePassword";
         }
+    },
+    lookupRecord: (state, searchStr) => {
+        let table = state.content[state.content.activeItem].detail.table;
+        table.lookupValue = searchStr;
+        state.canRender = false;
+        debounceSearch(state, searchStr, 0,
+            table.sortFields[table.activeSort].value, table.activeSortType);
     },
     openActivityList: ({activity}) => {
         activity.active = !activity.active;

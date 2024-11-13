@@ -22,7 +22,9 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	@Query("SELECT COUNT(u) FROM User u WHERE MONTH(u.createDate) = :month AND YEAR(u.createDate) = :year")
 	long countUsersCreatedInMonth(@Param("month") int month, @Param("year") int year);
+	long countByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(String username, String email);
 
 	Page<User> findAll(Pageable pageable);
 	Page<User> findAllByOrderByEloDesc(Pageable pageable);
+	Page<User> findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(String username, String email, Pageable pageable);
 }

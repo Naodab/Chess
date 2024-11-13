@@ -261,7 +261,6 @@
     top: 0;
     display: flex;
     flex-direction: column;
-    animation: fadeIn .3 ease-in-out;
 }
 
 .detail__chart {
@@ -414,7 +413,6 @@
 .lookup__search-bar .lookup__icon:hover {
     background-color: #333;
     color: var(--text-color);
-    animation: fadeIn .3s ease;
 }
 
 .table {
@@ -426,7 +424,6 @@
     border-collapse: separate;
     border-spacing: 2px 4px;
     padding: 0;
-    animation: fadeIn .3s ease-in-out;
 }
 
 .table tr {
