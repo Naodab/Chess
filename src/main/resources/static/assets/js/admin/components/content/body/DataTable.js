@@ -2,6 +2,7 @@ import { connect } from "../../../store.js";
 import html from "../../../core.js";
 import TableColumn from "./TableColumn.js";
 import AccountRow from "./AccountRow.js";
+import FunctionSort from "./FunctionSort.js";
 
 function DataTable({ table, activeItem }) {
     return html`
@@ -13,7 +14,7 @@ function DataTable({ table, activeItem }) {
                 <h1 class="detail__title">Danh sách</h1>
             </div>
             <div class="table__function">
-                
+                ${FunctionSort({ sortFields: table.sortFields})}
             </div>
             <div class="detail-container">
                 <table id="${ table.id }" class="table">
@@ -29,11 +30,12 @@ function DataTable({ table, activeItem }) {
                 </table>
             </div>
             <div class="detail__pages">
-                <span class="page active">1</span>
-                <span class="page">2</span>
-                <span class="page">3</span>
-                <span class="page">4</span>
-                <span class="page">5</span>
+                ${table.detailPages.map((page, index) => html`
+                    <span class="page ${index === table.activePage && 'active'}"
+                        onclick="dispatch('changePage', ${index})">
+                        ${page}
+                    </span>
+                `)}
             </div>
         </div>
     `;

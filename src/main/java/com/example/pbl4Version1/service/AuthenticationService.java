@@ -10,6 +10,8 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 import com.example.pbl4Version1.dto.request.*;
+import com.example.pbl4Version1.entity.Traffic;
+import com.example.pbl4Version1.repository.TrafficRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -54,6 +56,7 @@ public class AuthenticationService {
 	InvalidatedTokenRepository invalidatedTokenRepository;
 	PasswordResetTokenRepository passwordResetTokenRepository;
 	UserRepository userRepository;
+	TrafficRepository trafficRepository;
 	PasswordEncoder passwordEncoder;
 	
 	@NonFinal
@@ -136,7 +139,15 @@ public class AuthenticationService {
 			throw new AppException(ErrorCode.UNAUTHENTICATED);
 		user.setLatestLogin(LocalDate.now());
 		String token = generateToken(user);
-		
+		Traffic traffic = new Traffic();
+		if (trafficRepository.existsByDate(LocalDate.now())) {
+			traffic = trafficRepository.findTrafficByDate(LocalDate.now())
+					.orElseThrow();
+		} else {
+			traffic.setDate(LocalDate.now());
+		}
+		traffic.setSize(traffic.getSize() + 1);
+		trafficRepository.save(traffic);
 		user.setOperatingStatus(OperatingStatus.ONLINE);
 		userRepository.save(user);
 		

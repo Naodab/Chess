@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface TrafficRepository extends JpaRepository<Traffic, Long> {
     Optional<Traffic> findTrafficByDate(LocalDate date);
+    boolean existsByDate(LocalDate date);
 }

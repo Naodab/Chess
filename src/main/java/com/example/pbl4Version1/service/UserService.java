@@ -3,6 +3,8 @@ package com.example.pbl4Version1.service;
 import java.util.HashSet;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -106,6 +108,18 @@ public class UserService {
 		user.setOperatingStatus(OperatingStatus.ONLINE);
 		userRepository.save(user);
 		return userMapper.toUserResponse(user);
+	}
+
+	public List<UserResponse> getUsers(int page) {
+		Page<User> userPage = userRepository.findAll(PageRequest.of(page, 10));
+		List<User> users = userPage.getContent();
+		return users.stream().map(userMapper::toUserResponse).toList();
+	}
+
+	public List<UserResponse> getTop10User() {
+		List<User> users = userRepository.findAllByOrderByEloDesc
+				(PageRequest.of(0, 10)).getContent();
+		return users.stream().map(userMapper::toUserResponse).toList();
 	}
 	
 	@PreAuthorize("hasRole('ADMIN')")

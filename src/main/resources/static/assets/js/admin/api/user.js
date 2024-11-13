@@ -1,9 +1,9 @@
-function getUserSize(token) {
+function getUserSize() {
     return fetch("/chess/api/users/count", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
         }
     }).then(res => {
         if (res.status === 200) {
@@ -14,12 +14,12 @@ function getUserSize(token) {
     }).then(data => data.result);
 }
 
-function getUsers(token) {
+function getUsers() {
     return fetch("/chess/api/users", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`
         }
     }).then(response=> {
         if (response.ok) {
@@ -33,4 +33,23 @@ function getUsers(token) {
     });
 }
 
-export { getUserSize, getUsers }
+function getPageUsers(page) {
+    return fetch("/chess/api/users/page/" + page, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+        }
+    }).then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+    }).then(data => {
+        if (data.code === 1000) {
+            return data.result;
+        }
+        throw new Error("Can't get page " + page);
+    });
+}
+
+export { getUserSize, getUsers, getPageUsers }

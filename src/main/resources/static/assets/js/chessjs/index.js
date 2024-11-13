@@ -77,6 +77,30 @@ const matchID = localStorage.getItem("MATCH_ID");
 let apiBot = "/chess/api/matches/bot/" + matchID;
 let apiHuman = "/chess/api/matches/human/" + matchID;
 
+function addSteps(steps) {
+    steps.forEach((step, index) => {
+        console.log(step.name)
+        if (index % 2 === 0) {
+            const div = document.createElement("div");
+            div.classList.add("step-item");
+            div.innerHTML = `
+                        <div class="step-index">${Math.floor(index / 2) + 1}</div>
+                        <div class="step-container">
+                            <div class="step">${step.name}</div>
+                        </div>
+                        <div class="step-container">
+                            <div class="step"></div>
+                        </div>
+                    `;
+            STEPS_CONTAINER.appendChild(div);
+        } else {
+            const steps = document.querySelectorAll('.step');
+            const lastStep = steps[steps.length - 1];
+            lastStep.innerHTML = step.name;
+        }
+    });
+}
+
 document.body.onload = async function () {
     if (MODE === "PLAY_WITH_BOT") {
         await fetch(apiBot, {
@@ -111,34 +135,14 @@ document.body.onload = async function () {
                 const numB = parseInt(b.fen.match(/\d+$/)[0]);
                 return numA - numB;
             });
-            steps.forEach((step, index) => {
-                console.log(step.name)
-                if (index % 2 === 0) {
-                    const div = document.createElement("div");
-                    div.classList.add("step-item");
-                    div.innerHTML = `
-                        <div class="step-index">${Math.floor(index / 2) + 1}</div>
-                        <div class="step-container">
-                            <div class="step">${step.name}</div>
-                        </div>
-                        <div class="step-container">
-                            <div class="step"></div>
-                        </div>
-                    `;
-                    STEPS_CONTAINER.appendChild(div);
-                } else {
-                    const steps = document.querySelectorAll('.step');
-                    const lastStep = steps[steps.length - 1];
-                    lastStep.innerHTML = step.name;
-                }
-            });
+            addSteps(steps);
             STEPS_CONTAINER.scrollLeft = STEPS_CONTAINER.scrollWidth;
             const fen = steps[steps.length - 1].fen;
             initGameFromFenRender(globalState, fen);
             globalEvent();
         });
     } else {
-        // TODO: for human play render
+        // TODO: fetch room for user enter room
     }
 }
 export { globalState, ALLIANCE, OPPONENT };

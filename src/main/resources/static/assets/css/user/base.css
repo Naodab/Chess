@@ -420,7 +420,8 @@ a {
     min-width: 400px;
 }
 
-#change-password {
+#change-password,
+#find-room {
     min-width: 400px;
 }
 

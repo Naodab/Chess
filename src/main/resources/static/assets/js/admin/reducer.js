@@ -1,6 +1,6 @@
 import logout from "../account/logout.js";
 import changePassword from "../account/changePassword.js";
-import {getUsers} from "./api/user.js";
+import {getPageUsers, getUsers} from "./api/user.js";
 import {getAccountData} from "./api/traffic.js";
 
 const $ = document.querySelector.bind(document);
@@ -133,7 +133,7 @@ const init = {
                         }
                     ],
                     activeSort: 0,
-                    activeSortType: 0,
+                    activeSortType: "",
                     lookupFields: [
                         {
                             name: "Tài khoản",
@@ -178,7 +178,9 @@ const init = {
                             last: true
                         }
                     ],
-                    rows: []
+                    rows: [],
+                    detailPages: [],
+                    activePage: 0
                 },
                 activeDetail: "chart"
             },
@@ -220,7 +222,7 @@ window.onload = () => {
         init.content.account.dataList[2].quantity = data.trafficSize;
         init.content.account.dataList[3].quantity = data.newMemberSize;
         dispatch('rerender');
-    })
+    });
 
     //TODO: draw do thi
 }
@@ -242,8 +244,14 @@ const actions = {
         let detail = content[content.activeItem].detail;
         if (detail.activeDetail === "chart") {
             detail.table.rows = [];
+            detail.table.detailPages = [];
+            let size = content[content.activeItem].dataList[0].quantity;
+            for (let i = 1; i <= Math.ceil(size / 10); i++) {
+                detail.table.detailPages.push(i);
+            }
 
-            getUsers(window.token).then(data => {
+            getPageUsers(detail.table.activePage).then(data => {
+                console.log(data)
                 data.forEach(user => detail.table.rows.push(user));
                 detail.activeDetail = "table";
                 dispatch('rerender');
@@ -252,8 +260,24 @@ const actions = {
             detail.activeDetail = "chart";
         }
     },
+    changePage: ({ content }, index) => {
+        let detail = content[content.activeItem].detail;
+        detail.table.activePage = index;
+        getPageUsers(detail.table.activePage).then(data => {
+            detail.table.rows = [];
+            data.forEach(user => detail.table.rows.push(user));
+            dispatch('rerender');
+        })
+    },
+    changeSortType: ({ content }, type) => {
+        let detail = content[content.activeItem].detail;
+        if (type === detail.activeSortType) return;
+        detail.activeSortType = type;
+
+        // TODO: fetch order row
+    },
     executeActivity: ({modal}, index) => {
-        if (index === 0) logout(window.token);
+        if (index === 0) logout(localStorage.getItem("TOKEN"));
         else if (index === 1) {
             modal.activeModal = "changePassword";
         }
@@ -262,7 +286,6 @@ const actions = {
         activity.active = !activity.active;
     },
     openPersonalPage: ({ modal, content }, index) => {
-        console.log(1)
         modal.activeModal = "personalPage";
         modal.personalPage.user = content.account.detail.table.rows[index];
     },

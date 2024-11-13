@@ -62,7 +62,6 @@
     background-color: var(--text-color);
     color: var(--closure-color);
     font-weight: 600;
-    transition: fadeIn .6s ease-in;
 }
 
 .navbar__footer {
@@ -253,7 +252,6 @@
     width: 200%;
     height: 100%;
     position: absolute;
-    transition: all .6s ease-in;
 }
 
 .toggle-item {
@@ -479,8 +477,6 @@
     align-items: center;
     font-size: 12px;
     font-weight: bold;
-    animation: fillLeft .6s ease-in-out;
-    transition: width .6s ease;
     overflow: hidden;
 }
 

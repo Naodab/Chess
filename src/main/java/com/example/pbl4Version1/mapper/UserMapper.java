@@ -3,6 +3,7 @@ package com.example.pbl4Version1.mapper;
 import java.util.HashSet;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import com.example.pbl4Version1.dto.response.UserResponse;
 import com.example.pbl4Version1.entity.User;
 import com.example.pbl4Version1.enums.Rank;
 	
+@Slf4j
 @Component
 public class UserMapper {
 	@Autowired
@@ -47,7 +49,6 @@ public class UserMapper {
 		}
 		
 		String rank = Rank.getRank(user.getElo()).getName();
-		
 		return UserResponse.builder()
 				.id(user.getId())
 				.email(user.getEmail())
@@ -58,7 +59,7 @@ public class UserMapper {
 				.drawNumber(user.getDrawNumber())
 				.roles(roles)
 				.achievements(achievements)
-				.percent(user.getBattleNumber() != 0 ? (float)user.getWinNumber() / user.getBattleNumber() : 0)
+				.percent(user.getBattleNumber() != 0 ? (int)((float)user.getWinNumber() /(float) user.getBattleNumber() * 100 ): 0)
 				.rank(rank)
 				.latestLogin(user.getLatestLogin())
 				.createDate(user.getCreateDate())

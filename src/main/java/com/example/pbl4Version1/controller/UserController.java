@@ -80,4 +80,18 @@ public class UserController {
 				.message(userID + " has been deleted.")
 				.build();
 	}
+
+	@GetMapping("/page/{pageNumber}")
+	public ApiResponse<List<UserResponse>> getAllPage(@PathVariable("pageNumber") int pageNumber) {
+		return ApiResponse.<List<UserResponse>>builder()
+				.result(userService.getUsers(pageNumber))
+				.build();
+	}
+
+	@GetMapping("/top")
+	public ApiResponse<List<UserResponse>> getTop() {
+		return ApiResponse.<List<UserResponse>>builder()
+				.result(userService.getTop10User())
+				.build();
+	}
 }

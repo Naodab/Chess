@@ -76,7 +76,7 @@
 	</div>
 	<div class="content__footer closure">
 		<div class="btn btn--green content__btn" id="create-room">Tạo phòng</div>
-		<div class="btn btn--pink content__btn" id="find-room">Tìm phòng</div>
+		<div class="btn btn--pink content__btn" id="find-room-btn">Tìm phòng</div>
 		<div class="btn btn--yellow content__btn" id="play-random">Ngẫu nhiên</div>
 		<div class="btn btn--blue content__btn" id="play-with-bot">Chơi với máy</div>
 	</div>

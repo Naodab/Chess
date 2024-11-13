@@ -4,7 +4,9 @@ import {
     renderConfirm,
     renderChangePassword,
     renderCreateRoom,
-    renderRoom
+    renderRoom,
+    renderTopUser,
+    renderFindRoom
 } from "./render.js";
 
 const $ = document.querySelector.bind(document);
@@ -13,6 +15,53 @@ const $$ = document.querySelectorAll.bind(document);
 const overlay = $("#overlay");
 const activityBtn = $("#activity-btn");
 const activityList = $(".activity-list");
+const topUsers = [];
+
+function addEventForEye() {
+    const iconEyes = $$(".password-container i");
+    iconEyes.forEach(icon => {
+        icon.onclick = () => {
+            const pwContainer = icon.closest(".password-container");
+            if (pwContainer && pwContainer.classList.contains("active")) {
+                pwContainer.classList.remove("active");
+                pwContainer.querySelector("input").type = "password";
+            } else if (pwContainer) {
+                pwContainer.classList.add("active");
+                pwContainer.querySelector("input").type = "text";
+            }
+        }
+    });
+}
+
+function addTopUser(user, rank) {
+    const div = document.createElement("div");
+    div.classList.add("player");
+    div.innerHTML = renderTopUser(user, rank);
+    $(".leader-container").appendChild(div);
+}
+
+window.addEventListener("load", () => {
+    console.log(1)
+    fetch("/chess/api/users/top", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+        }
+    }).then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+    }).then(data => {
+        data.result.forEach((user, index) => {
+            addTopUser(user, index + 1);
+            topUsers.push(user);
+        });
+        $$(".player").forEach((player, index) => {
+            player.onclick = () => turnOnModal(renderPersonalInformation, topUsers[index]);
+        });
+    });
+});
 
 function turnOnModal(renderFunction, attr) {
     overlay.style.zIndex = "100";
@@ -115,7 +164,7 @@ $("#see-my-information").addEventListener("click", event => {
 $("#change-avatar-btn").addEventListener("click", event => {
     event.preventDefault();
     const user = localStorage.getItem("USER");
-    turnOnModal(renderUpdateAvatar, "");
+    turnOnModal(renderUpdateAvatar, avatar);
 
     $("#avatarInput").onchange = event => {
         const file = event.target.files[0];
@@ -141,10 +190,14 @@ $("#change-avatar-btn").addEventListener("click", event => {
                 },
                 body: formData
             }).then(response => {
-                return response.ok;
+                if (response.ok) {
+                    return response.json();
+                }
             }).then(data => {
                 if (data) {
                     turnOffModal();
+                    avatar = data.result;
+                    $(".header__avatar").style.background = `url("${avatar}") no-repeat center center / cover`;
                 }
             })
         }
@@ -154,24 +207,11 @@ $("#change-avatar-btn").addEventListener("click", event => {
 $("#change-password-btn").onclick = event => {
     event.preventDefault();
     turnOnModal(renderChangePassword);
+    addEventForEye();
     const oldPassword = $("#oldPassword");
     const newPassword = $("#newPassword");
     const preNewPassword = $("#preNewPassword");
     const error = $(".error-message");
-
-    const iconEyes = $$(".password-container i");
-    iconEyes.forEach(icon => {
-        icon.onclick = () => {
-            const pwContainer = icon.closest(".password-container");
-            if (pwContainer && pwContainer.classList.contains("active")) {
-                pwContainer.classList.remove("active");
-                pwContainer.querySelector("input").type = "password";
-            } else if (pwContainer) {
-                pwContainer.classList.add("active");
-                pwContainer.querySelector("input").type = "text";
-            }
-        }
-    });
 
     $("#confirm-change-password").onclick = () => {
         const old = oldPassword.value;
@@ -225,24 +265,22 @@ $("#play-with-bot").onclick = () => {
     });
 }
 
+$("#find-room-btn").onclick = () => {
+    turnOnModal(renderFindRoom);
+    addEventForEye();
+    $("#cancel").onclick = () => turnOffModal();
+
+    $("#confirm-enter-room").onclick = () => {
+        // TODO: find room, code similarly with create room but fetch to find if room active and corrected password
+    };
+}
+
 $("#create-room").onclick = () => {
     turnOnModal(renderCreateRoom);
+    addEventForEye();
     let timeActive = 0;
 
     $("#cancel").onclick = () => turnOffModal();
-
-    $$(".password-container i").forEach(icon => {
-        icon.onclick = event => {
-            const pwContainer = event.target.closest(".password-container");
-            if (pwContainer && pwContainer.classList.contains("active")) {
-                pwContainer.classList.remove("active");
-                pwContainer.querySelector("input").type = "password";
-            } else if (pwContainer) {
-                pwContainer.classList.add("active");
-                pwContainer.querySelector("input").type = "text";
-            }
-        }
-    });
 
     const times = $$(".time");
     times.forEach((time, index) => {
