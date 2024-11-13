@@ -29,7 +29,16 @@ export function createStore(reducer) {
         },
         dispatch(action, ...args) {
             state = reducer(state, action, args);
-            render();
+            if (state.canRender !== false) {
+                render();
+                const search = document.querySelector("#search");
+                if (search) {
+                    search.focus();
+                    search.selectionStart = search.selectionEnd = search.value.length;
+                }
+            } else {
+                state.canRender = true;
+            }
         }
     }
 }

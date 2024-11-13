@@ -413,7 +413,7 @@
 }
 
 .right-item:last-child {
-    margin-bottom: unset;
+    margin-bottom: 0;
 }
 
 .right-item__header {

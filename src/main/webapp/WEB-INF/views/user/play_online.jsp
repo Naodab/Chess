@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/user/base.css">
     <link rel="stylesheet" href="../assets/css/chess.css">
-    <link rel="stylesheet" href="../assets/css/play_bot.css">
+    <link rel="stylesheet" href="../assets/css/play_online.css">
     <title>Chess</title>
 </head>
 <body>
@@ -66,11 +66,42 @@
         </div>
 
         <div class="right-panel">
-            <div class="closure chat-container right-item">
+            <div class="closure right-item chat-function">
                 <div class="right-item__header">
-                    <div class="header-img" style="background: url('../assets/img/robot.png')
-                    no-repeat center center / cover;"></div>
-                    <div class="right-item__title">Chơi với máy</div>
+                    <i class="fa-solid fa-comments header-img"></i>
+                    <div class="right-item__title">Tin nhắn</div>
+                </div>
+                <div class="chats">
+                    <div class="chat-container scrollable-element">
+                        <div class="chat-list">
+                            <div class="message other">
+                                <div class="message__avatar"
+                                     style="background: url('../assets/img/robot.png') no-repeat center center / cover">
+                                </div>
+                                <div class="chat closure">
+                                    ba doan nay dep trai qua di ba doan nay dep trai qua di ba doan nay dep trai qua di
+                                </div>
+                                <div class="chat-username">
+                                    badoan
+                                </div>
+                            </div>
+                            <div class="message">
+                                <div class="message__avatar"
+                                     style="background: url('../assets/img/robot.png') no-repeat center center / cover">
+                                </div>
+                                <div class="chat closure">
+                                    ta cung thay day
+                                </div>
+                                <div class="chat-username">
+                                    badoan
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="send-chat-input" placeholder="Nhập tin nhắn" >
+                        <i class="fa-solid fa-paper-plane send-icon" id="send-message"></i>
+                    </div>
                 </div>
             </div>
             <div class="closure steps-container right-item">
@@ -94,8 +125,9 @@
                     </div>
                 </div>
                 <div class="step__footer">
+                    <div class="btn btn--blue step__function"><i class="fa-regular fa-flag"></i></div>
+                    <div class="btn btn--green step__function"><i class="fa-regular fa-handshake"></i></div>
                     <div class="btn btn--pink step__function"><i class="fa-solid fa-angle-left"></i></div>
-                    <div class="btn btn--green step__function"><i class="fa-solid fa-plus"></i></div>
                     <div class="btn btn--pink step__function"><i class="fa-solid fa-angle-right"></i></div>
                 </div>
             </div>

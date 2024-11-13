@@ -61,7 +61,7 @@ public class HomeController {
 
     @GetMapping("/playonl")
     public String playonl() {
-    	return "user/playonl";
+    	return "user/play_online";
     }
 
     @GetMapping("/selectplay")

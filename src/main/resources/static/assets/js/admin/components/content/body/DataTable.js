@@ -3,6 +3,7 @@ import html from "../../../core.js";
 import TableColumn from "./TableColumn.js";
 import AccountRow from "./AccountRow.js";
 import FunctionSort from "./FunctionSort.js";
+import FunctionLookup from "./FunctionLookup.js";
 
 function DataTable({ table, activeItem }) {
     return html`
@@ -15,6 +16,7 @@ function DataTable({ table, activeItem }) {
             </div>
             <div class="table__function">
                 ${FunctionSort({ sortFields: table.sortFields})}
+                ${FunctionLookup({ table })}
             </div>
             <div class="detail-container">
                 <table id="${ table.id }" class="table">

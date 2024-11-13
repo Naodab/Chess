@@ -2,6 +2,7 @@ package com.example.pbl4Version1.controller;
 
 import java.util.List;
 
+import com.example.pbl4Version1.dto.request.SearchUserRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -92,6 +93,20 @@ public class UserController {
 	public ApiResponse<List<UserResponse>> getTop() {
 		return ApiResponse.<List<UserResponse>>builder()
 				.result(userService.getTop10User())
+				.build();
+	}
+
+	@PostMapping("/search")
+	public ApiResponse<List<UserResponse>> getAllPage(@RequestBody SearchUserRequest request) {
+		return ApiResponse.<List<UserResponse>>builder()
+				.result(userService.search(request))
+				.build();
+	}
+
+	@PostMapping("/search/{searchStr}")
+	public ApiResponse<Long> countSearch(@PathVariable("searchStr") String searchStr) {
+		return ApiResponse.<Long>builder()
+				.result(userService.countSearch(searchStr))
 				.build();
 	}
 }
