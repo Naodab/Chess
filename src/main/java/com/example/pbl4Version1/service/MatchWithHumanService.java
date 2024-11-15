@@ -1,8 +1,13 @@
 package com.example.pbl4Version1.service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
+import com.example.pbl4Version1.dto.request.MatchWithHumanUpdateRequest;
 import com.example.pbl4Version1.entity.Room;
+import com.example.pbl4Version1.enums.PlayerType;
+import com.example.pbl4Version1.repository.StepRepisitory;
 import org.springframework.stereotype.Service;
 
 import com.example.pbl4Version1.dto.request.MatchBotCreationRequest;
@@ -30,6 +35,7 @@ public class MatchWithHumanService {
 	MatchWithHumanRepository matchRepository;
 	UserRepository userRepository;
 	RoomRepository roomRepository;
+	StepRepisitory stepRepisitory;
 	MatchMapper matchMapper;
 	
 	public MatchWithHumanResponse create(MatchCreationRequest request) {
@@ -60,16 +66,84 @@ public class MatchWithHumanService {
 	public MatchWithHumanResponse getMatch(Long id) {
 		MatchWithHuman match = matchRepository.findById(id)
 				.orElseThrow(() -> new AppException(ErrorCode.MATCH_NOT_EXISTED));
+		match.setSteps(new HashSet<>(stepRepisitory.findByMatchId(match.getId())));
 		return matchMapper.toMatchWithHumanResponse(match);
 	}
-	
-	public MatchWithHumanResponse playWithBot(MatchBotCreationRequest request) {
-		User user = userRepository.findByUsername(request.getUsername())
-				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-		MatchWithHuman match = new MatchWithHuman();
-		match.setWhitePlayer(user);
-		return null;
+
+	public MatchWithHumanResponse updateMatchWithHuman(MatchWithHumanUpdateRequest request) {
+		MatchWithHuman match = matchRepository.findById(request.getMatchId())
+				.orElseThrow(() -> new AppException(ErrorCode.MATCH_NOT_EXISTED));
+		if (request.getTimeWhitePlayer() != null)
+			match.setTimeWhiteUser(request.getTimeWhitePlayer());
+
+		if (request.getTimeBlackPlayer() != null)
+			match.setTimeBlackUser(request.getTimeBlackPlayer());
+
+		if (request.getWinnerId() != null) {
+			if (match.getBlackPlayer().getId().equals(request.getWinnerId()))
+				match.setWinner(PlayerType.BLACK);
+			else if (match.getWhitePlayer().getId().equals(request.getWinnerId()))
+				match.setWinner(PlayerType.WHITE);
+			else if (request.getWinnerId().equalsIgnoreCase("DRAW")) {
+				match.setWinner(PlayerType.DRAW);
+			}
+
+			int[] newElo = calculateEloAfterMatch(match.getWhitePlayer().getElo(),
+					match.getBlackPlayer().getElo(), match.getWinner());
+
+			match.getWhitePlayer().setElo(newElo[0]);
+			match.getBlackPlayer().setElo(newElo[1]);
+			userRepository.save(match.getWhitePlayer());
+			userRepository.save(match.getBlackPlayer());
+		}
+
+		match = matchRepository.save(match);
+		return matchMapper.toMatchWithHumanResponse(match);
 	}
-	
-//	public MatchResponse update(Long i)
+
+	public int determineKFactor(int elo) {
+		if (elo < 1600) {
+			return 32;
+		} else if (elo <= 2400) {
+			return 24;
+		} else {
+			return 16;
+		}
+	}
+
+	public double calculateExpectedScore(double ratingA, double ratingB) {
+		return 1.0 / (1.0 + Math.pow(10, (ratingB - ratingA) / 400.0));
+	}
+
+	public double calculateNewRating(double currentRating, double expectedScore,
+									 double actualScore, int kFactor) {
+		return currentRating + kFactor * (actualScore - expectedScore);
+	}
+
+	public int[] calculateEloAfterMatch(int eloWhite, int eloBlack, PlayerType playerType) {
+		int kFactorWhite = determineKFactor(eloWhite);
+		int kFactorBlack = determineKFactor(eloBlack);
+		double expectedScoreWhite = calculateExpectedScore(eloWhite, eloBlack);
+		double expectedScoreBlack = calculateExpectedScore(eloBlack, eloWhite);
+		double actualScoreWhite = 0, actualScoreBlack = 0;
+		switch (playerType) {
+			case BLACK:
+				actualScoreBlack = 1.0;
+				break;
+			case WHITE:
+				actualScoreWhite = 1.0;
+				break;
+			default:
+				actualScoreBlack = 0.5;
+				actualScoreWhite = 0.5;
+				break;
+		}
+		double newRatingWhite = calculateNewRating(eloWhite,
+				expectedScoreWhite, actualScoreWhite, kFactorWhite);
+		double newRatingBlack = calculateNewRating(eloBlack,
+				expectedScoreBlack, actualScoreBlack, kFactorBlack);
+
+		int[] result = {(int) newRatingWhite, (int) newRatingBlack};
+		return result;
+	}
 }

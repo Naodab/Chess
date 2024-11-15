@@ -132,7 +132,7 @@ const init = {
                             value: "battleNumber"
                         }
                     ],
-                    activeSort: 0,
+                    activeSort: "username",
                     activeSortType: "",
                     lookupValue: "",
                     columns: [
@@ -185,8 +185,47 @@ const init = {
 init.content.sortFields = init.content.account.detail.table.sortFields;
 init.content.lookupFields = init.content.account.detail.table.lookupFields;
 
+function createChart(ctx) {
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+            datasets: [{
+                label: 'Quantity',
+                data: [10, 20, 15, 30, 25, 30, 20],
+                borderColor: 'rgba(145, 221, 198, 1)',
+                backgroundColor: 'rgba(145, 221, 198, 0.4)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#FCD39F'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#FCD39F'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
 window.onload = () => {
-    console.log(1)
     getAccountData().then(data => {
         init.content.account.dataList[0].quantity = data.userSize;
         init.content.account.dataList[1].quantity = data.onlineSize;
@@ -194,8 +233,6 @@ window.onload = () => {
         init.content.account.dataList[3].quantity = data.newMemberSize;
         dispatch('rerender');
     });
-
-    //TODO: draw do thi
 }
 
 function debounce(func, delay) {
@@ -210,13 +247,21 @@ const debounceSearch = debounce((state, searchStr, page,
                                  sortField, sortDirection) => {
     const table = state.content[state.content.activeItem].detail.table;
     table.activePage = 0;
-    countSearchUser(searchStr).then(data => {
-        table.detailPages = [];
-        for (let i = 1; i <= Math.ceil(data / 10); i++) {
-            table.detailPages.push(i);
+    if (searchStr) {
+        countSearchUser(searchStr).then(data => {
+            table.detailPages = [];
+            for (let i = 1; i <= Math.ceil(data / 10); i++) {
+                table.detailPages.push(i);
+            }
+            dispatch('rerender');
+        });
+    } else {
+        state.content[state.content.activeItem].detail.table.detailPages = [];
+        let size = state.content[state.content.activeItem].dataList[0].quantity;
+        for (let i = 1; i <= Math.ceil(size / 10); i++) {
+            state.content[state.content.activeItem].detail.table.detailPages.push(i);
         }
-        dispatch('rerender');
-    });
+    }
 
     searchUser(searchStr, page, sortField, sortDirection)
         .then(data => {
@@ -259,6 +304,20 @@ const actions = {
             detail.activeDetail = "chart";
         }
     },
+    changeFieldSort: ({ content }, value) => {
+        let table = content[content.activeItem].detail.table;
+        table.activeSort = value;
+        table.activePage = 0;
+        if (!table.activeSortType) return;
+
+        searchUser(table.lookupValue, table.activePage,
+            table.activeSort, table.activeSortType)
+            .then(data => {
+                table.rows = [];
+                data.forEach(user => table.rows.push(user));
+                dispatch('rerender');
+            });
+    },
     changePage: ({ content }, index) => {
         let detail = content[content.activeItem].detail;
         if (!detail.table.lookupValue) {
@@ -270,15 +329,29 @@ const actions = {
             });
         } else {
             let table = detail.table;
+            table.activePage = index;
 
+            searchUser(table.lookupValue, table.activePage,
+                table.activeSort, table.activeSortType)
+                .then(data => {
+                    table.rows = [];
+                    data.forEach(user => table.rows.push(user));
+                    dispatch('rerender');
+                });
         }
     },
     changeSortType: ({ content }, type) => {
-        let detail = content[content.activeItem].detail;
-        if (type === detail.activeSortType) return;
-        detail.activeSortType = type;
+        let table = content[content.activeItem].detail.table;
+        if (type === table.activeSortType) return;
+        table.activeSortType = type;
 
-        // TODO: fetch order row
+        searchUser(table.lookupValue, table.activePage,
+            table.activeSort, table.activeSortType)
+            .then(data => {
+                table.rows = [];
+                data.forEach(user => table.rows.push(user));
+                dispatch('rerender');
+            });
     },
     executeActivity: ({modal}, index) => {
         if (index === 0) logout(localStorage.getItem("TOKEN"));
@@ -290,8 +363,7 @@ const actions = {
         let table = state.content[state.content.activeItem].detail.table;
         table.lookupValue = searchStr;
         state.canRender = false;
-        debounceSearch(state, searchStr, 0,
-            table.sortFields[table.activeSort].value, table.activeSortType);
+        debounceSearch(state, searchStr, 0, table.activeSort, table.activeSortType);
     },
     openActivityList: ({activity}) => {
         activity.active = !activity.active;
@@ -334,3 +406,5 @@ export default function reducer(state = init, action, args) {
     actions[action] && actions[action](state, ...args);
     return state;
 }
+
+export { createChart }

@@ -1,3 +1,7 @@
+import { OVERLAY } from "../helper/constants.js";
+
+const $ = document.querySelector.bind(document);
+
 function html([first, ...strings], ...values) {
     return values.reduce(
         (acc, cur) => acc.concat(cur, strings.shift()),
@@ -17,6 +21,134 @@ function renderMessage(user, message) {
     `;
 }
 
+function renderConfirmModal(message) {
+    return html`
+        <div class="modal closure active" id="update-avatar">
+            <h1 class="modal__title">Thông báo</h1>
+            <i class="fa-solid fa-xmark btn-icon btn-close" id="back"></i>
+            <div class="main-modal">
+                <h3 class="modal__elo modal-item">${message}</h3>
+                <div class="modal__function top--margin">
+                    <div class="btn btn--green modal__btn" id="yes">Có</div>
+                    <div class="btn btn--pink modal__btn" id="no">Không</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function alertModal(message) {
+    return html`
+        <div class="modal closure active" id="alert-message">
+            <h1 class="modal__title">Thông báo</h1>
+            <i class="fa-solid fa-xmark btn-icon btn-close" id="back"></i>
+            <div class="main-modal">
+                <h3 class="modal__elo modal-item">${message}</h3>
+                <div class="modal__function top--margin">
+                    <div class="btn btn--green modal__btn" id="confirm">OK</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function alertMessage(message) {
+    turnOnOverlay(alertModal, message);
+
+    $("#confirm").onclick =  function () {
+        turnOffOverlay();
+    }
+}
+
+function renderReadyModal() {
+    return html`
+        <div class="modal closure active" id="update-avatar">
+            <h1 class="modal__title">Bạn đã sẵn sàng?</h1>
+            <i class="fa-solid fa-xmark btn-icon btn-close" id="back"></i>
+            <div class="main-modal">
+                <div class="modal__function top--margin">
+                    <div class="btn btn--green modal__btn" id="ready">Sẵn sàng</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function innerStepContainer(step, index) {
+    return html`
+        <div class="step-index">${Math.floor(index / 2) + 1}</div>
+        <div class="step-container">
+            <div class="step">${step.name}</div>
+        </div>
+        <div class="step-container">
+            <div class="step"></div>
+        </div>
+    `;
+}
+
+function innerStepAvatar(avatar) {
+    return html`
+        <div class="step-index">avatar</div>
+        <div class="step-container">
+            <div class="step-avatar" style="background: url('${avatar}')
+                no-repeat center center / cover;"></div>
+        </div>
+        <div class="step-container">
+            <div class="step-avatar" style="background: url('../assets/img/robot.png')
+                no-repeat center center / cover;"></div>
+        </div>
+    `;
+}
+
+function turnOnOverlay(renderFunction, arg) {
+    OVERLAY.style.zIndex = "100";
+    OVERLAY.innerHTML = renderFunction(arg);
+
+    $("#back").onclick =  function () {
+        turnOnOverlay();
+    };
+}
+
+function turnOffOverlay() {
+    OVERLAY.innerHTML = "";
+    OVERLAY.style.zIndex = "-10";
+}
+
+let confirmResolve;
+function confirm(message) {
+    turnOnOverlay(renderConfirmModal, message);
+
+    $("#yes").addEventListener("click", function () {
+        resolveConfirm(true);
+    });
+
+    $("#no").addEventListener("click", function () {
+        resolveConfirm(false);
+    });
+
+    $("#back").onclick =  function () {
+        resolveConfirm(false);
+    };
+
+    return new Promise(resolve => {
+        confirmResolve = resolve;
+    });
+}
+
+function resolveConfirm(isConfirmed) {
+    OVERLAY.innerHTML = "";
+    turnOffOverlay();
+    confirmResolve(isConfirmed);
+}
+
 export {
-    renderMessage
+    renderMessage,
+    renderConfirmModal,
+    renderReadyModal,
+    turnOnOverlay,
+    turnOffOverlay,
+    innerStepAvatar,
+    innerStepContainer,
+    confirm,
+    alertMessage
 }

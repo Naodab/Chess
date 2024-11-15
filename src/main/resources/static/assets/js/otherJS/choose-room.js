@@ -1,44 +1,58 @@
-function onClickFunc() {
-    window.location.href = "../play-with-people/new-room";
+let wsCreateRoom;
+let wsJoinRoom;
+let viewerList = [];
+
+function initializeWebSockets() {
+    //for creating room
+    wsCreateRoom = new WebSocket("ws://localhost:8080/chess/websocket/createRoom");
+    wsCreateRoom.onopen = function () {
+        console.log("Websocket is ready to create a room from choose-room.js");
+    }
+    wsCreateRoom.onmessage = function (event) {
+        const newRoom = JSON.parse(event.data);
+        addRoomToLobby(newRoom);
+    }
+
+    //for joining room
+    wsJoinRoom = new WebSocket("ws://localhost:8080/chess/websocket/joinRoom")
+    wsJoinRoom.onopen = function () {
+        console.log("Websocket is ready to join a room from joinRoomRequest");
+    }
+    wsJoinRoom.onmessage = function (event) {
+        const joinRoomRequest = JSON.parse(event.data);
+        updateWhenJoiningRoom(joinRoomRequest);
+    }
 }
 
-function onExitFunc() {
-    window.location.href = "../login";
+function joinRoom(roomData) {
+    const roomResult =  JSON.parse(roomData);
+    const userRequestJoinRoom = sessionStorage.getItem("USERNAME");
+
+    let coPlayer = null;
+    if (roomResult.coPlayer === "Waiting ...") {
+        coPlayer = userRequestJoinRoom;
+    }
+
+    const viewerCount = roomResult.viewerCount;
+    if (viewerCount > 0) {
+        viewerList.push(userRequestJoinRoom);
+    }
+
+    const joinRoomRequest = {
+        roomID: roomResult.roomID,
+        host: roomResult.host,
+        coPlayer: coPlayer,
+        viewerList: viewerList
+    };
+
+    wsJoinRoom.send(JSON.stringify(joinRoomRequest));
+    sessionStorage.setItem("RoomID", joinRoomRequest.roomID + "");
+    window.location.href = "../play-with-people/enter-game";
 }
 
-function joinRoom(roomID) {
-    alert("Bạn đang chuẩn bị vào phòng chơi mới! Room ID = " + roomID);
-    const token = localStorage.getItem("TOKEN");
-    console.log(token);
-    const socket = new SockJS('/chess/websocket', {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
-    const stompClient = Stomp.over(socket);
-    console.log("chuan bi");
-    stompClient.connect({
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-        }, (frame) => {
-        console.log("aa");
-        console.log("Connected: " + frame);
-        stompClient.subscribe('/topic/public', (message) => {
-            const notification = JSON.parse(message);
-            console.log(notification);
-            alert(notification); //khúc ni là khúc chuẩn bị cập nhật lại giao diện!
-        });
-        const massage = "Nguoi dung muon tham gia room: " + roomID;
-        stompClient.send('/app/join-room', {}, JSON.stringify(massage));
-        alert("Request sent to join room: " + roomID);
-        }, (error) => {
-        console.error("Error connecting to WebSocket:", error);
-        }
-    );
-}
-
+/*
 function loadRoom() {
+    //for testing in postman
     const token = localStorage.getItem("TOKEN");
     console.log(token);
 
@@ -50,7 +64,7 @@ function loadRoom() {
         }
     })
         .then(response => {
-            if (!response.ok) throw new Error("Có chuyện xảy ra rồi!");
+            if (!response.ok) throw new Error("Oops, having problems here!");
             return response.json();
         })
         .then(data => {
@@ -94,10 +108,67 @@ function loadRoom() {
             })
         })
         .catch(error => {
-            console.error("Lỗi khi truyền tải dữ liệu!", error);
+            console.error("Error in processing data!", error);
         });
+}
+*/
+
+function addRoomToLobby(roomCreateRequest) {
+    const table = document.getElementById("myTable");
+    const newRow = table.insertRow(-1);
+
+    const joinButton = document.createElement("button");
+    joinButton.textContent = "Vào game";
+    joinButton.addEventListener('click', (event) => {
+        const row = event.target.closest("tr");
+        const data = {
+            roomID : row.cells[0].innerHTML,
+            host: row.cells[1].innerHTML,
+            coPlayer: row.cells[2].innerHTML,
+            viewerCount: row.cells[3].innerHTML
+        };
+        joinRoom(JSON.stringify(data));
+    });
+
+    const idCell = newRow.insertCell(0);
+    const hostCell = newRow.insertCell(1);
+    const coPlayerCell = newRow.insertCell(2);
+    const viewerCountCell = newRow.insertCell(3);
+    const enterGameCell = newRow.insertCell(4);
+
+    idCell.innerHTML = roomCreateRequest.roomID;
+    hostCell.innerHTML = roomCreateRequest.host;
+    coPlayerCell.innerHTML = "Waiting ...";
+    viewerCountCell.innerHTML = "0";
+    enterGameCell.appendChild(joinButton);
+}
+
+function updateWhenJoiningRoom(joinRoomRequest) {
+    const table = document.getElementById("myTable");
+    const rows = table.rows;
+    for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const currentRoomID = row.cells[0].textContent;
+        if (currentRoomID === joinRoomRequest.roomID) {
+            row.cells[1].textContent = joinRoomRequest.host;
+            row.cells[2].textContent = joinRoomRequest.coPlayer;
+            row.cells[3].textContent = joinRoomRequest.viewerList.length;
+            break;
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadRoom();
+    initializeWebSockets();
+    /*
+    loadRoom(); //error using token, fix many times!
+     */
 });
+
+function onClickFunc() {
+    window.location.href = "../play-with-people/new-room";
+}
+
+function onExitFunc() {
+    window.location.href = "../login";
+}

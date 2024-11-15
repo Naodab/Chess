@@ -3,6 +3,7 @@ package com.example.pbl4Version1.constant;
 import com.example.pbl4Version1.entity.Achievement;
 
 public class PredefinedAchievement {
+
 	
 
 	// Achievement format: new Achievement(title, imageUrl, description)
@@ -86,7 +87,8 @@ public class PredefinedAchievement {
 	private Achievement fingerPaint = new Achievement("Finger Paint", "../assets/img/achievement/fingerPaint.png", "Customize Your Theme");
 
 	
-	private PredefinedAchievement() {
-		
-	}
+
+
+	private PredefinedAchievement() {}
+
 }

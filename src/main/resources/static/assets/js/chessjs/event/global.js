@@ -22,6 +22,7 @@ import {
     getPieceAtPosition,
     moveStatus
 } from "../helper/commonHelper.js";
+import {alertMessage} from "../opponents/message.js";
 
 let highlight_state = false;
 let previousHighlight = null;
@@ -967,7 +968,7 @@ async function sendStepToServer(from, to) {
             moveElement(piece, data.result.to);
             const status = moveStatus(ALLIANCE.toLowerCase());
             if (status === "CHECK_MATE" || status === "STALE_MATE") {
-                alert(status);
+                alertMessage(status);
             } else if (status === "IN_CHECK") {
                 alert(status);
             }

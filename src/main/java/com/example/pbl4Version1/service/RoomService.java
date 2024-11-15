@@ -86,6 +86,8 @@ public class RoomService {
 	public RoomResponse getRoom(Long id) {
 		Room room = roomRepository.findById(id).orElseThrow(
 				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
+		List<RoomUser> roomUsers = roomUserRepository.findByRoomId(id);
+		room.setRoomUsers(new HashSet<>(roomUsers));
 		return roomMapper.toRoomResponse(room);
 	}
 	
@@ -116,21 +118,31 @@ public class RoomService {
 		return roomMapper.toRoomResponse(room);
 	}
 
-	//value of "id" here is the "id" of the room to join
-	//wait, testing web socket activates well
-	public RoomResponse joinRoom(Long id, JoinRoomRequest request) {
+	public void joinRoom(Long id, JoinRoomRequest request) {
 		Room room = roomRepository.findById(id).orElseThrow(
 				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
-		User viewer = userRepository.findByUsername(request.getUsername())
-				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-		if (room.getRoomUsers().size() < 2) {
-			room.getRoomUsers().add(RoomUser.builder().room(room).user(viewer).role(Mode.PLAYER).build());
+		var authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName();
+		User user = userRepository.findByUsername(username)
+						.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+		log.info(user.getId() + "/" + user.getUsername());
+		RoomUser roomUser;
+		if (request.getRole().equals(Mode.PLAYER.toString())) {
+			roomUser = RoomUser.builder()
+							.user(user)
+							.room(room)
+							.role(Mode.PLAYER).build();
 		}
 		else {
-			room.getRoomUsers().add(RoomUser.builder().room(room).user(viewer).role(Mode.VIEWER).build());
+			roomUser = RoomUser.builder()
+							.user(user)
+							.room(room)
+							.role(Mode.VIEWER)
+							.build();
 		}
-		room = roomRepository.save(room);
-		return roomMapper.toRoomResponse(room);
+		roomUserRepository.save(roomUser);
+
+		//update room when a new user comes in!
 	}
 	
 	public void deleteRoom(Long id) {

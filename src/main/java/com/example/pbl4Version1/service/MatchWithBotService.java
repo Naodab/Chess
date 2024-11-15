@@ -32,15 +32,6 @@ public class MatchWithBotService {
 	UserRepository userRepository;
 	StepRepisitory stepRepisitory;
 	MatchMapper matchMapper;
-	
-	public MatchWithBotResponse create(MatchBotCreationRequest request) {
-		User player = userRepository.findByUsername(request.getUsername())
-				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-		MatchWithBot match = matchMapper.toMatchWithBot(request);
-		match.setPlayer(player);
-		match = matchRepository.save(match);
-		return matchMapper.toMatchWithBotResponse(match);
-	}
 
 	@PreAuthorize("hasRole('ADMIN')")
 	public List<MatchWithBotResponse> getAll() {
@@ -57,7 +48,7 @@ public class MatchWithBotService {
 		return matchMapper.toMatchWithBotResponse(match);
 	}
 	
-	public MatchWithBotResponse playWithBot() {
+	public MatchWithBotResponse create() {
 		var authentication = SecurityContextHolder.getContext().getAuthentication();
 		String name = authentication.getName();
 		User user = userRepository.findByUsername(name)

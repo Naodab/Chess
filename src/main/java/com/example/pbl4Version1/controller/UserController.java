@@ -103,7 +103,7 @@ public class UserController {
 				.build();
 	}
 
-	@PostMapping("/search/{searchStr}")
+	@GetMapping("/search/{searchStr}")
 	public ApiResponse<Long> countSearch(@PathVariable("searchStr") String searchStr) {
 		return ApiResponse.<Long>builder()
 				.result(userService.countSearch(searchStr))

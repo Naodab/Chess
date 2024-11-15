@@ -25,7 +25,8 @@ public class SecurityConfig {
 												"/api/auth/intro", "/api/auth/refresh", 
 												"/api/auth/logout", "/api/auth/verify"};
 	private final String[] FRONTEND_ENDPOINTS = {"/public/**", "/assets/**"};
-	
+	private final String[] WEBSOCKET_ENDPOINTS = {	"/websocket/**", "/websocket/createRoom", "/websocket/joinRoom",
+													"/websocket/chatInRoom"};
 	@Autowired
 	CustomJwtDecoder customJwtDecoder;
 	
@@ -34,11 +35,11 @@ public class SecurityConfig {
 		http.authorizeHttpRequests(request -> 
 			{
 				request
-					.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-					.requestMatchers(FRONTEND_ENDPOINTS).permitAll()
-					.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-						.requestMatchers("/chess/websocket/**").permitAll()
-					.anyRequest().authenticated();
+						.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
+						.requestMatchers(FRONTEND_ENDPOINTS).permitAll()
+						.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+						.requestMatchers(WEBSOCKET_ENDPOINTS).permitAll()
+						.anyRequest().authenticated();
 			});
 		
 		http.oauth2ResourceServer(oauth2 -> 

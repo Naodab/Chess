@@ -20,17 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 public class MatchWithBotController {
 	MatchWithBotService matchWithBotService;
 	
-	@PostMapping
-	ApiResponse<MatchWithBotResponse> create(@RequestBody MatchBotCreationRequest request) {
-		return ApiResponse.<MatchWithBotResponse>builder()
-				.result(matchWithBotService.create(request))
-				.build();
-	}
-	
 	@GetMapping
 	ApiResponse<MatchWithBotResponse> createBoard() {
 		return ApiResponse.<MatchWithBotResponse>builder()
-				.result(matchWithBotService.playWithBot())
+				.result(matchWithBotService.create())
 				.build();
 	}
 
