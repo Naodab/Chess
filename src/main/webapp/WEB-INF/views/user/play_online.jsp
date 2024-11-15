@@ -30,7 +30,7 @@
         <div class="play-area">
             <div class="player-info-container">
                 <div class="player-info">
-                    <div class="avatar" style="background: url('../assets/img/robot.png')
+                    <div class="avatar" style="background: url('${"avatar"}')
                     no-repeat center center / cover;">
                     </div>
                     <span class="content">
