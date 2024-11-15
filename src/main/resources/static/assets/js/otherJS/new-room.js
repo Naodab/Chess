@@ -1,18 +1,43 @@
+var wsCreateRoom;
+
 function onClickFunc() {
     window.location.href = "../play-with-people/choose-room";
 }
 
 function onCreateFunc() {
     const roomPassword = document.getElementById("roomCode").value;
+
+    //for testing with token and username
     const token = localStorage.getItem("TOKEN");
-    //for showing token, help a lot in testing in postman
     console.log(token);
-    const username = localStorage.getItem("USERNAME");
+
+    const username = sessionStorage.getItem("USERNAME");
+    console.log(username);
+
     if (!roomPassword) {
-        alert("Hãy nhập một mật khẩu cho phòng chơi của bạn!");
+        alert("Please enter a password for your new room!");
         return;
     }
 
+    const roomCreateRequest = {
+        roomID: Math.floor(Math.random() * 10000),
+        password: roomPassword,
+        host: username
+    }
+
+    wsCreateRoom = new WebSocket("ws://localhost:8080/chess/websocket/createRoom");
+    //for testing purpose:
+    wsCreateRoom.onopen = function () {
+        console.log("Websocket from newroom.js is now open!");
+        wsCreateRoom.send(JSON.stringify(roomCreateRequest));
+        sessionStorage.setItem("RoomID", roomCreateRequest.roomID + "");
+        window.location.href = "../play-with-people/enter-game";
+    }
+    wsCreateRoom.onerror = function () {
+        console.log("Websocket from newrooom.js has error(s)!");
+    }
+
+    /*
     fetch(`/chess/api/users/username/${username}`, {
         method: "GET",
         headers: {
@@ -21,7 +46,7 @@ function onCreateFunc() {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error("Không thể lấy được hostID từ username!");
+                throw new Error("Cannot get hostID from username!");
             }
             return response.json();
         })
@@ -44,12 +69,36 @@ function onCreateFunc() {
         })
         .then (response => response.json())
         .then (data => {
+            //for testing purpose
+            console.log(data);
             const result = data.result;
-            console.log("Một phòng chơi mới đã được tạo thành công!" + result.host + " " + result.password);
-            alert("Một phòng chơi mới đã được tạo thành công!");
+            console.log(result);
+            alert("A room has just been created successfully!");
+            //window.location.href = "../play-with-people/enter-game";
+            connectWebSocket();
         })
         .catch(error => {
             console.log("Lỗi: " + error);
             alert("Đã xảy ra lỗi trong quá trình tạo phòng!");
         })
+     */
 }
+
+/*
+function connectWebSocket() {
+    const ws = new WebSocket("ws://localhost:8080/chess/websocket/createRoom");
+    ws.onopen = function () {
+        console.log("websocket cập nhật rooms khi có một room mới được khởi tạo!");
+    }
+    ws.onmessage = function (event) {
+        console.log("chuẩn bị broadcast đi nè");
+        const message = JSON.parse(event.data);
+        console.log(event);
+        console.log(message);
+
+    }
+    ws.onerror = function (error ) {
+        console.error("websocket có lỗi " + error);
+    }
+}
+*/

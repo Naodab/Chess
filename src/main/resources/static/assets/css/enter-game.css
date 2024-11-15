@@ -22,7 +22,6 @@ body {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Phần bảng bên trái */
 .left-panel {
     flex: 1;
     border-right: 1px solid #ddd;
@@ -37,7 +36,6 @@ body {
     color: #333;
 }
 
-/* Phần bên phải */
 .right-panel {
     flex: 3;
     display: flex;
@@ -45,21 +43,22 @@ body {
     justify-content: space-between;
 }
 
-/* Khu vực chính của phần bên phải */
 .main-content {
     flex-grow: 1;
     padding: 20px;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     border-bottom: 1px solid #ddd;
+    overflow-y: auto;
 }
 
-/* Thanh nhập liệu và nút ở dưới cùng */
 .bottom-bar {
     display: flex;
+    align-items: center;
     padding: 10px;
     background-color: #f9f9f9;
+    position: relative;
 }
 
 .text-input {
@@ -69,6 +68,7 @@ body {
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-right: 10px;
+    transition: opacity 0.3s;
 }
 
 .submit-btn {
@@ -88,4 +88,64 @@ body {
 
 img {
     width: 610px;
+}
+
+.sent-message, .received-message {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+    padding: 5px 10px;
+    border-radius: 5px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+.message strong {
+    margin-right: 5px;
+    color: #333333;
+}
+
+.received-message {
+    background-color: #f1f1f1;
+    align-self: flex-start;
+}
+
+.sent-message {
+    background-color: #d1e7ff;
+    align-self: flex-end;
+}
+
+.audio-button {
+    width: 60px;
+    height: 60px;
+    background-color: #0078ff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.audio-button:active {
+    background-color: #005bb5;
+    transform: scale(0.9);
+}
+
+#status {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+.recording-timer {
+    flex: 4;
+    font-size: 16px;
+    color: #333;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
 }

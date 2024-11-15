@@ -121,14 +121,14 @@ function renderChangePassword() {
 function renderRoom(room) {
     return html`
         <td>${room.id}</td>
-        <td>${room.time / 60} phút</td>
-        <td>${room.people}</td>
+        <td>${room.time} phút</td>
+        <td class="room-people">${room.people}</td>
         <td>
             <div class="room-role-list">
-                <div class="btn btn--pink room-role-item">
+                <div class="btn btn--pink room-role-item" id="join-a-room-as-player">
                     Tham gia
                 </div>
-                <div class="btn btn--pink room-role-item">
+                <div class="btn btn--pink room-role-item" id="join-a-room-as-viewer">
                     Xem
                 </div>
             </div>
