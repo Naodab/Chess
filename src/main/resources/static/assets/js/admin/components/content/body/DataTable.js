@@ -15,7 +15,11 @@ function DataTable({ table, activeItem }) {
                 <h1 class="detail__title">Danh sách</h1>
             </div>
             <div class="table__function">
-                ${FunctionSort({ sortFields: table.sortFields})}
+                ${FunctionSort({ 
+                    sortFields: table.sortFields, 
+                    activeSort: table.activeSort, 
+                    activeSortType: table.activeSortType 
+                })}
                 ${FunctionLookup({ table })}
             </div>
             <div class="detail-container">

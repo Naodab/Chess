@@ -1,9 +1,6 @@
 package com.example.pbl4Version1.controller;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.pbl4Version1.dto.request.MatchCreationRequest;
 import com.example.pbl4Version1.dto.response.ApiResponse;
@@ -27,6 +24,13 @@ public class MatchWithHumanController {
 	ApiResponse<MatchWithHumanResponse> create(@RequestBody MatchCreationRequest request) {
 		return ApiResponse.<MatchWithHumanResponse>builder()
 				.result(matchWithHumanService.create(request))
+				.build();
+	}
+
+	@GetMapping("/{matchId}")
+	ApiResponse<MatchWithHumanResponse> get(@PathVariable Long matchId) {
+		return ApiResponse.<MatchWithHumanResponse>builder()
+				.result(matchWithHumanService.getMatch(matchId))
 				.build();
 	}
 	

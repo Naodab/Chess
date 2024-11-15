@@ -58,6 +58,11 @@ public class MatchMapper {
 		if (match.getWinner() != null) {
 			winner = match.getWinner().name();
 		}
+
+		ArrayList<StepResponse> steps = new ArrayList<>();
+		if (match.getSteps() != null) {
+			steps.addAll(match.getSteps().stream().map(stepMapper::toStepResponse).toList());
+		}
 		
 		return MatchWithHumanResponse.builder()
 				.roomResponse(roomMapper.toRoomResponse(match.getRoom()))
@@ -67,6 +72,7 @@ public class MatchMapper {
 				.timeWhite(match.getTimeWhiteUser())
 				.id(match.getId())
 				.winner(winner)
+				.steps(steps)
 				.build();
 	}
 }

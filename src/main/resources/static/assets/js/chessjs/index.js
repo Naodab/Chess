@@ -8,7 +8,7 @@ const playerInfo = document.querySelectorAll(".player-info");
 const defeatedPieces = document.querySelectorAll(".defeated-pieces");
 const gbContainer = document.querySelector(".game-board-container");
 
-const globalState = initGame();
+let globalState = initGame();
 
 const matchID = localStorage.getItem("MATCH_ID");
 
@@ -22,6 +22,10 @@ let ROLE;
 let matchNumber = localStorage.getItem("MATCH_NUMBER") ? localStorage.getItem("MATCH_NUMBER") : 0;
 let blackPlayer;
 let whitePlayer;
+
+function reCreateGame() {
+    globalState = initGame();
+}
 
 function loadPageFunction(alliance) {
     if (alliance === "BLACK") {
@@ -208,4 +212,4 @@ document.body.onload = async function () {
     }
 }
 
-export { globalState, ALLIANCE, OPPONENT };
+export { globalState, ALLIANCE, OPPONENT, reCreateGame };

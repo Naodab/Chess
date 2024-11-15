@@ -1,3 +1,5 @@
+import { createChart } from "./reducer.js";
+
 export default function html([first, ...strings], ...values) {
     return values.reduce(
         (acc, cur) => acc.concat(cur, strings.shift()),
@@ -35,6 +37,11 @@ export function createStore(reducer) {
                 if (search) {
                     search.focus();
                     search.selectionStart = search.selectionEnd = search.value.length;
+                }
+                const canvas = document.querySelector(`#account__chart`);
+                if (canvas) {
+                    const ctx = canvas.getContext("2d");
+                    createChart(ctx);
                 }
             } else {
                 state.canRender = true;
