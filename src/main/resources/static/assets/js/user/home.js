@@ -26,13 +26,12 @@ function initializeWebsocket() {
         console.log("Websocket is now opened!");
     }
     ws.onmessage = function (event) {
-        if (event.data.type === "CREATE_ROOM") {
-            const roomToCreate = JSON.parse(event.data);
-            addRoom(roomToCreate);
+        const data = JSON.parse(event.data);
+        if (data.type === "CREATE_ROOM") {
+            addRoom(data);
         }
-        else if (event.data.type === "JOIN_ROOM_AS_PLAYER" || event.data.type === "JOIN_ROOM_AS_VIEWER") {
-            const roomToUpdate = JSON.parse(event.data);
-            updateRoomUI(roomToUpdate);
+        else if (data.type === "JOIN_ROOM_AS_PLAYER" || data.type === "JOIN_ROOM_AS_VIEWER") {
+            updateRoomUI(data);
         }
     }
 }
