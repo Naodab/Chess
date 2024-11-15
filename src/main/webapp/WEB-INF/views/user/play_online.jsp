@@ -30,7 +30,7 @@
         <div class="play-area">
             <div class="player-info-container">
                 <div class="player-info">
-                    <div class="avatar" style="background: url('${"avatar"}')
+                    <div class="avatar" style="background: url('../assets/img/robot.png')
                     no-repeat center center / cover;">
                     </div>
                     <span class="content">
@@ -114,8 +114,8 @@
                         <div class="step-item">
                             <div class="step-index">avatar</div>
                             <div class="step-container">
-                                <div class="step-avatar" style="background: url('${"avatar"}')
-                                    no-repeat center center / cover;"></div>
+                                <div class="step-avatar" style="background: url('../assets/img/robot.png')
+                                    no-repeat center center / cover;" ></div>
                             </div>
                             <div class="step-container">
                                 <div class="step-avatar" style="background: url('../assets/img/robot.png')

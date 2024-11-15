@@ -3,7 +3,7 @@ import {
     SQUARE_SELECTOR,
     PROMPT_PIECE
 } from "../helper/constants.js"
-import { globalState, ALLIANCE, OPPONENT } from "../index.js";
+import {globalState, ALLIANCE, OPPONENT, ROLE} from "../index.js";
 import {
     selfHighlight,
     clearPreviousSelfHighlight,
@@ -422,7 +422,7 @@ function whitePawnClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite || ALLIANCE === "BLACK") {
+    if (!turnWhite || ALLIANCE === "BLACK" || ROLE === "VIEWER") {
         return;
     }
 
@@ -454,7 +454,7 @@ function whiteRookClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite || ALLIANCE === "BLACK") {
+    if (!turnWhite || ALLIANCE === "BLACK" || ROLE === "VIEWER") {
         return;
     }
 
@@ -479,7 +479,7 @@ function whiteKnightClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite || ALLIANCE === "BLACK") {
+    if (!turnWhite || ALLIANCE === "BLACK" || ROLE === "VIEWER") {
         return;
     }
 
@@ -504,7 +504,7 @@ function whiteBishopClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite || ALLIANCE === "BLACK") {
+    if (!turnWhite || ALLIANCE === "BLACK" || ROLE === "VIEWER") {
         return;
     }
 
@@ -529,7 +529,7 @@ function whiteQueenClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite || ALLIANCE === "BLACK") {
+    if (!turnWhite || ALLIANCE === "BLACK" || ROLE === "VIEWER") {
         return;
     }
 
@@ -554,7 +554,7 @@ function whiteKingClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite || ALLIANCE === "BLACK") {
+    if (!turnWhite || ALLIANCE === "BLACK" || ROLE === "VIEWER") {
         return;
     }
 
@@ -619,7 +619,7 @@ function blackPawnClick({ piece }) {
             return;
         }
     }
-    if (turnWhite || ALLIANCE === "WHITE") {
+    if (turnWhite || ALLIANCE === "WHITE" || ROLE === "VIEWER") {
         return;
     }
 
@@ -651,7 +651,7 @@ function blackRookClick({ piece }) {
             return;
         }
     }
-    if (turnWhite || ALLIANCE === "WHITE") {
+    if (turnWhite || ALLIANCE === "WHITE" || ROLE === "VIEWER") {
         return;
     }
 
@@ -676,7 +676,7 @@ function blackKnightClick({ piece }) {
             return;
         }
     }
-    if (turnWhite || ALLIANCE === "WHITE") {
+    if (turnWhite || ALLIANCE === "WHITE" || ROLE === "VIEWER") {
         return;
     }
 
@@ -701,7 +701,7 @@ function blackBishopClick({ piece }) {
             return;
         }
     }
-    if (turnWhite || ALLIANCE === "WHITE") {
+    if (turnWhite || ALLIANCE === "WHITE" || ROLE === "VIEWER") {
         return;
     }
 
@@ -726,7 +726,7 @@ function blackQueenClick({ piece }) {
             return;
         }
     }
-    if (turnWhite || ALLIANCE === "WHITE") {
+    if (turnWhite || ALLIANCE === "WHITE" || ROLE === "VIEWER") {
         return;
     }
 
@@ -751,7 +751,7 @@ function blackKingClick({ piece }) {
             return;
         }
     }
-    if (turnWhite || ALLIANCE === "WHITE") {
+    if (turnWhite || ALLIANCE === "WHITE" || ROLE === "VIEWER") {
         return;
     }
 
@@ -872,8 +872,11 @@ function moveOrCancelMove(square) {
                 (square.id.includes("8") || square.id.includes("1"))) {
                 beginPromotionPawn(moveState);
             }
-            // TODO: send Step API to Server
-            sendStepToServer(oldMove, square.id);
+            if (MODE === "PLAY_WITH_BOT")
+                sendStepToServer(oldMove, square.id);
+            else if (MODE === "PLAY_ONLINE") {
+                sendStepToOthers(oldMove, square.id);
+            }
             nameMove = "";
         } else {
             clearPreviousSelfHighlight(previousHighlight);
@@ -976,6 +979,22 @@ async function sendStepToServer(from, to) {
         }
     } catch (error) {
     }
+}
+
+async function sendStepToOthers(from, to) {
+    const fen = generateFen();
+    // send to save in database
+    await fetch("/chess/api/steps", {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+        },
+        body: JSON.stringify({ matchId: matchID, fen: fen, from: from, to: to, name: nameMove }),
+        redirect: "follow"
+    });
+
+    // send to others people in ROOM
 }
 
 export {
