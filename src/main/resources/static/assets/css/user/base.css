@@ -99,6 +99,7 @@ a {
 .modal {
     position: relative;
     display: none;
+    min-width: 400px;
 }
 
 .modal.active {

@@ -22,7 +22,7 @@
                 <a href="" class="active"><i class="fas fa-puzzle-piece"></i>Chơi với máy</a>
             </div>
             <div class="sidebar-body">
-                <button class="btn btn--pink logout">Đăng xuất</button>
+                <button class="btn btn--pink" id="return">Trở lại</button>
             </div>
             <a class="settings-link" href=""><i class="fas fa-cog"></i>Cài đặt</a>
         </div>
@@ -95,7 +95,9 @@
                 </div>
                 <div class="step__footer">
                     <div class="btn btn--pink step__function"><i class="fa-solid fa-angle-left"></i></div>
-                    <div class="btn btn--green step__function"><i class="fa-solid fa-plus"></i></div>
+                    <div class="btn btn--green step__function" id="create-new-match">
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
                     <div class="btn btn--pink step__function"><i class="fa-solid fa-angle-right"></i></div>
                 </div>
             </div>
@@ -105,5 +107,6 @@
         const MODE = "PLAY_WITH_BOT";
     </script>
     <script type="module" src="../assets/js/chessjs/index.js"></script>
+    <script type="module" src="../assets/js/chessjs/mode/play_with_bot.js"></script>
 </body>
 </html>

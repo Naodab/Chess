@@ -1,6 +1,6 @@
 package com.example.pbl4Version1.dto.response;
 
-import java.util.Set;
+import java.util.List;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,5 +22,5 @@ public class MatchWithHumanResponse {
 	float timeWhite;
 	float timeBlack;
 	String winner;
-	Set<StepResponse> steps;
+	List<StepResponse> steps;
 }

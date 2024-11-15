@@ -60,7 +60,6 @@ function addTopUser(user, rank) {
 }
 
 window.addEventListener("load", () => {
-    console.log(1);
     fetch("/chess/api/users/top", {
         method: "GET",
         headers: {
@@ -89,7 +88,6 @@ window.addEventListener("load", () => {
 
 function turnOnModal(renderFunction, attr) {
     overlay.style.zIndex = "100";
-    console.log(renderFunction(attr));
     overlay.innerHTML = renderFunction(attr);
 
     $("#back").onclick =  function () {
@@ -363,6 +361,7 @@ $("#create-room").onclick = () => {
                 time: roomCreateData.time,
                 people: people
             };
+            sessionStorage.setItem("ROOM_ID", roomCreateData.id);
             ws.send(JSON.stringify(infoToBroadcast));
             window.location.href = "../public/playonl";
         }).catch((error) => {
@@ -372,6 +371,7 @@ $("#create-room").onclick = () => {
 }
 
 function addRoom(room) {
+    console.log(room.id);
     const tr = document.createElement("tr");
     tr.classList.add("room");
     tr.setAttribute("data-id", room.id);
@@ -386,7 +386,7 @@ function addRoom(room) {
     }
     tr.querySelector("#join-a-room-as-viewer").onclick = () => {
         joinRoomAsViewer(room);
-        sessionStorage.setItem("Room_ID", room.id);
+        sessionStorage.setItem("ROOM_ID", room.id);
         window.location.href = "../public/playonl";
     }
 }

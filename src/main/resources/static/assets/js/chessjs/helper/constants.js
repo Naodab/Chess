@@ -1,6 +1,6 @@
 const ROOT_DIV = document.getElementById("game-board");
 const GB_CONTAINER = document.querySelector(".game-board-container");
-const OVERLAY = document.querySelector(".overlay");
+const OVERLAY = document.querySelector("#overlay");
 const SQUARE_SELECTOR = ".square";
 const WHITE_DEFEATED_PIECES = ".alliance-black.defeated-pieces";
 const BLACK_DEFEATED_PIECES = ".alliance-white.defeated-pieces";

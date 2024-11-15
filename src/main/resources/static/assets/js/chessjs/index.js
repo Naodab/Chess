@@ -8,7 +8,7 @@ const playerInfo = document.querySelectorAll(".player-info");
 const defeatedPieces = document.querySelectorAll(".defeated-pieces");
 const gbContainer = document.querySelector(".game-board-container");
 
-const globalState = initGame();
+let globalState = initGame();
 
 const matchID = localStorage.getItem("MATCH_ID");
 
@@ -22,6 +22,10 @@ let ROLE;
 let matchNumber = localStorage.getItem("MATCH_NUMBER") ? localStorage.getItem("MATCH_NUMBER") : 0;
 let blackPlayer;
 let whitePlayer;
+
+function reCreateGame() {
+    globalState = initGame();
+}
 
 function loadPageFunction(alliance) {
     if (alliance === "BLACK") {
@@ -173,8 +177,7 @@ document.body.onload = async function () {
             globalEvent();
         });
     } else {
-        // get room from database
-        await fetch(`/chess/api/rooms/ ${localStorage.getItem("ROOM_ID")}`, {
+        await fetch(`/chess/api/rooms/ ${sessionStorage.getItem("ROOM_ID")}`, {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
@@ -187,7 +190,7 @@ document.body.onload = async function () {
         }).then(data => data.result)
         .then(data => {
             ROOM = data;
-            ROLE = getRole(localStorage.getItem("USERNAME"));
+            ROLE = getRole(sessionStorage.getItem("USERNAME"));
             if (matchNumber % 2 === 0) {
                 whitePlayer = ROOM.host;
                 blackPlayer = ROOM.player;
@@ -208,4 +211,4 @@ document.body.onload = async function () {
     }
 }
 
-export { globalState, ALLIANCE, OPPONENT };
+export { globalState, ALLIANCE, OPPONENT, reCreateGame };
