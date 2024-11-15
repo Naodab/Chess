@@ -17,6 +17,26 @@ const activityBtn = $("#activity-btn");
 const activityList = $(".activity-list");
 const topUsers = [];
 
+//NOTE: for websocket declaration
+let ws;
+
+function initializeWebsocket() {
+    ws = new WebSocket("ws://localhost:8080/chess/websocket");
+    ws.onopen = function () {
+        console.log("Websocket is now opened!");
+    }
+    ws.onmessage = function (event) {
+        if (event.data.type === "CREATE_ROOM") {
+            const roomToCreate = JSON.parse(event.data);
+            addRoom(roomToCreate);
+        }
+        else if (event.data.type === "JOIN_ROOM_AS_PLAYER" || event.data.type === "JOIN_ROOM_AS_VIEWER") {
+            const roomToUpdate = JSON.parse(event.data);
+            updateRoomUI(roomToUpdate);
+        }
+    }
+}
+
 function addEventForEye() {
     const iconEyes = $$(".password-container i");
     iconEyes.forEach(icon => {
@@ -41,7 +61,7 @@ function addTopUser(user, rank) {
 }
 
 window.addEventListener("load", () => {
-    console.log(1)
+    console.log(1);
     fetch("/chess/api/users/top", {
         method: "GET",
         headers: {
@@ -61,6 +81,11 @@ window.addEventListener("load", () => {
             player.onclick = () => turnOnModal(renderPersonalInformation, topUsers[index]);
         });
     });
+    //NOTE: next initializeWebsocket when loading page jsp
+    initializeWebsocket();
+    console.log(localStorage.getItem("TOKEN"));
+    //NOTE: fetch to get all active rooms
+    loadAllRooms();
 });
 
 function turnOnModal(renderFunction, attr) {
@@ -227,7 +252,7 @@ $("#change-password-btn").onclick = event => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": "Bearer " + token
+                    "Authorization": "Bearer " + localStorage.getItem("TOKEN")
                 },
                 body: JSON.stringify({ oldPassword, newPassword })
             }).then(response => {
@@ -271,7 +296,24 @@ $("#find-room-btn").onclick = () => {
     $("#cancel").onclick = () => turnOffModal();
 
     $("#confirm-enter-room").onclick = () => {
+        const idRoom = $("#idRoom").value;
+        const passwordRoom = $("#roomPassword").value;
         // TODO: find room, code similarly with create room but fetch to find if room active and corrected password
+        console.log(localStorage.getItem("TOKEN"));
+        fetch("../api/rooms/" + idRoom, {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            }
+        }).then(response => {
+            if (response.ok)
+                return response.json();
+            else
+                throw new Error("Network response was not ok " + response.statusText);
+        }).then(data => {
+            //NOTE: not ready to continue coding, fix room return result afterward!
+        })
     };
 }
 
@@ -292,11 +334,41 @@ $("#create-room").onclick = () => {
         }
     });
 
-    $("$confirm-create-room").onclick = () => {
+    $("#confirm-create-room").onclick = () => {
         const time = times[timeActive].getAttribute("data-value");
         const password = $("#roomPassword").value;
         const data = {time, password};
         // TODO: create room and direct to another jsp to test
+        console.log(localStorage.getItem("TOKEN"));
+        fetch("../api/rooms", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            },
+            body: JSON.stringify(data)
+        }).then(response => {
+            if (response.ok)
+                return response.json();
+            else
+                throw new Error("Network response was not ok " + response.statusText);
+        }).then(data => {
+            const roomCreateData = data.result;
+            let people = 0;
+            if (roomCreateData.host != null) people++;
+            if (roomCreateData.player != null) people++;
+            if (roomCreateData.viewers.length !== 0) people += roomCreateData.viewers.length;
+            const infoToBroadcast = {
+                type: "CREATE_ROOM",
+                id: roomCreateData.id,
+                time: roomCreateData.time,
+                people: people
+            };
+            ws.send(JSON.stringify(infoToBroadcast));
+            window.location.href = "../public/playonl";
+        }).catch((error) => {
+            console.log("An error has been detected: " + error);
+        })
     }
 }
 
@@ -307,6 +379,84 @@ function addRoom(room) {
     tr.style.backgroundColor = "#3a3a3a";
     tr.innerHTML = renderRoom(room);
     $(".rooms-list").appendChild(tr);
+
+    tr.querySelector("#join-a-room-as-player").onclick = () => {
+        joinRoomAsPlayer(room);
+        sessionStorage.setItem("ROOM_ID", room.id);
+        window.location.href = "../public/playonl";
+    }
+    tr.querySelector("#join-a-room-as-viewer").onclick = () => {
+        joinRoomAsViewer(room);
+        sessionStorage.setItem("Room_ID", room.id);
+        window.location.href = "../public/playonl";
+    }
 }
 
 // TODO: add event when load this jsp load room active to add room and use addRoom to add a room
+// NOTE: get all active rooms when load/reload page
+function loadAllRooms() {
+    fetch("../api/rooms/active", {
+        method: "GET",
+        headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+        }
+    }).then(response => {
+        if (response.ok)
+            return response.json();
+        else
+            throw new Error("Network response was not ok " + response.statusText);
+    }).then(data => {
+        const roomList = data.result;
+        for (let i = 0; i < roomList.length; i++) {
+            const room = roomList[i];
+            let people = 0;
+            if (room.host != null) people++;
+            if (room.player != null) people++;
+            if (room.viewers != null) people += room.viewers.length;
+            const roomData = {
+                id: room.id,
+                time: room.time,
+                people: people
+            }
+            addRoom(roomData);
+        }
+    })
+}
+
+function joinRoomAsPlayer(room) {
+    fetch("../api/rooms/joinRoom/" + room.id, {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+        },
+        body: JSON.stringify({"username": sessionStorage.getItem("USERNAME"), "role": "PLAYER"})
+    }).then(response => {
+        ws.send(JSON.stringify({ "type": "JOIN_ROOM_AS_PLAYER" ,"id": room.id}));
+        return response.ok;
+    })
+}
+
+function joinRoomAsViewer(room) {
+    fetch("../api/rooms/joinRoom/" + room.id, {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+        },
+        body: JSON.stringify({"username": sessionStorage.getItem("USERNAME"), "role": "VIEWER"})
+    }).then(response => {
+        ws.send(JSON.stringify({"type": "JOIN_ROOM_AS_VIEWER", "id": room.id}));
+        return response.ok;
+    })
+}
+
+function updateRoomUI(room) {
+    const roomRow = document.querySelector(`[data-id='${room.id}']`);
+    if (roomRow) {
+        let peopleElement = roomRow.querySelector(".room-people");
+        let currentPeople = parseInt(peopleElement.textContent);
+        peopleElement.textContent = (currentPeople + 1) + "";
+    }
+}

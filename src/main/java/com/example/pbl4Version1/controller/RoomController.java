@@ -2,6 +2,7 @@ package com.example.pbl4Version1.controller;
 
 import java.util.List;
 
+import com.example.pbl4Version1.dto.request.JoinRoomRequest;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -76,9 +77,11 @@ public class RoomController {
 				.build();
 	}
 
-	@MessageMapping("/join-room")
-	@SendTo("/topic/public")
-	public String joinRoom() {
-		return "abc join";
+	@PostMapping("/joinRoom/{roomId}")
+	ApiResponse<?> joinRoom(@PathVariable("roomId") Long id, @RequestBody JoinRoomRequest request) {
+		roomService.joinRoom(id, request);
+		return ApiResponse.builder()
+				.message("Room " + id + " has updated a new user!")
+				.build();
 	}
 }

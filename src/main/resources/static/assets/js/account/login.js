@@ -26,6 +26,7 @@ Validator({
         }).then(data2 => {
             localStorage.setItem("TOKEN", data2.result.token)
             localStorage.setItem("USERNAME", data.username);
+            sessionStorage.setItem("USERNAME", data.username);
             window.location.href = "../public/home";
         }).catch(error => {
             $("#message").innerText = error.message;
