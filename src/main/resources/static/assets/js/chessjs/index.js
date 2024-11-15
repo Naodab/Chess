@@ -177,8 +177,7 @@ document.body.onload = async function () {
             globalEvent();
         });
     } else {
-        // get room from database
-        await fetch(`/chess/api/rooms/ ${localStorage.getItem("ROOM_ID")}`, {
+        await fetch(`/chess/api/rooms/ ${sessionStorage.getItem("ROOM_ID")}`, {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
@@ -191,7 +190,7 @@ document.body.onload = async function () {
         }).then(data => data.result)
         .then(data => {
             ROOM = data;
-            ROLE = getRole(localStorage.getItem("USERNAME"));
+            ROLE = getRole(sessionStorage.getItem("USERNAME"));
             if (matchNumber % 2 === 0) {
                 whitePlayer = ROOM.host;
                 blackPlayer = ROOM.player;

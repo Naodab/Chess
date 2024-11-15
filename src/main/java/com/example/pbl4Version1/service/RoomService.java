@@ -86,6 +86,8 @@ public class RoomService {
 	public RoomResponse getRoom(Long id) {
 		Room room = roomRepository.findById(id).orElseThrow(
 				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
+		List<RoomUser> roomUsers = roomUserRepository.findByRoomId(id);
+		room.setRoomUsers(new HashSet<>(roomUsers));
 		return roomMapper.toRoomResponse(room);
 	}
 	
