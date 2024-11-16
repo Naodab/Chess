@@ -3,7 +3,7 @@ import {
     SQUARE_SELECTOR,
     PROMPT_PIECE
 } from "../helper/constants.js"
-import {globalState, ALLIANCE, OPPONENT, ROLE} from "../index.js";
+import {globalState, ALLIANCE, OPPONENT, ROLE, matchActiveId} from "../index.js";
 import {
     selfHighlight,
     clearPreviousSelfHighlight,
@@ -982,20 +982,23 @@ async function sendStepToServer(from, to) {
     }
 }
 
-async function sendStepToOthers(from, to) {
+function sendStepToOthers(from, to) {
     const fen = generateFen();
     // send to server to save in database
-    await fetch("/chess/api/steps", {
+    console.log(nameMove);
+    fetch("/chess/api/steps", {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
         },
-        body: JSON.stringify({ matchId: matchID, fen: fen, from: from, to: to, name: nameMove }),
+        body: JSON.stringify({ matchId: matchActiveId, fen: fen, from: from, to: to, name: nameMove }),
         redirect: "follow"
-    });
+    }).then(response => response.json())
+        .catch(error => console.log(error));
 
     // send to others
+    console.log(nameMove);
     ws.send(JSON.stringify({ type: "STEP", from, to, name: nameMove }));
 }
 

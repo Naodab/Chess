@@ -15,12 +15,16 @@ import {
     setMatchActiveId,
     matchNumber,
     setMatchNumber,
+    addSteps,
     setRoomAndComponents,
-    ALLIANCE
+    ALLIANCE, matchActiveId, globalState
 } from "../index.js";
 import {getRoom} from "../../user/api/room.js";
 import {createMatchOnline, getMatch} from "../../user/api/match.js";
-import {receiveMoveFromOthers} from "../event/global.js";
+import {globalEvent, receiveMoveFromOthers} from "../event/global.js";
+import {initGameFromFenRender, initGameRender} from "../render/main.js";
+import {STEPS_CONTAINER} from "../helper/constants.js";
+import {resetClock} from "../opponents/handleClock.js";
 
 const $ = document.querySelector.bind(document);
 const modalReadySelector = "#ready-confirm";
@@ -59,7 +63,7 @@ function handleReadyModal() {
                     sessionStorage.setItem("MATCH_ID", data.id);
                     setMatchActiveId(data.id);
                     reCreateGame();
-                    console.log(ALLIANCE);
+                    resetClock();
                 });
             }
         }
@@ -72,7 +76,6 @@ function initializeWebsocket() {
         console.log("Websocket to broadcast in a room is now opened! - RoomID: " + sessionStorage.getItem("ROOM_ID"));
         getRoom(sessionStorage.getItem("ROOM_ID")).then(room => {
             setRoomAndComponents(room);
-            console.log(room);
             if (ROLE !== "HOST") {
                 let avatar = "";
                 let elo;
@@ -96,9 +99,31 @@ function initializeWebsocket() {
                     user
                 }
                 ws.send(JSON.stringify(dataToSend));
-                if (ROLE === "PLAYER") {
+                if (ROLE === "PLAYER" && !matchActiveId) {
                     setTimeout(() => handleReadyModal(), 3000);
                 }
+            }
+
+            if (matchActiveId || matchActiveId === 0) {
+                getMatch("human", matchActiveId).then(match => {
+                    sessionStorage.setItem("MATCH_ID", match.id);
+                    let steps = match.steps;
+                    if (steps.length === 0) {
+                        initGameRender(globalState);
+                        globalEvent();
+                        return;
+                    }
+                    steps.sort((a, b) => {
+                        const numA = parseInt(a.fen.match(/\d+$/)[0]);
+                        const numB = parseInt(b.fen.match(/\d+$/)[0]);
+                        return numA - numB;
+                    });
+                    addSteps(steps);
+                    STEPS_CONTAINER.scrollLeft = STEPS_CONTAINER.scrollWidth;
+                    const fen = steps[steps.length - 1].fen;
+                    initGameFromFenRender(globalState, fen);
+                    globalEvent();
+                });
             }
         });
     }
@@ -113,7 +138,7 @@ function initializeWebsocket() {
                 const other = data.user;
                 if (other.role === "PLAYER") {
                     initComponent(other, OPPONENT.toLowerCase());
-                    if (ROLE !== "VIEWER") {
+                    if (ROLE !== "VIEWER" && !matchActiveId) {
                         setTimeout(() => handleReadyModal(), 3000);
                     }
                 }
@@ -121,14 +146,13 @@ function initializeWebsocket() {
         } else if (data.type === "READY") {
             if (data.isReady) {
                 isOpponentReady = true;
-
             }
         } else if (data.type === "BEGIN_MATCH") {
             setMatchActiveId(data.matchId);
             getMatch("human", data.matchId).then(match => {
                 sessionStorage.setItem("MATCH_ID", match.id);
                 reCreateGame();
-                console.log(ALLIANCE)
+                resetClock();
             });
         } else if (data.type === "STEP") {
             receiveMoveFromOthers(data);
@@ -137,7 +161,9 @@ function initializeWebsocket() {
 }
 
 window.addEventListener("load", () => {
-    initializeWebsocket();
+    if (MODE === "PLAY_ONLINE") {
+        initializeWebsocket();
+    }
 });
 
 function addMessages(user, message, isOther = false) {
@@ -152,40 +178,45 @@ function addMessages(user, message, isOther = false) {
     scrollableElement.scrollTop = scrollableElement.scrollHeight;
 }
 
-$("#send-message").onclick = () => {
-    const messageContent = $("#send-chat-input");
-    if (messageContent !== "") {
-        const user = {
-            "username": sessionStorage.getItem("USERNAME"),
-            "avatar": avatar
+const sendMessageBtn = $("#send-message");
+if (sendMessageBtn) {
+    sendMessageBtn.onclick = () => {
+        const messageContent = $("#send-chat-input");
+        if (messageContent !== "") {
+            const user = {
+                "username": sessionStorage.getItem("USERNAME"),
+                "avatar": avatar
+            }
+            const dataToSend = {
+                "type": "SEND_MESSAGE",
+                "user": user,
+                "message": messageContent.value
+            }
+            addMessages(user, messageContent.value);
+            ws.send(JSON.stringify(dataToSend));
+            messageContent.value = "";
         }
-        const dataToSend = {
-            "type": "SEND_MESSAGE",
-            "user": user,
-            "message": messageContent.value
-        }
-        addMessages(user, messageContent.value);
-        ws.send(JSON.stringify(dataToSend));
-        messageContent.value = "";
     }
 }
 
-$("#flag-lose").onclick = () => {
-    //TODO:
-}
 
-$("#handshake").onclick = () => {
-    //TODO:
-}
+if (MODE === "PLAY_ONLINE") {
+    $("#flag-lose").onclick = () => {
+        //TODO:
+    }
 
-$("#return-left").onclick = () => {
-    //TODO:
-}
+    $("#handshake").onclick = () => {
+        //TODO:
+    }
 
-$("#return-right").onclick = () => {
-    //TODO:
-}
+    $("#return-left").onclick = () => {
+        //TODO:
+    }
 
-//NOTE: TODO: exit room!
+    $("#return-right").onclick = () => {
+        //TODO:
+    }
+
+}
 
 export { ws }

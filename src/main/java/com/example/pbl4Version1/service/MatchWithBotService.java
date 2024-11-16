@@ -45,6 +45,7 @@ public class MatchWithBotService {
 		MatchWithBot match = matchRepository.findById(id)
 				.orElseThrow(() -> new AppException(ErrorCode.MATCH_NOT_EXISTED));
 		match.setSteps(new HashSet<>(stepRepisitory.findByMatchId(match.getId())));
+		log.info("get steps completely");
 		return matchMapper.toMatchWithBotResponse(match);
 	}
 	

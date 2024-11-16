@@ -19,7 +19,7 @@ let OPPONENT = "BLACK";
 let ROOM;
 let ROLE = "PLAYER";
 let matchActiveId;
-let matchNumber = localStorage.getItem("MATCH_NUMBER") ? localStorage.getItem("MATCH_NUMBER") : 0;
+let matchNumber = 0;
 let blackPlayer;
 let whitePlayer;
 
@@ -42,6 +42,9 @@ function setMatchActiveId(id) {
 function setRoom(data) {
     ROOM = data;
     ROLE = getRole(sessionStorage.getItem("USERNAME"));
+    matchNumber = ROOM.matchNumber;
+    if (ROOM.matchActiveId)
+        matchNumber -= 1;
     if (matchNumber % 2 === 0) {
         whitePlayer = ROOM.host;
         blackPlayer = ROOM.player;
@@ -176,18 +179,6 @@ function addSteps(steps) {
     });
 }
 
-// function add message.
-// nếu nhận message từ user khác thì truyền isOther = true, nếu là của mình thì không cần truyền vì đã có mặc định
-function addMessage(user, message, isOther = false) {
-    const div = document.createElement("div");
-    div.classList.add("message");
-    if (isOther) {
-        div.classList.add("other");
-    }
-    div.innerHTML = renderMessage(user, message);
-    document.querySelector(".chat-list").appendChild(div);
-}
-
 function getRole(username) {
     if (ROOM.host.username === username) {
         return "HOST";
@@ -254,6 +245,7 @@ export {
     matchNumber,
     whitePlayer,
     blackPlayer,
+    addSteps,
     setRoom,
     setRoomAndComponents,
     setMatchActiveId,

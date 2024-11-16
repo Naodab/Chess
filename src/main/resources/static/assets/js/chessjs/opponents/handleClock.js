@@ -1,17 +1,17 @@
 import { ROOM } from "../index.js";
 
-let countDownTime = ROOM.time * 60 * 1000;
+let countDownTime = 0;
 
 const timeWhite = {
-    clock: document.querySelector(".player-info.alliance-white .clock"),
-    endTime: new Date().getTime() + countDownTime,
+    clock: null,
+    endTime: 0,
     countDownInterval: null,
     isPaused: true
 }
 
 const timeBlack = {
-    clock: document.querySelector(".player-info.alliance-black .clock"),
-    endTime: new Date().getTime() + countDownTime,
+    clock: null,
+    endTime: 0,
     countDownInterval: null,
     isPaused: true
 }
@@ -23,9 +23,9 @@ function updateCountDown(timeColor) {
     const minutes = Math.floor(distance / (1000 * 60));
     const seconds = Math.floor(distance % (1000 * 60) / 1000);
 
-    document.querySelector(timeColor.selector + " .minutes")
+    timeColor.clock.querySelector(".minutes")
         .textContent = minutes.toString().padStart(2, "0");
-    document.querySelector(timeColor.selector + " .seconds")
+    timeColor.clock.querySelector(".seconds")
         .textContent = seconds.toString().padStart(2, "0");
 
     if (distance < 0) {
@@ -49,4 +49,16 @@ function togglePause(timeColor) {
     timeColor.isPaused = !timeColor.isPaused;
 }
 
-export { timeWhite, timeBlack, togglePause }
+function resetClock() {
+    timeWhite.clock = document.querySelector(".player-info.alliance-white .clock");
+    timeBlack.clock = document.querySelector(".player-info.alliance-black .clock");
+
+    countDownTime = ROOM.time * 60 * 1000;
+    timeWhite.endTime = new Date().getTime() + countDownTime;
+    timeBlack.endTime = new Date().getTime() + countDownTime;
+
+    updateCountDown(timeBlack);
+    updateCountDown(timeWhite);
+}
+
+export { timeWhite, timeBlack, togglePause, resetClock }
