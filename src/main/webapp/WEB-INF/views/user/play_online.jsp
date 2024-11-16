@@ -73,6 +73,21 @@
                 <span class="defeated-pieces"></span>
                 <span class="defeated-pieces "></span>
             </div>
+
+            <div class="ready-container">
+                <div class="modal closure active" id="ready-confirm">
+                    <h1 class="modal__title">Bạn đã sẵn sàng?</h1>
+                    <div class="main-modal">
+                        <div class="modal__function top--margin">
+                            <div class="btn btn--green modal__btn" id="ready">Sẵn sàng</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal closure" id="wait-others">
+                    <h1 class="modal__title">Chờ người chơi khác sẵn sàng</h1>
+                </div>
+            </div>
         </div>
 
         <div class="right-panel">
@@ -123,6 +138,7 @@
     <script>
         const MODE = "PLAY_ONLINE";
         let avatar = "${user.avatar}";
+        let elo = "${user.elo}";
     </script>
     <script type="module" src="../assets/js/chessjs/index.js"></script>
     <script type="module" src="../assets/js/chessjs/mode/play_online.js"></script>

@@ -40,5 +40,7 @@ public class Room {
 	@OneToMany(mappedBy = "room")
 	Set<MatchWithHuman> matches;
 
+	Long matchActiveId;
+
 	int time;
 }

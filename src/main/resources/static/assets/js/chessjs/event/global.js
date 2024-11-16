@@ -22,6 +22,7 @@ import {
     getPieceAtPosition,
     moveStatus
 } from "../helper/commonHelper.js";
+import { ws } from "../mode/play_online.js";
 import {alertMessage} from "../opponents/message.js";
 
 let highlight_state = false;
@@ -891,7 +892,7 @@ function moveOrCancelMove(square) {
 }
 
 function globalEvent() {
-    ROOT_DIV.addEventListener("click", (event) => {
+    ROOT_DIV.onclick = (event) => {
         if (event.target.localName === "img") {
             const clickedId = event.target.parentNode.id;
             const flatArray = globalState.flat();
@@ -938,7 +939,7 @@ function globalEvent() {
             const square = event.target.closest(SQUARE_SELECTOR);
             moveOrCancelMove(square);
         }
-    });
+    };
     PROMPT_PIECE.forEach(piece => {
         piece.addEventListener('click', () => {
             const name = piece.getAttribute("name");
@@ -983,7 +984,7 @@ async function sendStepToServer(from, to) {
 
 async function sendStepToOthers(from, to) {
     const fen = generateFen();
-    // send to save in database
+    // send to server to save in database
     await fetch("/chess/api/steps", {
         method: 'POST',
         headers: {
@@ -994,7 +995,24 @@ async function sendStepToOthers(from, to) {
         redirect: "follow"
     });
 
-    // send to others people in ROOM
+    // send to others
+    ws.send(JSON.stringify({ type: "STEP", from, to, name: nameMove }));
+}
+
+function receiveMoveFromOthers({ from, to, name }) {
+    turn++;
+    handleNameMove(name);
+    nameMove = "";
+    const piece = getPieceAtPosition(from);
+    prepareForMoving(piece, to);
+    moveElement(piece, to);
+    const status = moveStatus(ALLIANCE.toLowerCase());
+    if (status === "CHECK_MATE" || status === "STALE_MATE") {
+        alertMessage(status);
+    } else if (status === "IN_CHECK") {
+        alert(status);
+    }
+    turnWhite = !turnWhite;
 }
 
 export {
@@ -1004,6 +1022,7 @@ export {
     setEnPassantMove,
     setTurnNumber,
     pushXToNameMove,
+    receiveMoveFromOthers,
     turnWhite,
     enPassantMove,
     turn

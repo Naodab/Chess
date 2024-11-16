@@ -21,5 +21,6 @@ public class RoomResponse {
 	UserResponse host;
 	UserResponse player;
 	Set<UserResponse> viewers;
+	Long matchActiveId;
 	int time;
 }
