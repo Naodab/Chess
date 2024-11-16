@@ -30,22 +30,32 @@
         <div class="play-area">
             <div class="player-info-container">
                 <div class="player-info">
-                    <div class="avatar" style="background: url('${"avatar"}')
-                    no-repeat center center / cover;">
-                    </div>
+                    <div class="avatar"></div>
                     <span class="content">
-                        <span class="name">Computer</span>
-                        <span class="elo">200</span>
+                        <span class="name"></span>
+                        <div class="ele-wrap">
+                            <span class="elo"></span>
+                            <div class="clock">
+                                <span class="minutes">00</span>
+                                :
+                                <span class="seconds">00</span>
+                            </div>
+                        </div>
                     </span>
                 </div>
                 <div class="player-info">
                     <span class="content">
-                        <span class="name">Computer</span>
-                        <span class="elo">200</span>
+                        <span class="name"></span>
+                        <div class="ele-wrap">
+                            <span class="elo"></span>
+                            <div class="clock">
+                                <span class="minutes">00</span>
+                                :
+                                <span class="seconds">00</span>
+                            </div>
+                        </div>
                     </span>
-                    <div class="avatar" style="background: url('../assets/img/robot.png')
-                    no-repeat center center / cover;">
-                    </div>
+                    <div class="avatar"></div>
                 </div>
             </div>
 
@@ -73,30 +83,7 @@
                 </div>
                 <div class="chats">
                     <div class="chat-container scrollable-element">
-                        <div class="chat-list">
-                            <div class="message other">
-                                <div class="message__avatar"
-                                     style="background: url('../assets/img/robot.png') no-repeat center center / cover">
-                                </div>
-                                <div class="chat closure">
-                                    ba doan nay dep trai qua di ba doan nay dep trai qua di ba doan nay dep trai qua di
-                                </div>
-                                <div class="chat-username">
-                                    badoan
-                                </div>
-                            </div>
-                            <div class="message">
-                                <div class="message__avatar"
-                                     style="background: url('../assets/img/robot.png') no-repeat center center / cover">
-                                </div>
-                                <div class="chat closure">
-                                    ta cung thay day
-                                </div>
-                                <div class="chat-username">
-                                    badoan
-                                </div>
-                            </div>
-                        </div>
+                        <div class="chat-list"></div>
                     </div>
                     <div class="chat-input">
                         <input type="text" id="send-chat-input" placeholder="Nhập tin nhắn" >

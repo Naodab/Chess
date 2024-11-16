@@ -104,12 +104,19 @@
 }
 
 .player-info .content {
+    flex: 1;
     display: flex;
     flex-direction: column;
 }
 
 .content .elo {
     font-weight: bold;
+    flex: 1;
+}
+
+.content .ele-wrap {
+    display: flex;
+    width: 100%;
 }
 
 .player-info:last-child {
@@ -147,6 +154,10 @@
 
 .alliance-black .content {
     color: black;
+}
+
+.alliance-black .ele-wrap {
+    flex-direction: row-reverse;
 }
 
 .player-info-container .avatar {
