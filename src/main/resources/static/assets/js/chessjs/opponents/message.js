@@ -52,26 +52,24 @@ function alertModal(message) {
     `;
 }
 
+function renderWaitModal(message) {
+    return html`
+        <div class="modal closure active" id="alert-message">
+            <h1 class="modal__title">Thông báo</h1>
+            <i class="fa-solid fa-xmark btn-icon btn-close" id="back"></i>
+            <div class="main-modal">
+                <h3 class="modal__elo modal-item">${message || "Chờ người chơi khác sẵn sàng"}</h3>
+            </div>
+        </div>
+    `;
+}
+
 function alertMessage(message) {
     turnOnOverlay(alertModal, message);
 
     $("#confirm").onclick =  function () {
         turnOffOverlay();
     }
-}
-
-function renderReadyModal() {
-    return html`
-        <div class="modal closure active" id="update-avatar">
-            <h1 class="modal__title">Bạn đã sẵn sàng?</h1>
-            <i class="fa-solid fa-xmark btn-icon btn-close" id="back"></i>
-            <div class="main-modal">
-                <div class="modal__function top--margin">
-                    <div class="btn btn--green modal__btn" id="ready">Sẵn sàng</div>
-                </div>
-            </div>
-        </div>
-    `;
 }
 
 function innerStepContainer(step, index) {
@@ -114,6 +112,16 @@ function turnOffOverlay() {
     OVERLAY.style.zIndex = "-10";
 }
 
+function turnOnGameModal(selector) {
+    $(".ready-container").classList.add("active");
+    $(selector).classList.add("active");
+}
+
+function turnOffGameModal(selector) {
+    $(".ready-container").classList.remove("active");
+    $(selector).classList.remove("active");
+}
+
 let confirmResolve;
 function confirm(message) {
     turnOnOverlay(renderConfirmModal, message);
@@ -142,9 +150,11 @@ function resolveConfirm(isConfirmed) {
 }
 
 export {
+    renderWaitModal,
     renderMessage,
     renderConfirmModal,
-    renderReadyModal,
+    turnOnGameModal,
+    turnOffGameModal,
     turnOnOverlay,
     turnOffOverlay,
     innerStepAvatar,

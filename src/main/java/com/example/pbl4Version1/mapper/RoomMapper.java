@@ -45,6 +45,11 @@ public class RoomMapper {
 				}
 			}
 		}
+
+		int sizeMath = 0;
+		if (room.getMatches() != null) {
+			sizeMath = room.getMatches().size();
+		}
 		
 		return RoomResponse.builder()
 				.id(room.getId())
@@ -52,6 +57,8 @@ public class RoomMapper {
 				.player(player)
 				.time(room.getTime())
 				.viewers(viewers)
+				.matchNumber(sizeMath)
+				.matchActiveId(room.getMatchActiveId())
 				.playDay(room.getPlayDay())
 				.build();
 	}

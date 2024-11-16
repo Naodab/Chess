@@ -1,8 +1,7 @@
 import { createMatchBot } from "../../user/api/match.js";
 import {confirm, innerStepAvatar} from "../opponents/message.js";
-import {ROOT_DIV, STEPS_CONTAINER} from "../helper/constants.js";
-import {globalState, reCreateGame} from "../index.js";
-import {initGameRender} from "../render/main.js";
+import { STEPS_CONTAINER } from "../helper/constants.js";
+import { reCreateGame } from "../index.js";
 
 const $ = document.querySelector.bind(document);
 
@@ -20,9 +19,7 @@ if (btnNewBotMatch) {
                 STEPS_CONTAINER.innerHTML = "";
                 STEPS_CONTAINER.appendChild(div);
 
-                ROOT_DIV.innerHTML = "";
                 reCreateGame();
-                initGameRender(globalState);
             });
         }
     }

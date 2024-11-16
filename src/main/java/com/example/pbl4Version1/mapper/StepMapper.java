@@ -15,6 +15,7 @@ public class StepMapper {
 				.from(request.getFrom())
 				.to(request.getTo())
 				.boardState(request.getFen())
+				.name(request.getName())
 				.build();
 	}
 	

@@ -79,9 +79,34 @@ function pieceRender(data) {
 	});
 }
 
+function renderRow(listRow) {
+	if (ALLIANCE === "WHITE") {
+		for (let i = 0; i < listRow.length; i++) {
+			const rowEl = document.createElement("div");
+			for (let square of listRow[i]) {
+				rowEl.appendChild(square);
+			}
+			rowEl.classList.add("squareRow");
+			ROOT_DIV.appendChild(rowEl);
+		}
+	} else {
+		for (let i = listRow.length - 1; i >= 0; i--) {
+			listRow[i].reverse();
+			const rowEl = document.createElement("div");
+			for (let square of listRow[i]) {
+				rowEl.appendChild(square);
+			}
+			rowEl.classList.add("squareRow");
+			ROOT_DIV.appendChild(rowEl);
+		}
+	}
+}
+
 //use when you want to render board for first time when game start
 function initGameRender(data) {
+	const listRow = [];
 	data.forEach(row => {
+		const squareRow = [];
 		const rowEl = document.createElement("div");
 		row.forEach((square) => {
 			const squareDiv = document.createElement('div');
@@ -137,11 +162,14 @@ function initGameRender(data) {
 				whitePieces.push(piece);
 				square.piece = piece;
 			}
-			rowEl.appendChild(squareDiv);
+			// rowEl.appendChild(squareDiv);
+			squareRow.push(squareDiv);
 		});
-		rowEl.classList.add("squareRow");
-		ROOT_DIV.appendChild(rowEl);
+		// rowEl.classList.add("squareRow");
+		listRow.push(squareRow);
+		// ROOT_DIV.appendChild(rowEl);
 	});
+	renderRow(listRow);
 	pieceRender(data);
 }
 
@@ -445,29 +473,9 @@ function initGameFromFenRender(data, fen) {
 		}
 		listRow.push(squareRow);
 	});
-
-	if (ALLIANCE === "WHITE") {
-		for (let i = 0; i < listRow.length; i++) {
-			const rowEl = document.createElement("div");
-			for (let square of listRow[i]) {
-				rowEl.appendChild(square);
-			}
-			rowEl.classList.add("squareRow");
-			ROOT_DIV.appendChild(rowEl);
-		}
-	} else {
-		for (let i = listRow.length - 1; i >= 0; i--) {
-			listRow[i].reverse();
-			const rowEl = document.createElement("div");
-			for (let square of listRow[i]) {
-				rowEl.appendChild(square);
-			}
-			rowEl.classList.add("squareRow");
-			ROOT_DIV.appendChild(rowEl);
-		}
-	}
-
+	renderRow(listRow);
 	pieceRender(data);
+
 	if (info[1] === "w") changeTurn(true);
 	else changeTurn(false);
 

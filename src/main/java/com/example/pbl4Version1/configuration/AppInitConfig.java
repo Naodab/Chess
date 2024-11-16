@@ -2,6 +2,8 @@ package com.example.pbl4Version1.configuration;
 
 import java.util.HashSet;
 
+import com.example.pbl4Version1.constant.PredefinedAchievement;
+import com.example.pbl4Version1.repository.AchievementRepository;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +30,9 @@ public class AppInitConfig {
 	PasswordEncoder passwordEncoder;
 	
 	@Bean
-	ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
+	ApplicationRunner applicationRunner(UserRepository userRepository,
+										AchievementRepository achievementRepository,
+										RoleRepository roleRepository) {
 		return args -> {
 			log.info("Initializing application.....");
 			if (!userRepository.existsByUsername(ADMIN_USERNAME)) {
@@ -51,6 +55,8 @@ public class AppInitConfig {
 				roles.add(adminRole);
 				user.setRoles(roles);
 				userRepository.save(user);
+				achievementRepository.saveAll(PredefinedAchievement.predefinedAchievements());
+
 				log.warn("admin user has been created with default password: admin, please change it");
 			}
 			log.info("Initializing completed......");

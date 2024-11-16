@@ -65,8 +65,7 @@ Validator({
             return response.json();
         }).then(() => {
             alert("Đăng ký thành công");
-            // TODO: direct to home page and relogin
-            fetch("../public/home");
+            $(".btn-login").click();
         }).catch(error => {
             $("#message2").innerText = error.message;
         });

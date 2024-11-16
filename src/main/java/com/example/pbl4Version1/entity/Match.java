@@ -6,14 +6,11 @@ import com.example.pbl4Version1.enums.GameStatus;
 import com.example.pbl4Version1.enums.PlayerType;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Data
+@Getter
+@Setter
 @Builder
 @Entity(name = "game_match")
 @NoArgsConstructor

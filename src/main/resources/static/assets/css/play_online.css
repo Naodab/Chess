@@ -1,3 +1,13 @@
+.clock {
+    border-radius: 8px;
+    border: 2px solid black;
+    background-color: white;
+    color: black;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+}
+
 .chat-function {
     display: flex;
     flex-direction: column;
@@ -92,4 +102,21 @@
     font-size: 20px;
     cursor: pointer;
     border-radius: 50%;
+}
+
+.ready-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--overlay-color);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.ready-container.active {
+    display: flex;
 }

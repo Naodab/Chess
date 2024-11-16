@@ -95,7 +95,7 @@
 	</div>
 </div>
 <script>
-	let avatar = "${user.avatar}";
+		let avatar = "${user.avatar}";
 </script>
 <script type="module" src="../assets/js/user/home.js"></script>
 </body>

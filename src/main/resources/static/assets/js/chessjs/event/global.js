@@ -3,7 +3,7 @@ import {
     SQUARE_SELECTOR,
     PROMPT_PIECE
 } from "../helper/constants.js"
-import { globalState, ALLIANCE, OPPONENT } from "../index.js";
+import {globalState, ALLIANCE, OPPONENT, ROLE, matchActiveId} from "../index.js";
 import {
     selfHighlight,
     clearPreviousSelfHighlight,
@@ -22,6 +22,7 @@ import {
     getPieceAtPosition,
     moveStatus
 } from "../helper/commonHelper.js";
+import { ws } from "../mode/play_online.js";
 import {alertMessage} from "../opponents/message.js";
 
 let highlight_state = false;
@@ -422,7 +423,7 @@ function whitePawnClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite || ALLIANCE === "BLACK") {
+    if (!turnWhite || ALLIANCE === "BLACK" || ROLE === "VIEWER") {
         return;
     }
 
@@ -454,7 +455,7 @@ function whiteRookClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite || ALLIANCE === "BLACK") {
+    if (!turnWhite || ALLIANCE === "BLACK" || ROLE === "VIEWER") {
         return;
     }
 
@@ -479,7 +480,7 @@ function whiteKnightClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite || ALLIANCE === "BLACK") {
+    if (!turnWhite || ALLIANCE === "BLACK" || ROLE === "VIEWER") {
         return;
     }
 
@@ -504,7 +505,7 @@ function whiteBishopClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite || ALLIANCE === "BLACK") {
+    if (!turnWhite || ALLIANCE === "BLACK" || ROLE === "VIEWER") {
         return;
     }
 
@@ -529,7 +530,7 @@ function whiteQueenClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite || ALLIANCE === "BLACK") {
+    if (!turnWhite || ALLIANCE === "BLACK" || ROLE === "VIEWER") {
         return;
     }
 
@@ -554,7 +555,7 @@ function whiteKingClick({ piece }) {
             return;
         }
     }
-    if (!turnWhite || ALLIANCE === "BLACK") {
+    if (!turnWhite || ALLIANCE === "BLACK" || ROLE === "VIEWER") {
         return;
     }
 
@@ -619,7 +620,7 @@ function blackPawnClick({ piece }) {
             return;
         }
     }
-    if (turnWhite || ALLIANCE === "WHITE") {
+    if (turnWhite || ALLIANCE === "WHITE" || ROLE === "VIEWER") {
         return;
     }
 
@@ -651,7 +652,7 @@ function blackRookClick({ piece }) {
             return;
         }
     }
-    if (turnWhite || ALLIANCE === "WHITE") {
+    if (turnWhite || ALLIANCE === "WHITE" || ROLE === "VIEWER") {
         return;
     }
 
@@ -676,7 +677,7 @@ function blackKnightClick({ piece }) {
             return;
         }
     }
-    if (turnWhite || ALLIANCE === "WHITE") {
+    if (turnWhite || ALLIANCE === "WHITE" || ROLE === "VIEWER") {
         return;
     }
 
@@ -701,7 +702,7 @@ function blackBishopClick({ piece }) {
             return;
         }
     }
-    if (turnWhite || ALLIANCE === "WHITE") {
+    if (turnWhite || ALLIANCE === "WHITE" || ROLE === "VIEWER") {
         return;
     }
 
@@ -726,7 +727,7 @@ function blackQueenClick({ piece }) {
             return;
         }
     }
-    if (turnWhite || ALLIANCE === "WHITE") {
+    if (turnWhite || ALLIANCE === "WHITE" || ROLE === "VIEWER") {
         return;
     }
 
@@ -751,7 +752,7 @@ function blackKingClick({ piece }) {
             return;
         }
     }
-    if (turnWhite || ALLIANCE === "WHITE") {
+    if (turnWhite || ALLIANCE === "WHITE" || ROLE === "VIEWER") {
         return;
     }
 
@@ -872,8 +873,11 @@ function moveOrCancelMove(square) {
                 (square.id.includes("8") || square.id.includes("1"))) {
                 beginPromotionPawn(moveState);
             }
-            // TODO: send Step API to Server
-            sendStepToServer(oldMove, square.id);
+            if (MODE === "PLAY_WITH_BOT")
+                sendStepToServer(oldMove, square.id);
+            else if (MODE === "PLAY_ONLINE") {
+                sendStepToOthers(oldMove, square.id);
+            }
             nameMove = "";
         } else {
             clearPreviousSelfHighlight(previousHighlight);
@@ -888,7 +892,7 @@ function moveOrCancelMove(square) {
 }
 
 function globalEvent() {
-    ROOT_DIV.addEventListener("click", (event) => {
+    ROOT_DIV.onclick = (event) => {
         if (event.target.localName === "img") {
             const clickedId = event.target.parentNode.id;
             const flatArray = globalState.flat();
@@ -935,7 +939,7 @@ function globalEvent() {
             const square = event.target.closest(SQUARE_SELECTOR);
             moveOrCancelMove(square);
         }
-    });
+    };
     PROMPT_PIECE.forEach(piece => {
         piece.addEventListener('click', () => {
             const name = piece.getAttribute("name");
@@ -978,6 +982,42 @@ async function sendStepToServer(from, to) {
     }
 }
 
+function sendStepToOthers(from, to) {
+    const fen = generateFen();
+    // send to server to save in database
+    console.log(nameMove);
+    fetch("/chess/api/steps", {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+        },
+        body: JSON.stringify({ matchId: matchActiveId, fen: fen, from: from, to: to, name: nameMove }),
+        redirect: "follow"
+    }).then(response => response.json())
+        .catch(error => console.log(error));
+
+    // send to others
+    console.log(nameMove);
+    ws.send(JSON.stringify({ type: "STEP", from, to, name: nameMove }));
+}
+
+function receiveMoveFromOthers({ from, to, name }) {
+    turn++;
+    handleNameMove(name);
+    nameMove = "";
+    const piece = getPieceAtPosition(from);
+    prepareForMoving(piece, to);
+    moveElement(piece, to);
+    const status = moveStatus(ALLIANCE.toLowerCase());
+    if (status === "CHECK_MATE" || status === "STALE_MATE") {
+        alertMessage(status);
+    } else if (status === "IN_CHECK") {
+        alert(status);
+    }
+    turnWhite = !turnWhite;
+}
+
 export {
     globalEvent,
     calculateLegalMoves,
@@ -985,6 +1025,7 @@ export {
     setEnPassantMove,
     setTurnNumber,
     pushXToNameMove,
+    receiveMoveFromOthers,
     turnWhite,
     enPassantMove,
     turn
