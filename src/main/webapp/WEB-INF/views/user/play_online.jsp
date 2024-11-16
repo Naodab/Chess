@@ -22,7 +22,7 @@
                 <a href=""><i class="fas fa-puzzle-piece"></i>Chơi với máy</a>
             </div>
             <div class="sidebar-body">
-                <button class="btn btn--pink logout">Đăng xuất</button>
+                <button class="btn btn--pink logout" id="exit-room-button">Thoát phòng</button>
             </div>
             <a class="settings-link" href=""><i class="fas fa-cog"></i>Cài đặt</a>
         </div>

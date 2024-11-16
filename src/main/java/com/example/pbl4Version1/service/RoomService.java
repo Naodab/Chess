@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.example.pbl4Version1.dto.request.JoinRoomRequest;
+import com.example.pbl4Version1.dto.request.LeaveRoomRequest;
 import com.example.pbl4Version1.entity.RoomUser;
 import com.example.pbl4Version1.enums.Mode;
 import com.example.pbl4Version1.repository.RoomUserRepository;
@@ -144,20 +145,14 @@ public class RoomService {
 
 		//update room when a new user comes in!
 	}
+
+	public void leaveRoom(Long id, LeaveRoomRequest leaveRoomRequest) {
+		Room room = roomRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
+		User user = userRepository.findByUsername(leaveRoomRequest.getUsername()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+		roomUserRepository.deleteByRoomIdAndUsername(room.getId(), user.getId());
+	}
 	
 	public void deleteRoom(Long id) {
 		roomRepository.deleteById(id);
-	}
-	
-	public int getPlayerCount(Long id) {
-		Room room = roomRepository.findById(id).orElseThrow(
-				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
-		return (int)room.getRoomUsers().stream().filter(user -> user.getRole() == Mode.PLAYER).count();
-	}
-	
-	public int getViewerCount(Long id) {
-		Room room = roomRepository.findById(id).orElseThrow(
-				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
-		return (int)room.getRoomUsers().stream().filter(user -> user.getRole() == Mode.VIEWER).count();
 	}
 }

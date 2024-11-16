@@ -21,19 +21,43 @@ const topUsers = [];
 let ws;
 
 function initializeWebsocket() {
-    ws = new WebSocket("ws://localhost:8080/chess/websocket");
-    ws.onopen = function () {
-        console.log("Websocket is now opened!");
-    }
-    ws.onmessage = function (event) {
-        const data = JSON.parse(event.data);
-        if (data.type === "CREATE_ROOM") {
-            addRoom(data);
+    fetch("../api/network/local-ip", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
         }
-        else if (data.type === "JOIN_ROOM_AS_PLAYER" || data.type === "JOIN_ROOM_AS_VIEWER") {
-            updateRoomUI(data);
-        }
-    }
+    })  .then(response => response.json())
+        .then(data => {
+            const ipAddress = data.result;
+            console.log("Server ip address: " + ipAddress);
+            ws = new WebSocket(`ws://${ipAddress}:8080/chess/websocket`);
+            ws.onopen = function () {
+                console.log("Websocket is now opened!");
+            }
+            ws.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+                if (data.type === "CREATE_ROOM") {
+                    addRoom(data);
+                }
+                else if (data.type === "JOIN_ROOM_AS_PLAYER" || data.type === "JOIN_ROOM_AS_VIEWER") {
+                    updateRoomUI(data);
+                }
+            }
+        });
+    // ws = new WebSocket("ws://localhost:8080/chess/websocket");
+    // ws.onopen = function () {
+    //     console.log("Websocket is now opened!");
+    // }
+    // ws.onmessage = function (event) {
+    //     const data = JSON.parse(event.data);
+    //     if (data.type === "CREATE_ROOM") {
+    //         addRoom(data);
+    //     }
+    //     else if (data.type === "JOIN_ROOM_AS_PLAYER" || data.type === "JOIN_ROOM_AS_VIEWER") {
+    //         updateRoomUI(data);
+    //     }
+    // }
 }
 
 function addEventForEye() {
@@ -84,6 +108,9 @@ window.addEventListener("load", () => {
     console.log(localStorage.getItem("TOKEN"));
     //NOTE: fetch to get all active rooms
     loadAllRooms();
+    //testing:
+    const ip = window.location.hostname;
+    alert(ip);
 });
 
 function turnOnModal(renderFunction, attr) {

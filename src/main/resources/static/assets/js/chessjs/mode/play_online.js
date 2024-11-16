@@ -29,6 +29,8 @@ function addMessages(user, message, isOther = false) {
     }
     div.innerHTML = renderMessage(user, message);
     document.querySelector(".chat-list").appendChild(div);
+    const scrollableElement = $(".scrollable-element");
+    scrollableElement.scrollTop = scrollableElement.scrollHeight;
 }
 
 $("#send-message").onclick = () => {
@@ -66,3 +68,16 @@ $("#return-right").onclick = () => {
 }
 
 //NOTE: TODO: exit room!
+$("#exit-room-button").onclick = () => {
+    alert("Click exit room!");
+    const data = {
+
+    }
+    fetch("../api/rooms/leaveRoom/" + sessionStorage.getItem("ROOM_ID"), {
+        method: "GET",
+        headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+        }
+    })
+}
