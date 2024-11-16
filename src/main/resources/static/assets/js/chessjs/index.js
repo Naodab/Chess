@@ -201,7 +201,7 @@ document.body.onload = async function () {
             globalEvent();
         });
     } else {
-        await fetch(`/chess/api/rooms/ ${sessionStorage.getItem("ROOM_ID")}`, {
+        await fetch(`/chess/api/rooms/${sessionStorage.getItem("ROOM_ID")}`, {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",

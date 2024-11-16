@@ -112,17 +112,19 @@
                     </div>
                 </div>
                 <div class="step__footer">
-                    <div class="btn btn--blue step__function"><i class="fa-regular fa-flag"></i></div>
-                    <div class="btn btn--green step__function"><i class="fa-regular fa-handshake"></i></div>
-                    <div class="btn btn--pink step__function"><i class="fa-solid fa-angle-left"></i></div>
-                    <div class="btn btn--pink step__function"><i class="fa-solid fa-angle-right"></i></div>
+                    <div class="btn btn--blue step__function"   id="flag-lose"><i class="fa-regular fa-flag"></i></div>
+                    <div class="btn btn--green step__function"  id="handshake"><i class="fa-regular fa-handshake"></i></div>
+                    <div class="btn btn--pink step__function"   id="return-left"><i class="fa-solid fa-angle-left"></i></div>
+                    <div class="btn btn--pink step__function"   id="return-right"><i class="fa-solid fa-angle-right"></i></div>
                 </div>
             </div>
         </div>
     </div>
     <script>
         const MODE = "PLAY_ONLINE";
+        let avatar = "${user.avatar}";
     </script>
     <script type="module" src="../assets/js/chessjs/index.js"></script>
+    <script type="module" src="../assets/js/chessjs/mode/play_online.js"></script>
 </body>
 </html>
