@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MatchWithHumanUpdateRequest {
     Long matchId;
-    Float timeWhitePlayer;
-    Float timeBlackPlayer;
+    Integer timeWhitePlayer;
+    Integer timeBlackPlayer;
     String winnerId;
 }

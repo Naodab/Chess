@@ -157,7 +157,7 @@
     color: black;
 }
 
-.alliance-black .ele-wrap {
+.player-info:last-child .ele-wrap {
     flex-direction: row-reverse;
 }
 

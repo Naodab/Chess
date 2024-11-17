@@ -7,11 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -19,37 +17,30 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
-public class RoomSocketHandler extends TextWebSocketHandler {
-    List<WebSocketSession> webSocketSessions = Collections.synchronizedList(new ArrayList<>());
+public class RoomSocketHandler {
+    List<WebSocketSession> webSocketSessions;
     WebSocketSession hostSession;
     WebSocketSession playerSession;
     private final ObjectMapper mapper = new ObjectMapper();
     private TimeState timeState = null;
 
-    @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        super.afterConnectionEstablished(session);
-        System.out.println(session.getId() + " connected!");
+    public RoomSocketHandler() {
+        webSocketSessions = Collections.synchronizedList(new ArrayList<>());
+    }
+
+    public void add(WebSocketSession session) {
         webSocketSessions.add(session);
     }
 
-    @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        super.afterConnectionClosed(session, status);
-        System.out.println(session.getId() + " disconnected!");
-        if (timeState != null) {
-            if (hostSession.equals(session)) {
-
-            } else if (playerSession.equals(session)) {
-
-            }
-        }
+    public void remove(WebSocketSession session) {
         webSocketSessions.remove(session);
     }
 
-    @Override
+    public int size() {
+        return webSocketSessions.size();
+    }
+
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        super.handleMessage(session, message);
         if (message instanceof TextMessage) {
             String payload = ((TextMessage) message).getPayload();
             JsonNode jsonNode = mapper.readTree(payload);
@@ -75,13 +66,15 @@ public class RoomSocketHandler extends TextWebSocketHandler {
                 case "STEP" -> {
                     timeState.toggleTimers();
                     session.sendMessage(getDataTime());
-                    message = new TextMessage(message.getPayload()
-                            + getDataTimeIgnoreType().getPayload());
+                    payload = payload.substring(0, payload.length() - 1) + "," +
+                            getDataTimeIgnoreType().getPayload().substring(1);
+                    log.info(payload);
+                    message = new TextMessage(payload);
                 }
             }
         }
         for (WebSocketSession webSocketSession : webSocketSessions) {
-            if (session == webSocketSession) continue;
+            if (session.equals(webSocketSession)) continue;
             webSocketSession.sendMessage(message);
         }
     }

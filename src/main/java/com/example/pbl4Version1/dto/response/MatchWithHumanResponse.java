@@ -2,14 +2,11 @@ package com.example.pbl4Version1.dto.response;
 
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,8 +16,8 @@ public class MatchWithHumanResponse {
 	RoomResponse roomResponse;
 	UserResponse white;
 	UserResponse black;
-	float timeWhite;
-	float timeBlack;
+	int timeWhite;
+	int timeBlack;
 	String winner;
 	List<StepResponse> steps;
 }

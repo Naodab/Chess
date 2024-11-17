@@ -32,8 +32,8 @@ public class MatchWithHuman extends Match {
 	@JoinColumn(name = "black_player_id")
 	User blackPlayer;
 
-	float timeWhiteUser;
-	float timeBlackUser;
+	int timeWhiteUser;
+	int timeBlackUser;
 	
 	public MatchWithHuman() {}
 

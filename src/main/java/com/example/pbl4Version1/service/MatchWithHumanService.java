@@ -46,8 +46,8 @@ public class MatchWithHumanService {
 		Room room = roomRepository.findById(request.getRoomId())
 				.orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
 		match.setRoom(room);
-		match.setTimeBlackUser(room.getTime());
-		match.setTimeWhiteUser(room.getTime());
+		match.setTimeBlackUser(room.getTime() * 60);
+		match.setTimeWhiteUser(room.getTime() * 60);
 
 		match = matchRepository.save(match);
 

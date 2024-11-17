@@ -1,6 +1,5 @@
-import { ROOM } from "../index.js";
-
-let countDownTime = 0;
+import { countDownTime } from "../mode/play_online.js";
+import {alertMessage} from "./message.js";
 
 const timeWhite = {
     clock: null,
@@ -28,9 +27,9 @@ function updateCountDown(timeColor) {
     timeColor.clock.querySelector(".seconds")
         .textContent = seconds.toString().padStart(2, "0");
 
-    if (distance < 0) {
+    if (distance <= 0) {
         clearInterval(timeColor.countDownInterval);
-        // TODO: announce time out
+        alertMessage("Hết giờ");
     }
 }
 
@@ -49,13 +48,13 @@ function togglePause(timeColor) {
     timeColor.isPaused = !timeColor.isPaused;
 }
 
-function resetClock() {
+function resetClock(whiteRemainTime = countDownTime,
+                    blackRemainTime = countDownTime) {
     timeWhite.clock = document.querySelector(".player-info.alliance-white .clock");
     timeBlack.clock = document.querySelector(".player-info.alliance-black .clock");
 
-    countDownTime = ROOM.time * 60 * 1000;
-    timeWhite.endTime = new Date().getTime() + countDownTime;
-    timeBlack.endTime = new Date().getTime() + countDownTime;
+    timeWhite.endTime = new Date().getTime() + whiteRemainTime * 1000;
+    timeBlack.endTime = new Date().getTime() + blackRemainTime * 1000;
 
     updateCountDown(timeBlack);
     updateCountDown(timeWhite);

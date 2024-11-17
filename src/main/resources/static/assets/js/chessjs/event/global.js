@@ -24,6 +24,7 @@ import {
 } from "../helper/commonHelper.js";
 import { ws } from "../mode/play_online.js";
 import {alertMessage} from "../opponents/message.js";
+import {timeBlack, timeWhite, togglePause} from "../opponents/handleClock.js";
 
 let highlight_state = false;
 let previousHighlight = null;
@@ -51,10 +52,19 @@ function setTurnNumber(num) {
     turn = num;
 }
 
+function exchangeTurn() {
+    turnWhite = !turnWhite;
+    if (MODE === "PLAY_ONLINE") {
+        turnWhite = !turnWhite;
+        if (ALLIANCE === "WHITE")
+            togglePause(timeWhite)
+        else togglePause(timeBlack);
+    }
+}
+
 function setEnPassantMove(position) {
     enPassantMove = position;
     if (position.includes("3") || position.includes("6")) {
-        console.log(getPieceAtPosition(position));
         enPassantPawn = getPieceAtPosition(position);
     }
 }
@@ -71,10 +81,10 @@ function highlightLocal(legalMoves) {
     });
 
     legalMoves.attack.forEach(dest => {
-        document.getElementById(dest.destination).classList.add("capturedColor");
+        document.getElementById(dest.destination || dest.deletePiece).classList.add("capturedColor");
         globalState.forEach(row => {
             row.forEach(ele => {
-                if (ele.id === dest.destination) {
+                if (ele.id === (dest.destination || dest.deletePiece)) {
                     ele.highlightCaptured = true;
                     ele.highlight = true;
                 }
@@ -850,7 +860,7 @@ function moveOrCancelMove(square) {
 
     if (spanHighlight) {
         if (!willBeInCheck(moveState, square.id)) {
-            turnWhite = !turnWhite;
+            exchangeTurn();
             turn++;
             prepareForMoving(moveState, square.id);
             const oldMove = moveState.current_position;
@@ -985,7 +995,6 @@ async function sendStepToServer(from, to) {
 function sendStepToOthers(from, to) {
     const fen = generateFen();
     // send to server to save in database
-    console.log(nameMove);
     fetch("/chess/api/steps", {
         method: 'POST',
         headers: {
@@ -998,7 +1007,6 @@ function sendStepToOthers(from, to) {
         .catch(error => console.log(error));
 
     // send to others
-    console.log(nameMove);
     ws.send(JSON.stringify({ type: "STEP", from, to, name: nameMove }));
 }
 

@@ -21,18 +21,20 @@ import {
 } from "../index.js";
 import {getRoom} from "../../user/api/room.js";
 import {createMatchOnline, getMatch} from "../../user/api/match.js";
-import {globalEvent, receiveMoveFromOthers} from "../event/global.js";
+import {changeTurn, globalEvent, receiveMoveFromOthers, turnWhite} from "../event/global.js";
 import {initGameFromFenRender, initGameRender} from "../render/main.js";
 import {STEPS_CONTAINER} from "../helper/constants.js";
-import {resetClock} from "../opponents/handleClock.js";
+import {resetClock, timeBlack, timeWhite, togglePause} from "../opponents/handleClock.js";
 
 const $ = document.querySelector.bind(document);
 const modalReadySelector = "#ready-confirm";
 const modalWaitSelector = "#wait-others";
 
 let ws;
+let me;
 let isMySelfReady = false;
 let isOpponentReady = false;
+let countDownTime;
 
 function handleReadyModal() {
     turnOnGameModal(modalReadySelector);
@@ -52,18 +54,21 @@ function handleReadyModal() {
             clearInterval(internal);
             turnOffGameModal(modalWaitSelector);
             if (ROLE === "HOST") {
-                console.log(blackPlayer, whitePlayer);
                 createMatchOnline(whitePlayer.id, blackPlayer.id, ROOM.id).then(data => {
                     const sendData = {
                         type: "BEGIN_MATCH",
-                        matchId: data.id
+                        matchId: data.id,
+                        number: matchNumber,
+                        time: ROOM.time * 60
                     }
                     ws.send(JSON.stringify(sendData));
 
                     sessionStorage.setItem("MATCH_ID", data.id);
                     setMatchActiveId(data.id);
+                    setMatchNumber(matchNumber + 1);
                     reCreateGame();
-                    resetClock();
+                    resetClock(data.timeWhite, data.timeBlack);
+                    togglePause(timeWhite);
                 });
             }
         }
@@ -71,75 +76,77 @@ function handleReadyModal() {
 }
 
 function initializeWebsocket() {
-    ws = new WebSocket("ws://localhost:8080/chess/websocket/chatInRoom/" + sessionStorage.getItem("ROOM_ID"));
+    ws = new WebSocket("ws://localhost:8080/chess/websocket/chatInRoom/"
+        + sessionStorage.getItem("ROOM_ID")
+        + "?roomToken=" + sessionStorage.getItem("ROOM_ID"));
     ws.onopen = function () {
         console.log("Websocket to broadcast in a room is now opened! - RoomID: " + sessionStorage.getItem("ROOM_ID"));
         getRoom(sessionStorage.getItem("ROOM_ID")).then(room => {
             setRoomAndComponents(room);
-            if (ROLE !== "HOST") {
-                let avatar = "";
-                let elo;
-                if (ROLE === "PLAYER") {
-                    avatar = room.player.avatar;
-                    elo = room.player.elo;
-                } else {
-                    const view = room.viewers.find(viewer => viewer.username ===
+            switch (ROLE) {
+                case "HOST":
+                    me = room.host;
+                    break;
+                case "PLAYER":
+                    me = room.player;
+                    break;
+                case "VIEWER":
+                    me = room.viewers.find(viewer => viewer.username ===
                         sessionStorage.getItem("USERNAME"));
-                    elo = view.elo;
-                    avatar = view.avatar;
-                }
-                const user = {
+                    break;
+            }
+            const dataToSend = {
+                type: "ENTER_ROOM",
+                user: {
                     username: sessionStorage.getItem("USERNAME"),
-                    avatar,
-                    elo,
+                    avatar: me.avatar,
+                    elo: me.elo,
                     role: ROLE
                 }
-                const dataToSend = {
-                    type: "ENTER_ROOM",
-                    user
-                }
-                ws.send(JSON.stringify(dataToSend));
-                if (ROLE === "PLAYER" && !matchActiveId) {
-                    setTimeout(() => handleReadyModal(), 3000);
-                }
+            }
+            ws.send(JSON.stringify(dataToSend));
+
+            if (ROLE === "PLAYER" && !matchActiveId) {
+                setTimeout(() => handleReadyModal(), 2000);
             }
 
+            // for reload page and for when viewers enter room
             if (matchActiveId || matchActiveId === 0) {
                 getMatch("human", matchActiveId).then(match => {
                     sessionStorage.setItem("MATCH_ID", match.id);
                     let steps = match.steps;
                     if (steps.length === 0) {
                         initGameRender(globalState);
-                        globalEvent();
-                        return;
+                    } else {
+                        steps.sort((a, b) => {
+                            const numA = parseInt(a.fen.match(/\d+$/)[0]);
+                            const numB = parseInt(b.fen.match(/\d+$/)[0]);
+                            return numA - numB;
+                        });
+                        addSteps(steps);
+                        STEPS_CONTAINER.scrollLeft = STEPS_CONTAINER.scrollWidth;
+                        const fen = steps[steps.length - 1].fen;
+                        initGameFromFenRender(globalState, fen);
                     }
-                    steps.sort((a, b) => {
-                        const numA = parseInt(a.fen.match(/\d+$/)[0]);
-                        const numB = parseInt(b.fen.match(/\d+$/)[0]);
-                        return numA - numB;
-                    });
-                    addSteps(steps);
-                    STEPS_CONTAINER.scrollLeft = STEPS_CONTAINER.scrollWidth;
-                    const fen = steps[steps.length - 1].fen;
-                    initGameFromFenRender(globalState, fen);
-                    globalEvent();
+                    if (ROLE !== "VIEWER") globalEvent();
                 });
             }
         });
     }
+
     ws.onmessage = function (event) {
+        console.log(event.data);
         const data = JSON.parse(event.data);
         if (data.type === "SEND_MESSAGE") {
             addMessages(data.user, data.message, true);
         } else if (data.type === "ENTER_ROOM") {
             getRoom(ROOM.id).then(room => {
                 setRoom(room);
-                console.log(data.user);
                 const other = data.user;
                 if (other.role === "PLAYER") {
                     initComponent(other, OPPONENT.toLowerCase());
                     if (ROLE !== "VIEWER" && !matchActiveId) {
-                        setTimeout(() => handleReadyModal(), 3000);
+                        setTimeout(() => handleReadyModal(), 2000);
                     }
                 }
             });
@@ -152,12 +159,36 @@ function initializeWebsocket() {
             getMatch("human", data.matchId).then(match => {
                 sessionStorage.setItem("MATCH_ID", match.id);
                 reCreateGame();
-                resetClock();
+                resetClock(match.timeWhite, match.timeBlack);
+                togglePause(timeWhite);
             });
         } else if (data.type === "STEP") {
+            console.log(data);
             receiveMoveFromOthers(data);
+            handleDataTime(data);
+        } else if (data.type === "DATA_TIME") {
+            handleDataTime(data);
         }
     }
+}
+
+function handleDataTime(data) {
+    if (!timeWhite.isPaused) {
+        togglePause(timeWhite);
+    }
+    if (!timeBlack.isPaused) {
+        togglePause(timeBlack);
+    }
+    const whiteRemainingTime = data.timeWhite;
+    const blackRemainingTime = data.timeBlack;
+    resetClock(whiteRemainingTime, blackRemainingTime);
+    const isTurnWhite = data.turnWhite;
+    changeTurn(isTurnWhite);
+    let timeColor = timeWhite;
+    if (!turnWhite) {
+        timeColor = timeBlack;
+    }
+    togglePause(timeColor);
 }
 
 window.addEventListener("load", () => {
@@ -216,7 +247,6 @@ if (MODE === "PLAY_ONLINE") {
     $("#return-right").onclick = () => {
         //TODO:
     }
-
 }
 
-export { ws }
+export { ws, countDownTime }

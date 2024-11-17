@@ -157,7 +157,6 @@ window.onresize = resize;
 
 function addSteps(steps) {
     steps.forEach((step, index) => {
-        console.log(step.name)
         if (index % 2 === 0) {
             const div = document.createElement("div");
             div.classList.add("step-item");

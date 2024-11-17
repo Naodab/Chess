@@ -27,7 +27,7 @@
 <%--		<button id="btn-login" class="btn btn--green">Log In</button>--%>
 <%--	</div>--%>
 	<div class="sidebar-body">
-		<button class="btn btn--pink logout">Log out</button>
+		<button class="btn btn--pink logout">Đăng xuất</button>
 	</div>
 	<a class="settings-link" href=""><i class="fas fa-cog"></i>Cài đặt</a>
 </div>

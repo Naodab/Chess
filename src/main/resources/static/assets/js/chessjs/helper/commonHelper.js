@@ -5,7 +5,6 @@ let cloneGlobalState;
 let transitionGlobalState;
 
 function getPieceAtPosition(position) {
-    console.log(position);
     for (let row of globalState) {
         for (let element of row) {
             if (element.piece && element.piece.current_position.includes(position)) {
