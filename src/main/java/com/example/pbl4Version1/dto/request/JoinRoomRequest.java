@@ -11,4 +11,5 @@ import lombok.experimental.FieldDefaults;
 public class JoinRoomRequest {
 	String username;
 	String role;
+	String password;
 }

@@ -122,11 +122,16 @@ public class RoomService {
 	public void joinRoom(Long id, JoinRoomRequest request) {
 		Room room = roomRepository.findById(id).orElseThrow(
 				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
+		if (!passwordEncoder.matches(request.getPassword(), room.getPassword())) {
+			throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
+		}
+
 		var authentication = SecurityContextHolder.getContext().getAuthentication();
 		String username = authentication.getName();
+
 		User user = userRepository.findByUsername(username)
 						.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-		log.info(user.getId() + "/" + user.getUsername());
+
 		RoomUser roomUser;
 		if (request.getRole().equals(Mode.PLAYER.toString())) {
 			roomUser = RoomUser.builder()
