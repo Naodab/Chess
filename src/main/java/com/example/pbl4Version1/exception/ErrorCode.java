@@ -18,6 +18,7 @@ public enum ErrorCode {
     INVALID_RESET_PASSWORD(1011, "Code is incorrect.", HttpStatus.BAD_REQUEST), 
     MATCH_NOT_EXISTED(1012, "Match not existed.", HttpStatus.BAD_REQUEST),
 	PASSWORD_NOT_MATCH(1013, "Password does not match.", HttpStatus.BAD_REQUEST),
+	ROOM_HAD_PLAYER(1014, "Room had a player.", HttpStatus.BAD_REQUEST)
 	;
 	
 	private int code;

@@ -119,10 +119,10 @@ public class RoomService {
 		return roomMapper.toRoomResponse(room);
 	}
 
-	public void joinRoom(Long id, JoinRoomRequest request) {
+	public RoomResponse joinRoom(Long id, JoinRoomRequest request) {
 		Room room = roomRepository.findById(id).orElseThrow(
 				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
-		if (!passwordEncoder.matches(request.getPassword(), room.getPassword())) {
+		if (room.getPassword() != null && !passwordEncoder.matches(request.getPassword(), room.getPassword())) {
 			throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
 		}
 
@@ -130,25 +130,31 @@ public class RoomService {
 		String username = authentication.getName();
 
 		User user = userRepository.findByUsername(username)
-						.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
+		boolean isHavingPlayer = false;
+		List<RoomUser> roomUsers = roomUserRepository.findByRoomId(id);
 		RoomUser roomUser;
-		if (request.getRole().equals(Mode.PLAYER.toString())) {
-			roomUser = RoomUser.builder()
-							.user(user)
-							.room(room)
-							.role(Mode.PLAYER).build();
+		if (roomUsers != null) {
+			for (RoomUser roomuser : roomUsers) {
+				if (roomuser.getRole() == Mode.PLAYER) {
+					isHavingPlayer = true;
+					break;
+				}
+			}
 		}
-		else {
-			roomUser = RoomUser.builder()
-							.user(user)
-							.room(room)
-							.role(Mode.VIEWER)
-							.build();
+		if (request.getRole().equals(Mode.PLAYER.name())) {
+			if (!isHavingPlayer) {
+				roomUser = RoomUser.builder().user(user).room(room).role(Mode.PLAYER).build();
+			}
+			else throw new AppException(ErrorCode.ROOM_HAD_PLAYER);
+		} else {
+			roomUser = RoomUser.builder().user(user).room(room).role(Mode.VIEWER).build();
 		}
 		roomUserRepository.save(roomUser);
-
-		//update room when a new user comes in!
+		roomUsers.add(roomUser);
+		room.setRoomUsers(new HashSet<>(roomUsers));
+		return roomMapper.toRoomResponse(room);
 	}
 
 	public void leaveRoom(Long id, LeaveRoomRequest leaveRoomRequest) {

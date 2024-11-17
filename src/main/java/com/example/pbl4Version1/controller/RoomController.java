@@ -81,10 +81,9 @@ public class RoomController {
 	}
 
 	@PostMapping("/joinRoom/{roomId}")
-	ApiResponse<?> joinRoom(@PathVariable("roomId") Long id, @RequestBody JoinRoomRequest request) {
-		roomService.joinRoom(id, request);
-		return ApiResponse.builder()
-				.message("Room " + id + " has updated a new user!")
+	ApiResponse<RoomResponse> joinRoom(@PathVariable("roomId") Long id, @RequestBody JoinRoomRequest request) {
+		return ApiResponse.<RoomResponse>builder()
+				.result(roomService.joinRoom(id, request))
 				.build();
 	}
 

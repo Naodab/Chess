@@ -391,67 +391,48 @@ function addRoom(room) {
     $(".rooms-list").appendChild(tr);
 
     tr.querySelector("#join-a-room-as-player").onclick = async () => {
-        sessionStorage.setItem("ROOM_ID", room.id);
-        const roomResult = await getRoom(room.id);
-        if (roomResult.host != null && roomResult.player != null) {
-            enterPassword(room, true, true);
-        } else {
-            enterPassword(room, true, false);
-        }
+        enterPassword(room);
     }
 
     tr.querySelector("#join-a-room-as-viewer").onclick = () => {
-        sessionStorage.setItem("ROOM_ID", room.id);
         enterPassword(room, false);
     }
 }
 
-async function enterPassword(room, isPlayer = true, isHostAndPlayer = true) {
-    const roomNew = await getRoom(room.id);
-    if (roomNew.password != null) {
-        turnOnModal(renderEnterRoomWithPassword);
-        addEventForEye();
-        $("#idRoom").value = room.id;
+ function enterPassword(room, isPlayer = true) {
+    turnOnModal(renderEnterRoomWithPassword);
+    addEventForEye();
+    const role = isPlayer ? "PLAYER" : "VIEWER";
+    $("#idRoom").value = room.id;
+    const errorMessage = $(".error-message");
+    $("#cancel").onclick = () => turnOffModal();
 
-        $("#enter-room").onclick = () => {
-            const rawPassword = $("#roomPassword").value;
-            const encodedPassword = roomNew.password;
-            const params = new URLSearchParams();
-            params.append('rawPassword', rawPassword);
-            params.append('encodedPassword', encodedPassword);
-            fetch(`../api/password/check?${params.toString()}`, {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json",
-                    "Authorization": "Bearer " + localStorage.getItem("TOKEN")
-                }
-            }).then(response => {
-                if (response.ok)
-                    return response.text();
-                else {
-                    return Promise.reject('Password does not match');
-                    //alertMessage("Mật khẩu nhập không đúng. Hãy thử lại!");
-                }
-            }).then(data => {
-                alert(data.toString());
-                if (data.toString() === "Password matches") {
-                    if (isPlayer === true && isHostAndPlayer === true)
-                        joinRoomAsPlayer(room, isHostAndPlayer);
-                    else if (isPlayer === true && isHostAndPlayer === false)
-                        joinRoomAsPlayer(room);
-                    else if (isPlayer === false)
-                        joinRoomAsViewer(room);
-                }
-            })
-        }
-    }
-    else {
-        if (isPlayer === true && isHostAndPlayer === true)
-            joinRoomAsPlayer(room, isHostAndPlayer);
-        else if (isPlayer === true && isHostAndPlayer === false)
-            joinRoomAsPlayer(room);
-        else if (isPlayer === false)
-            joinRoomAsViewer(room);
+    $("#enter-room").onclick = () => {
+        const password = $("#roomPassword").value;
+        fetch("../api/rooms/joinRoom/" + room.id, {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            },
+            body: JSON.stringify({role, password})
+        }).then(response => {
+            console.log(response);
+            if (response.ok) {
+                return response.json();
+            }
+        }).then(data => data.result)
+            .then(room => {
+                sessionStorage.setItem("ROOM_ID", room.id);
+                if (role === "PLAYER")
+                    joinRoomAsPlayer(room);
+                else
+                    joinRoomAsViewer(room);
+            }).catch( () => {
+                if (role === "PLAYER")
+                    errorMessage.innerText = "Phòng đã có đủ người chơi hoặc sai mật khẩu!";
+                else errorMessage.innerText = "Mật khẩu không chính xác!";
+        })
     }
 }
 
@@ -487,47 +468,22 @@ function loadAllRooms() {
     })
 }
 
-function joinRoomAsPlayer(room, isHostAndPlayer = false) {
-    if (!isHostAndPlayer) {
-        fetch("../api/rooms/joinRoom/" + room.id, {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json",
-                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
-            },
-            body: JSON.stringify({"username": sessionStorage.getItem("USERNAME"), "role": "PLAYER"})
-        }).then(response => {
-            const dataToBroadcast = {
-                type: "JOIN_ROOM_AS_PLAYER",
-                id: room.id
-            };
-            ws.send(JSON.stringify(dataToBroadcast));
-            window.location.href = "../public/playonl";
-            return response.ok;
-        })
-    }
-    else {
-        alertMessage("Phòng chơi hiện có 'host' và 'player' đang chơi. Bạn chỉ có thể tham gia với vai trò là 'viewer'!");
-    }
+function joinRoomAsPlayer(room) {
+    const dataToBroadcast = {
+        type: "JOIN_ROOM_AS_PLAYER",
+        id: room.id
+    };
+    ws.send(JSON.stringify(dataToBroadcast));
+    window.location.href = "../public/playonl";
 }
 
 function joinRoomAsViewer(room) {
-    fetch("../api/rooms/joinRoom/" + room.id, {
-        method: "POST",
-        headers: {
-            "Content-type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
-        },
-        body: JSON.stringify({"username": sessionStorage.getItem("USERNAME"), "role": "VIEWER"})
-    }).then(response => {
-        const dataToBroadcast = {
-            type: "JOIN_ROOM_AS_VIEWER",
-            id: room.id
-        };
-        ws.send(JSON.stringify(dataToBroadcast));
-        window.location.href = "../public/playonl";
-        return response.ok;
-    })
+    const dataToBroadcast = {
+        type: "JOIN_ROOM_AS_VIEWER",
+        id: room.id
+    };
+    ws.send(JSON.stringify(dataToBroadcast));
+    window.location.href = "../public/playonl";
 }
 
 function updateRoomUI(room) {
