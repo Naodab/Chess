@@ -13,8 +13,8 @@ import {
     reCreateGame,
     initComponent,
     setMatchActiveId,
-    matchNumber,
     setMatchNumber,
+    matchNumber,
     addSteps,
     setRoomAndComponents,
     ALLIANCE, matchActiveId, globalState
@@ -217,20 +217,20 @@ if (MODE === "PLAY_ONLINE") {
         //TODO:
     }
 
-//NOTE: TODO: exit room!
-$("#exit-room-button").onclick = () => {
-    alert("Click exit room!");
-    const data = {
+    //NOTE: TODO: exit room!
+    $("#exit-room-button").onclick = () => {
+        alert("Click exit room!");
+        const data = {
 
-    }
-    fetch("../api/rooms/leaveRoom/" + sessionStorage.getItem("ROOM_ID"), {
-        method: "GET",
-        headers: {
-            "Content-type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
         }
-    })
-}
+        fetch("../api/rooms/leaveRoom/" + sessionStorage.getItem("ROOM_ID"), {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            }
+        })
+    }
 }
 
 export { ws }

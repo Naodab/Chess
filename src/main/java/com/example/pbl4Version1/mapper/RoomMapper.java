@@ -60,6 +60,7 @@ public class RoomMapper {
 				.matchNumber(sizeMath)
 				.matchActiveId(room.getMatchActiveId())
 				.playDay(room.getPlayDay())
+				.password(room.getPassword())
 				.build();
 	}
 }
