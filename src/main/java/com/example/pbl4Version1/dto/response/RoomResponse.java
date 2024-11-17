@@ -24,4 +24,5 @@ public class RoomResponse {
 	Long matchActiveId;
 	int matchNumber;
 	int time;
+	String password;
 }

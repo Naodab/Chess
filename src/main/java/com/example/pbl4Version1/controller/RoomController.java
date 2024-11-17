@@ -3,8 +3,11 @@ package com.example.pbl4Version1.controller;
 import java.util.List;
 
 import com.example.pbl4Version1.dto.request.JoinRoomRequest;
+import com.example.pbl4Version1.dto.request.LeaveRoomRequest;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -82,6 +85,14 @@ public class RoomController {
 		roomService.joinRoom(id, request);
 		return ApiResponse.builder()
 				.message("Room " + id + " has updated a new user!")
+				.build();
+	}
+
+	@DeleteMapping("/leaveRoom/{roomID}")
+	ApiResponse<?> leaveRoom(@PathVariable("roomID") Long id, @RequestBody LeaveRoomRequest request) {
+		roomService.leaveRoom(id, request);
+		return ApiResponse.builder()
+				.message("User " + request.getUsername() + " has left room with roomID = " + request.getRoomId())
 				.build();
 	}
 }

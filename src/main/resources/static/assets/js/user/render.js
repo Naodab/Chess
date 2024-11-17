@@ -216,6 +216,38 @@ function renderFindRoom() {
     `;
 }
 
+function renderEnterRoomWithPassword() {
+    return html`
+        <div class="modal closure active" id="password-to-enter-room">
+            <h1 class="modal__title">Nhập mật khẩu phòng</h1>
+            <i class="fa-solid fa-xmark btn-icon btn-close" id="back"></i>
+            <div class="error-message"></div>
+            <div class="main-modal">
+                <div class="password-item">
+                    <label for="idRoom" class="modal__label">Mã phòng</label>
+                    <div class="password-container">
+                        <input type="text" id="idRoom" class="password__input"
+                               placeholder="Nhập mã phòng">
+                    </div>
+                </div>
+                <div class="password-item">
+                    <label for="oldPassword" class="modal__label">Mật khẩu phòng</label>
+                    <div class="password-container">
+                        <input type="password" id="roomPassword" class="password__input"
+                               placeholder="Để trống nếu không cần thiết">
+                        <i class="fa-solid fa-eye on"></i>
+                        <i class="fa-solid fa-eye-slash off"></i>
+                    </div>
+                </div>
+                <div class="modal__function top--margin">
+                    <div class="btn btn--green modal__btn" id="enter-room">Vào</div>
+                    <div class="btn btn--pink modal__btn" id="cancel">Hủy</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 export {
     renderPersonalInformation,
     renderUpdateAvatar,
@@ -224,5 +256,6 @@ export {
     renderRoom,
     renderCreateRoom,
     renderTopUser,
-    renderFindRoom
+    renderFindRoom,
+    renderEnterRoomWithPassword
 }

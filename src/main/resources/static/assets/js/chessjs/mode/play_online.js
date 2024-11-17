@@ -142,6 +142,7 @@ function initializeWebsocket() {
         } else if (data.type === "ENTER_ROOM") {
             getRoom(ROOM.id).then(room => {
                 setRoom(room);
+                console.log(data.user);
                 const other = data.user;
                 if (other.role === "PLAYER") {
                     initComponent(other, OPPONENT.toLowerCase());
@@ -246,6 +247,21 @@ if (MODE === "PLAY_ONLINE") {
 
     $("#return-right").onclick = () => {
         //TODO:
+    }
+
+    //NOTE: TODO: exit room!
+    $("#exit-room-button").onclick = () => {
+        alert("Click exit room!");
+        const data = {
+
+        }
+        fetch("../api/rooms/leaveRoom/" + sessionStorage.getItem("ROOM_ID"), {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            }
+        })
     }
 }
 

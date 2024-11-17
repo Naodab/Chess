@@ -6,8 +6,11 @@ import {
     renderCreateRoom,
     renderRoom,
     renderTopUser,
-    renderFindRoom
+    renderFindRoom,
+    renderEnterRoomWithPassword
 } from "./render.js";
+import {alertMessage} from "../chessjs/opponents/message.js";
+import {getRoom} from "./api/room.js";
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
@@ -17,23 +20,33 @@ const activityBtn = $("#activity-btn");
 const activityList = $(".activity-list");
 const topUsers = [];
 
-//NOTE: for websocket declaration
 let ws;
 
 function initializeWebsocket() {
-    ws = new WebSocket("ws://localhost:8080/chess/websocket");
-    ws.onopen = function () {
-        console.log("Websocket is now opened!");
-    }
-    ws.onmessage = function (event) {
-        const data = JSON.parse(event.data);
-        if (data.type === "CREATE_ROOM") {
-            addRoom(data);
+    fetch("../api/network/local-ip", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
         }
-        else if (data.type === "JOIN_ROOM_AS_PLAYER" || data.type === "JOIN_ROOM_AS_VIEWER") {
-            updateRoomUI(data);
-        }
-    }
+    })  .then(response => response.json())
+        .then(data => {
+            const ipAddress = data.result;
+            ws = new WebSocket(`ws://${ipAddress}:8080/chess/websocket`);
+            ws.onopen = function () {
+                console.log("Websocket is now opened!");
+            }
+            ws.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+                console.log(data);
+                if (data.type === "CREATE_ROOM") {
+                    addRoom(data);
+                }
+                else if (data.type === "JOIN_ROOM_AS_PLAYER" || data.type === "JOIN_ROOM_AS_VIEWER") {
+                    updateRoomUI(data);
+                }
+            }
+        });
 }
 
 function addEventForEye() {
@@ -335,7 +348,6 @@ $("#create-room").onclick = () => {
         const time = times[timeActive].getAttribute("data-value");
         const password = $("#roomPassword").value;
         const data = {time, password};
-        // TODO: create room and direct to another jsp to test
         console.log(localStorage.getItem("TOKEN"));
         fetch("../api/rooms", {
             method: "POST",
@@ -371,7 +383,6 @@ $("#create-room").onclick = () => {
 }
 
 function addRoom(room) {
-    console.log(room.id);
     const tr = document.createElement("tr");
     tr.classList.add("room");
     tr.setAttribute("data-id", room.id);
@@ -379,15 +390,68 @@ function addRoom(room) {
     tr.innerHTML = renderRoom(room);
     $(".rooms-list").appendChild(tr);
 
-    tr.querySelector("#join-a-room-as-player").onclick = () => {
-        joinRoomAsPlayer(room);
+    tr.querySelector("#join-a-room-as-player").onclick = async () => {
         sessionStorage.setItem("ROOM_ID", room.id);
-        window.location.href = "../public/playonl";
+        const roomResult = await getRoom(room.id);
+        if (roomResult.host != null && roomResult.player != null) {
+            enterPassword(room, true, true);
+        } else {
+            enterPassword(room, true, false);
+        }
     }
+
     tr.querySelector("#join-a-room-as-viewer").onclick = () => {
-        joinRoomAsViewer(room);
         sessionStorage.setItem("ROOM_ID", room.id);
-        window.location.href = "../public/playonl";
+        enterPassword(room, false);
+    }
+}
+
+async function enterPassword(room, isPlayer = true, isHostAndPlayer = true) {
+    const roomNew = await getRoom(room.id);
+    if (roomNew.password != null) {
+        turnOnModal(renderEnterRoomWithPassword);
+        addEventForEye();
+        $("#idRoom").value = room.id;
+
+        $("#enter-room").onclick = () => {
+            const rawPassword = $("#roomPassword").value;
+            const encodedPassword = roomNew.password;
+            const params = new URLSearchParams();
+            params.append('rawPassword', rawPassword);
+            params.append('encodedPassword', encodedPassword);
+            fetch(`../api/password/check?${params.toString()}`, {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+                }
+            }).then(response => {
+                if (response.ok)
+                    return response.text();
+                else {
+                    return Promise.reject('Password does not match');
+                    //alertMessage("Mật khẩu nhập không đúng. Hãy thử lại!");
+                }
+            }).then(data => {
+                alert(data.toString());
+                if (data.toString() === "Password matches") {
+                    if (isPlayer === true && isHostAndPlayer === true)
+                        joinRoomAsPlayer(room, isHostAndPlayer);
+                    else if (isPlayer === true && isHostAndPlayer === false)
+                        joinRoomAsPlayer(room);
+                    else if (isPlayer === false)
+                        joinRoomAsViewer(room);
+                }
+            })
+        }
+    }
+    else {
+        if (isPlayer === true && isHostAndPlayer === true)
+            joinRoomAsPlayer(room, isHostAndPlayer);
+        else if (isPlayer === true && isHostAndPlayer === false)
+            joinRoomAsPlayer(room);
+        else if (isPlayer === false)
+            joinRoomAsViewer(room);
     }
 }
 
@@ -417,24 +481,34 @@ function loadAllRooms() {
                 id: room.id,
                 time: room.time,
                 people: people
-            }
+            };
             addRoom(roomData);
         }
     })
 }
 
-function joinRoomAsPlayer(room) {
-    fetch("../api/rooms/joinRoom/" + room.id, {
-        method: "POST",
-        headers: {
-            "Content-type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
-        },
-        body: JSON.stringify({"username": sessionStorage.getItem("USERNAME"), "role": "PLAYER"})
-    }).then(response => {
-        ws.send(JSON.stringify({ "type": "JOIN_ROOM_AS_PLAYER" ,"id": room.id}));
-        return response.ok;
-    })
+function joinRoomAsPlayer(room, isHostAndPlayer = false) {
+    if (!isHostAndPlayer) {
+        fetch("../api/rooms/joinRoom/" + room.id, {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            },
+            body: JSON.stringify({"username": sessionStorage.getItem("USERNAME"), "role": "PLAYER"})
+        }).then(response => {
+            const dataToBroadcast = {
+                type: "JOIN_ROOM_AS_PLAYER",
+                id: room.id
+            };
+            ws.send(JSON.stringify(dataToBroadcast));
+            window.location.href = "../public/playonl";
+            return response.ok;
+        })
+    }
+    else {
+        alertMessage("Phòng chơi hiện có 'host' và 'player' đang chơi. Bạn chỉ có thể tham gia với vai trò là 'viewer'!");
+    }
 }
 
 function joinRoomAsViewer(room) {
@@ -446,7 +520,12 @@ function joinRoomAsViewer(room) {
         },
         body: JSON.stringify({"username": sessionStorage.getItem("USERNAME"), "role": "VIEWER"})
     }).then(response => {
-        ws.send(JSON.stringify({"type": "JOIN_ROOM_AS_VIEWER", "id": room.id}));
+        const dataToBroadcast = {
+            type: "JOIN_ROOM_AS_VIEWER",
+            id: room.id
+        };
+        ws.send(JSON.stringify(dataToBroadcast));
+        window.location.href = "../public/playonl";
         return response.ok;
     })
 }
