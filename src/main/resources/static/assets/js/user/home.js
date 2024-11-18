@@ -304,27 +304,46 @@ $("#find-room-btn").onclick = () => {
     turnOnModal(renderFindRoom);
     addEventForEye();
     $("#cancel").onclick = () => turnOffModal();
-
-    $("#confirm-enter-room").onclick = () => {
+    $("#confirm-enter-room-player").onclick = () => {
         const idRoom = $("#idRoom").value;
         const passwordRoom = $("#roomPassword").value;
-        // TODO: find room, code similarly with create room but fetch to find if room active and corrected password
-        console.log(localStorage.getItem("TOKEN"));
-        fetch("../api/rooms/" + idRoom, {
-            method: "GET",
-            headers: {
-                "Content-type": "application/json",
-                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
-            }
-        }).then(response => {
-            if (response.ok)
-                return response.json();
-            else
-                throw new Error("Network response was not ok " + response.statusText);
-        }).then(data => {
-            //NOTE: not ready to continue coding, fix room return result afterward!
-        })
+        findRoom(idRoom, passwordRoom, true);
     };
+    $("#confirm-enter-room-viewer").onclick = () => {
+        const idRoom = $("#idRoom").value;
+        const passwordRoom = $("#roomPassword").value;
+        findRoom(idRoom, passwordRoom, false);
+    }
+}
+
+function findRoom(idRoom, passwordRoom, isPlayer) {
+    const errorMessage = $(".error-message");
+    const role = isPlayer ? "PLAYER" : "VIEWER";
+    const password = passwordRoom;
+    fetch("../api/rooms/joinRoom/" + idRoom, {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+        },
+        body: JSON.stringify({role, password})
+    }).then(response => {
+        console.log(response);
+        if (response.ok) {
+            return response.json();
+        }
+    }).then(data => data.result)
+        .then(room => {
+            sessionStorage.setItem("ROOM_ID", room.id);
+            if (role === "PLAYER")
+                joinRoomAsPlayer(room);
+            else
+                joinRoomAsViewer(room);
+        }).catch( () => {
+            if (role === "PLAYER")
+                errorMessage.innerText = "Phòng đã có đủ người chơi hoặc sai mật khẩu!";
+            else errorMessage.innerText = "Mật khẩu không chính xác!";
+    })
 }
 
 $("#create-room").onclick = () => {
