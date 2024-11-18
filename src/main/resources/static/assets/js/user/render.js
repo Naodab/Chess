@@ -208,7 +208,8 @@ function renderFindRoom() {
                     </div>
                 </div>
                 <div class="modal__function top--margin">
-                    <div class="btn btn--green modal__btn" id="confirm-enter-room">Vào</div>
+                    <div class="btn btn--green modal__btn" id="confirm-enter-room-player">Vào chơi</div>
+                    <div class="btn btn--yellow modal__btn" id="confirm-enter-room-viewer">Vào xem</div>
                     <div class="btn btn--pink modal__btn" id="cancel">Hủy</div>
                 </div>
             </div>

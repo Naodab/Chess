@@ -153,7 +153,7 @@ public class RoomService {
 			roomUser = RoomUser.builder().user(user).room(room).role(Mode.VIEWER).build();
 		}
 		roomUserRepository.save(roomUser);
-		if (roomUsers == null) roomUsers = new ArrayList<>();
+		if (roomUsers != null) roomUsers = new ArrayList<>();
 		roomUsers.add(roomUser);
 		room.setRoomUsers(new HashSet<>(roomUsers));
 		return roomMapper.toRoomResponse(room);
