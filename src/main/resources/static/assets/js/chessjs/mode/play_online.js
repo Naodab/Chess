@@ -1,7 +1,7 @@
 import {
     renderMessage,
     turnOnGameModal,
-    turnOffGameModal
+    turnOffGameModal, turnOnOverlay, renderWinner, turnOffOverlay
 } from "../opponents/message.js";
 import {
     ROLE,
@@ -24,7 +24,7 @@ import {createMatchOnline, getMatch} from "../../user/api/match.js";
 import {changeTurn, globalEvent, receiveMoveFromOthers, turnWhite} from "../event/global.js";
 import {initGameFromFenRender, initGameRender} from "../render/main.js";
 import {STEPS_CONTAINER} from "../helper/constants.js";
-import {resetClock, timeBlack, timeWhite, togglePause} from "../opponents/handleClock.js";
+import {getTimeRemaining, resetClock, timeBlack, timeWhite, togglePause} from "../opponents/handleClock.js";
 
 const $ = document.querySelector.bind(document);
 const modalReadySelector = "#ready-confirm";
@@ -111,7 +111,7 @@ function initializeWebsocket() {
             }
 
             // for reload page and for when viewers enter room
-            if (matchActiveId || matchActiveId === 0) {
+            if (matchActiveId) {
                 getMatch("human", matchActiveId).then(match => {
                     sessionStorage.setItem("MATCH_ID", match.id);
                     let steps = match.steps;
@@ -135,14 +135,12 @@ function initializeWebsocket() {
     }
 
     ws.onmessage = function (event) {
-        console.log(event.data);
         const data = JSON.parse(event.data);
         if (data.type === "SEND_MESSAGE") {
             addMessages(data.user, data.message, true);
         } else if (data.type === "ENTER_ROOM") {
             getRoom(ROOM.id).then(room => {
                 setRoom(room);
-                console.log(data.user);
                 const other = data.user;
                 if (other.role === "PLAYER") {
                     initComponent(other, OPPONENT.toLowerCase());
@@ -164,7 +162,6 @@ function initializeWebsocket() {
                 togglePause(timeWhite);
             });
         } else if (data.type === "STEP") {
-            console.log(data);
             receiveMoveFromOthers(data);
             handleDataTime(data);
         } else if (data.type === "DATA_TIME") {
@@ -231,6 +228,55 @@ if (sendMessageBtn) {
     }
 }
 
+function handleEndGame(data) {
+    turnOnOverlay(renderWinner, data);
+    if (!timeWhite.isPaused) {
+        togglePause(timeWhite);
+    }
+    if (!timeBlack.isPaused) {
+        togglePause(timeBlack);
+    }
+
+    if (ROLE === "HOST") {
+        let winnerId = "DRAW";
+        switch (data.winner) {
+            case "WHITE":
+                winnerId = whitePlayer.id;
+                break;
+            case "BLACK":
+                winnerId = blackPlayer.id;
+                break;
+        }
+        const dataSend = {
+            type: "END_MATCH",
+            timeWhitePlayer: getTimeRemaining(timeWhite),
+            timeBlackPlayer: getTimeRemaining(timeBlack),
+            gameStatus: data.status,
+            winnerId
+        }
+        fetch("/chess/api/matches/human/" + matchActiveId, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            },
+            body: JSON.stringify(dataSend)
+        }).then(response => response.json())
+            .then(data => {
+                // TODO: reset match
+                setMatchActiveId(0);
+                setMatchNumber(matchNumber + 1);
+                setRoom(ROOM);
+            })
+            .catch(error => console.log(error));
+    }
+    $("#ok").onclick = () => {
+        turnOffOverlay();
+    }
+
+
+}
+
 
 if (MODE === "PLAY_ONLINE") {
     $("#flag-lose").onclick = () => {
@@ -265,4 +311,4 @@ if (MODE === "PLAY_ONLINE") {
     }
 }
 
-export { ws, countDownTime }
+export { ws, countDownTime, handleEndGame }

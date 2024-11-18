@@ -61,7 +61,7 @@ public class StepService {
 		// TODO: handle for human win
 		Board board = Board.createByFEN(request.getFen());
 		if (board.getCurrentPlayer().isInCheckMate()) {
-			mwb.setGameStatus(GameStatus.CHECKMATE);
+			mwb.setGameStatus(GameStatus.CHECK_MATE);
 			mwb.setWinner(PlayerType.HUMAN);
 			matchWithBotRepository.save(mwb);
 			return StepResponse.builder()
@@ -69,7 +69,7 @@ public class StepService {
 					.gameStatus(mwb.getGameStatus().name())
 					.build();
 		} else if (board.getCurrentPlayer().isInStaleMate()) {
-			mwb.setGameStatus(GameStatus.STALEMATE);
+			mwb.setGameStatus(GameStatus.STALE_MATE);
 			mwb.setWinner(PlayerType.HUMAN);
 			matchWithBotRepository.save(mwb);
 			return StepResponse.builder()
@@ -83,10 +83,10 @@ public class StepService {
         Board executeBoard = board.getCurrentPlayer().makeMove(bestMove).getTransitionBoard();
 
 		if (executeBoard.getCurrentPlayer().isInCheckMate()) {
-			mwb.setGameStatus(GameStatus.CHECKMATE);
+			mwb.setGameStatus(GameStatus.CHECK_MATE);
 			mwb.setWinner(PlayerType.COMPUTER);
 		} else if (executeBoard.getCurrentPlayer().isInStaleMate()) {
-			mwb.setGameStatus(GameStatus.STALEMATE);
+			mwb.setGameStatus(GameStatus.STALE_MATE);
 			mwb.setWinner(PlayerType.COMPUTER);
 		}
 

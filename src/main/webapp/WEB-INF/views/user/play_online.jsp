@@ -61,12 +61,12 @@
 
             <div class="game-board-container">
                 <div id="game-board"></div>
-                <div id="prompt-pieces">
-                    <div class="rook prompt-piece" name="PAWN"></div>
-                    <div class="knight prompt-piece" name="KNIGHT"></div>
-                    <div class="bishop prompt-piece" name="BISHOP"></div>
-                    <div class="queen prompt-piece" name="QUEEN"></div>
-                </div>
+<%--                <div id="prompt-pieces">--%>
+<%--                    <div class="rook prompt-piece" name="PAWN"></div>--%>
+<%--                    <div class="knight prompt-piece" name="KNIGHT"></div>--%>
+<%--                    <div class="bishop prompt-piece" name="BISHOP"></div>--%>
+<%--                    <div class="queen prompt-piece" name="QUEEN"></div>--%>
+<%--                </div>--%>
             </div>
 
             <div class="defeated-pieces-container">

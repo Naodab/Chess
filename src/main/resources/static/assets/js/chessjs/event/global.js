@@ -1,7 +1,6 @@
 import {
     ROOT_DIV,
-    SQUARE_SELECTOR,
-    PROMPT_PIECE
+    SQUARE_SELECTOR
 } from "../helper/constants.js"
 import {globalState, ALLIANCE, OPPONENT, ROLE, matchActiveId} from "../index.js";
 import {
@@ -12,7 +11,6 @@ import {
     globalStateRender,
     deletePiece,
     generateFen,
-    beginPromotionPawn,
     finishPromotionPawn,
     handleNameMove
 } from "../render/main.js";
@@ -22,9 +20,9 @@ import {
     getPieceAtPosition,
     moveStatus
 } from "../helper/commonHelper.js";
-import { ws } from "../mode/play_online.js";
-import {alertMessage} from "../opponents/message.js";
-import {timeBlack, timeWhite, togglePause} from "../opponents/handleClock.js";
+import {handleEndGame, ws} from "../mode/play_online.js";
+import {alertMessage, promotion} from "../opponents/message.js";
+import {timeBlack, timeWhite, togglePause, getTimeRemaining } from "../opponents/handleClock.js";
 
 let highlight_state = false;
 let previousHighlight = null;
@@ -34,6 +32,8 @@ let enPassantPawn;
 let enPassantMove;
 let turn = 0;
 let nameMove = "";
+let promotionPiece;
+let namePromotion;
 
 function pushXToNameMove() {
     nameMove = 'x' + nameMove;
@@ -855,12 +855,12 @@ function prepareForMoving(piece, id) {
     }
 }
 
-function moveOrCancelMove(square) {
+async function moveOrCancelMove(square) {
     const spanHighlight = square.querySelector('span');
 
     if (spanHighlight) {
         if (!willBeInCheck(moveState, square.id)) {
-            exchangeTurn();
+            turnWhite = !turnWhite;
             turn++;
             prepareForMoving(moveState, square.id);
             const oldMove = moveState.current_position;
@@ -871,24 +871,39 @@ function moveOrCancelMove(square) {
                 }
                 nameMove += square.id;
             }
-
+            if (moveState.piece_name.includes("PAWN") &&
+                (square.id.includes("8") || square.id.includes("1"))) {
+                promotionPiece = moveState;
+                namePromotion = await promotion();
+                finishPromotionPawn(namePromotion);
+            }
             const status = moveStatus(OPPONENT.toLowerCase());
+            let isEndgame;
             if (status === "CHECK_MATE" || status === "STALE_MATE") {
                 nameMove += "#";
+                isEndgame = true;
             } else if (status === "IN_CHECK") {
                 nameMove += "+";
             }
             handleNameMove(nameMove);
-            if (moveState.piece_name.includes("PAWN") &&
-                (square.id.includes("8") || square.id.includes("1"))) {
-                beginPromotionPawn(moveState);
-            }
             if (MODE === "PLAY_WITH_BOT")
                 sendStepToServer(oldMove, square.id);
             else if (MODE === "PLAY_ONLINE") {
-                sendStepToOthers(oldMove, square.id);
+                sendStepToOthers(oldMove, square.id, namePromotion);
+                namePromotion = "";
             }
             nameMove = "";
+            if (isEndgame) {
+                handleEndGame({
+                    title: "Chiến thắng",
+                    state: "Hết nước đi!",
+                    status,
+                    time: ALLIANCE === "WHITE" ? getTimeRemaining(timeWhite)
+                        : getTimeRemaining(timeBlack),
+                    turn: Math.floor(turn / 2),
+                    winner: ALLIANCE
+                });
+            }
         } else {
             clearPreviousSelfHighlight(previousHighlight);
         }
@@ -950,12 +965,6 @@ function globalEvent() {
             moveOrCancelMove(square);
         }
     };
-    PROMPT_PIECE.forEach(piece => {
-        piece.addEventListener('click', () => {
-            const name = piece.getAttribute("name");
-            finishPromotionPawn(name);
-        });
-    });
 }
 
 const  matchID = localStorage.getItem('MATCH_ID');
@@ -992,7 +1001,7 @@ async function sendStepToServer(from, to) {
     }
 }
 
-function sendStepToOthers(from, to) {
+function sendStepToOthers(from, to, namePromotion) {
     const fen = generateFen();
     // send to server to save in database
     fetch("/chess/api/steps", {
@@ -1007,19 +1016,36 @@ function sendStepToOthers(from, to) {
         .catch(error => console.log(error));
 
     // send to others
-    ws.send(JSON.stringify({ type: "STEP", from, to, name: nameMove }));
+    const dataSend = { type: "STEP", from, to, name: nameMove }
+    if (namePromotion) {
+        dataSend.namePromotion = namePromotion;
+    }
+    // TODO: promotion to others
+    ws.send(JSON.stringify(dataSend));
 }
 
-function receiveMoveFromOthers({ from, to, name }) {
+function receiveMoveFromOthers({ from, to, name, namePromotion }) {
     turn++;
     handleNameMove(name);
     nameMove = "";
     const piece = getPieceAtPosition(from);
     prepareForMoving(piece, to);
     moveElement(piece, to);
+    if (namePromotion) {
+        promotionPiece = getPieceAtPosition(to);
+        finishPromotionPawn(namePromotion);
+    }
     const status = moveStatus(ALLIANCE.toLowerCase());
     if (status === "CHECK_MATE" || status === "STALE_MATE") {
-        alertMessage(status);
+        handleEndGame({
+            title: "Thua cuộc",
+            state: "Hết nước đi",
+            status,
+            time: ALLIANCE === "WHITE" ? getTimeRemaining(timeWhite)
+                : getTimeRemaining(timeBlack),
+            turn: Math.floor(turn / 2),
+            winner: OPPONENT
+        });
     } else if (status === "IN_CHECK") {
         alert(status);
     }
@@ -1036,5 +1062,6 @@ export {
     receiveMoveFromOthers,
     turnWhite,
     enPassantMove,
-    turn
+    turn,
+    promotionPiece
 }

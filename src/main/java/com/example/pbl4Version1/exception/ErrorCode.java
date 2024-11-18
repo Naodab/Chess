@@ -1,8 +1,10 @@
 package com.example.pbl4Version1.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
+@Getter
 public enum ErrorCode {
 	UNCLASSIFIABLE(9999, "UNKOWN ERROR", HttpStatus.INTERNAL_SERVER_ERROR),
 	INVALID_KEY(1001, "Uncategorized Error", HttpStatus.BAD_REQUEST),
@@ -12,7 +14,6 @@ public enum ErrorCode {
     USER_NOT_EXISTED(1005, "User not existed", HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
-    INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST), 
     ROOM_NOT_EXISTED(1009, "Room not existed.", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1010, "Email existed.", HttpStatus.BAD_REQUEST), 
     INVALID_RESET_PASSWORD(1011, "Code is incorrect.", HttpStatus.BAD_REQUEST), 
@@ -21,25 +22,13 @@ public enum ErrorCode {
 	ROOM_HAD_PLAYER(1014, "Room had a player.", HttpStatus.BAD_REQUEST)
 	;
 	
-	private int code;
-	private String message;
-	private HttpStatusCode httpStatusCode;
+	private final int code;
+	private final String message;
+	private final HttpStatusCode httpStatusCode;
 
-	private ErrorCode(int code, String message, HttpStatusCode httpStatusCode) {
+	ErrorCode(int code, String message, HttpStatusCode httpStatusCode) {
 		this.code = code;
 		this.message = message;
 		this.httpStatusCode = httpStatusCode;
-	}
-
-	public int getCode() {
-		return code;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public HttpStatusCode getHttpStatusCode() {
-		return httpStatusCode;
 	}
 }

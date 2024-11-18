@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.example.pbl4Version1.dto.request.MatchWithHumanUpdateRequest;
 import com.example.pbl4Version1.entity.Room;
+import com.example.pbl4Version1.enums.GameStatus;
 import com.example.pbl4Version1.enums.PlayerType;
 import com.example.pbl4Version1.repository.StepRepisitory;
 import org.springframework.stereotype.Service;
@@ -51,8 +52,12 @@ public class MatchWithHumanService {
 
 		match = matchRepository.save(match);
 
+		match.getWhitePlayer().setBattleNumber(match.getWhitePlayer().getBattleNumber() + 1);
+		match.getBlackPlayer().setBattleNumber(match.getBlackPlayer().getBattleNumber() + 1);
 		room.setMatchActiveId(match.getId());
 		roomRepository.save(room);
+		userRepository.save(match.getBlackPlayer());
+		userRepository.save(match.getWhitePlayer());
 		return matchMapper.toMatchWithHumanResponse(match);
 	}
 	
@@ -70,8 +75,8 @@ public class MatchWithHumanService {
 		return matchMapper.toMatchWithHumanResponse(match);
 	}
 
-	public MatchWithHumanResponse updateMatchWithHuman(MatchWithHumanUpdateRequest request) {
-		MatchWithHuman match = matchRepository.findById(request.getMatchId())
+	public MatchWithHumanResponse updateMatchWithHuman(Long matchId, MatchWithHumanUpdateRequest request) {
+		MatchWithHuman match = matchRepository.findById(matchId)
 				.orElseThrow(() -> new AppException(ErrorCode.MATCH_NOT_EXISTED));
 		if (request.getTimeWhitePlayer() != null)
 			match.setTimeWhiteUser(request.getTimeWhitePlayer());
@@ -80,12 +85,18 @@ public class MatchWithHumanService {
 			match.setTimeBlackUser(request.getTimeBlackPlayer());
 
 		if (request.getWinnerId() != null) {
-			if (match.getBlackPlayer().getId().equals(request.getWinnerId()))
+			if (match.getBlackPlayer().getId().equals(request.getWinnerId())) {
 				match.setWinner(PlayerType.BLACK);
-			else if (match.getWhitePlayer().getId().equals(request.getWinnerId()))
+				match.getBlackPlayer().setWinNumber(match.getBlackPlayer().getWinNumber() + 1);
+			}
+			else if (match.getWhitePlayer().getId().equals(request.getWinnerId())) {
 				match.setWinner(PlayerType.WHITE);
+				match.getWhitePlayer().setWinNumber(match.getWhitePlayer().getWinNumber() + 1);
+			}
 			else if (request.getWinnerId().equalsIgnoreCase("DRAW")) {
 				match.setWinner(PlayerType.DRAW);
+				match.getBlackPlayer().setDrawNumber(match.getBlackPlayer().getDrawNumber() + 1);
+				match.getWhitePlayer().setDrawNumber(match.getWhitePlayer().getDrawNumber() + 1);
 			}
 
 			int[] newElo = calculateEloAfterMatch(match.getWhitePlayer().getElo(),
@@ -95,6 +106,8 @@ public class MatchWithHumanService {
 			match.getBlackPlayer().setElo(newElo[1]);
 			userRepository.save(match.getWhitePlayer());
 			userRepository.save(match.getBlackPlayer());
+			log.info(request.getGameStatus());
+			match.setGameStatus(GameStatus.valueOf(request.getGameStatus()));
 		}
 
 		match = matchRepository.save(match);

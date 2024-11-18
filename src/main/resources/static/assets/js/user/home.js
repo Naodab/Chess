@@ -9,8 +9,6 @@ import {
     renderFindRoom,
     renderEnterRoomWithPassword
 } from "./render.js";
-import {alertMessage} from "../chessjs/opponents/message.js";
-import {getRoom} from "./api/room.js";
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
@@ -103,9 +101,12 @@ function turnOnModal(renderFunction, attr) {
     overlay.style.zIndex = "100";
     overlay.innerHTML = renderFunction(attr);
 
-    $("#back").onclick =  function () {
-        turnOffModal();
-    };
+    const backBtn = $("#back");
+    if (backBtn) {
+        backBtn.onclick =  function () {
+            turnOffModal();
+        };
+    }
 }
 
 function turnOffModal() {

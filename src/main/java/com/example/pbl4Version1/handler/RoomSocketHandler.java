@@ -40,7 +40,9 @@ public class RoomSocketHandler {
         return webSocketSessions.size();
     }
 
-    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+    public void handleMessage(WebSocketSession session,
+                              WebSocketMessage<?> message)
+            throws Exception {
         if (message instanceof TextMessage) {
             String payload = ((TextMessage) message).getPayload();
             JsonNode jsonNode = mapper.readTree(payload);
@@ -68,7 +70,6 @@ public class RoomSocketHandler {
                     session.sendMessage(getDataTime());
                     payload = payload.substring(0, payload.length() - 1) + "," +
                             getDataTimeIgnoreType().getPayload().substring(1);
-                    log.info(payload);
                     message = new TextMessage(payload);
                 }
             }

@@ -1,5 +1,6 @@
 package com.example.pbl4Version1.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -152,6 +153,7 @@ public class RoomService {
 			roomUser = RoomUser.builder().user(user).room(room).role(Mode.VIEWER).build();
 		}
 		roomUserRepository.save(roomUser);
+		if (roomUsers == null) roomUsers = new ArrayList<>();
 		roomUsers.add(roomUser);
 		room.setRoomUsers(new HashSet<>(roomUsers));
 		return roomMapper.toRoomResponse(room);
