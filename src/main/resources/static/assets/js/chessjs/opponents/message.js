@@ -1,6 +1,9 @@
 import { OVERLAY } from "../helper/constants.js";
+import { OPPONENT } from "../index.js";
 
 const $ = document.querySelector.bind(document);
+const $$ = document.querySelectorAll.bind(document);
+
 
 function html([first, ...strings], ...values) {
     return values.reduce(
@@ -102,9 +105,12 @@ function turnOnOverlay(renderFunction, arg) {
     OVERLAY.style.zIndex = "100";
     OVERLAY.innerHTML = renderFunction(arg);
 
-    $("#back").onclick =  function () {
-        turnOnOverlay();
-    };
+    const backBtn = $("#back");
+    if (backBtn) {
+        backBtn.onclick =  function () {
+            turnOffOverlay();
+        };
+    }
 }
 
 function turnOffOverlay() {
@@ -149,10 +155,71 @@ function resolveConfirm(isConfirmed) {
     confirmResolve(isConfirmed);
 }
 
+
+function renderPromotion() {
+    return html`
+        <div id="prompt-pieces" class="modal active closure ${'alliance-' + OPPONENT.toLowerCase()}">
+            <div class="main-modal">
+                <div class="modal__function">
+                    <div class="rook prompt-piece" data-name="ROOK"></div>
+                    <div class="knight prompt-piece" data-name="KNIGHT"></div>
+                    <div class="bishop prompt-piece" data-name="BISHOP"></div>
+                    <div class="queen prompt-piece" data-name="QUEEN"></div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+let confirmPromotion;
+function promotion() {
+    turnOnOverlay(renderPromotion);
+
+    $$(".prompt-piece").forEach(piece => {
+        piece.onclick = () => resolvePromotion(piece.getAttribute("data-name"))
+    });
+
+    return new Promise(resolve => {
+        confirmPromotion = resolve;
+    });
+}
+
+function resolvePromotion(name) {
+    OVERLAY.innerHTML = "";
+    turnOffOverlay();
+    confirmPromotion(name);
+}
+
+function renderWinner({title, state, time, turn}) {
+    return html`
+        <div class="modal closure active" id="win-modal">
+            <h1 class="modal__title">${title}</h1>
+            <h3 class="modal__status">${state}!!!</h3>
+            <div class="closure modal-closure">
+                <div class="modal-closure-item item-icon" id="turn-icon"></div>
+                <div class="modal-closure-item item-text">Nước đi</div>
+                <div class="modal-closure-item item-data">${turn}</div>
+            </div>
+            <div class="closure modal-closure">
+                <div class="modal-closure-item item-icon" id="clock-icon"></div>
+                <div class="modal-closure-item item-text">Thời gian</div>
+                <div class="modal-closure-item item-data">${time}</div>
+            </div>
+            <div class="main-modal">
+                <h3 class="modal__elo modal-item"></h3>
+                <div class="modal__function">
+                    <div class="btn btn--green modal__btn" id="ok">Ok</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 export {
     renderWaitModal,
     renderMessage,
     renderConfirmModal,
+    renderWinner,
     turnOnGameModal,
     turnOffGameModal,
     turnOnOverlay,
@@ -160,5 +227,6 @@ export {
     innerStepAvatar,
     innerStepContainer,
     confirm,
+    promotion,
     alertMessage
 }

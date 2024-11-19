@@ -1,7 +1,9 @@
-import { countDownTime } from "../mode/play_online.js";
-import {alertMessage} from "./message.js";
+import {countDownTime, handleEndGame} from "../mode/play_online.js";
+import {ALLIANCE, ROOM} from "../index.js";
+import {turn} from "../event/global.js";
 
 const timeWhite = {
+    color: "WHITE",
     clock: null,
     endTime: 0,
     countDownInterval: null,
@@ -9,10 +11,20 @@ const timeWhite = {
 }
 
 const timeBlack = {
+    color: "BLACK",
     clock: null,
     endTime: 0,
     countDownInterval: null,
     isPaused: true
+}
+
+function getTimeRemaining(timeColor) {
+    const minute = parseInt(timeColor.clock
+        .querySelector(".minutes").textContent);
+    const second = parseInt(timeColor
+        .clock.querySelector(".seconds").textContent);
+
+    return ROOM.time * 60 - minute * 60 - second;
 }
 
 function updateCountDown(timeColor) {
@@ -22,14 +34,26 @@ function updateCountDown(timeColor) {
     const minutes = Math.floor(distance / (1000 * 60));
     const seconds = Math.floor(distance % (1000 * 60) / 1000);
 
-    timeColor.clock.querySelector(".minutes")
-        .textContent = minutes.toString().padStart(2, "0");
-    timeColor.clock.querySelector(".seconds")
-        .textContent = seconds.toString().padStart(2, "0");
+    const minutesDiv = timeColor.clock.querySelector(".minutes");
+    const secondsDiv = timeColor.clock.querySelector(".seconds");
+
+    minutesDiv.textContent = minutes.toString().padStart(2, "0");
+    secondsDiv.textContent = seconds.toString().padStart(2, "0");
 
     if (distance <= 0) {
+        minutesDiv.textContent = "00";
+        secondsDiv.textContent = "00";
+
         clearInterval(timeColor.countDownInterval);
-        alertMessage("Hết giờ");
+        handleEndGame({
+            title: ALLIANCE === timeColor.color ? "Thua cuộc" : "Chiến thắng",
+            state: "Hết giờ",
+            status: "TIME_OUT",
+            time: ALLIANCE === "WHITE" ? getTimeRemaining(timeWhite)
+                : getTimeRemaining(timeBlack),
+            turn: Math.floor(turn / 2),
+            winner: timeColor.color === "WHITE" ? "BLACK" : "WHITE",
+        });
     }
 }
 
@@ -60,4 +84,4 @@ function resetClock(whiteRemainTime = countDownTime,
     updateCountDown(timeWhite);
 }
 
-export { timeWhite, timeBlack, togglePause, resetClock }
+export { timeWhite, timeBlack, getTimeRemaining, togglePause, resetClock }

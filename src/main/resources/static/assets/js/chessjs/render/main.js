@@ -5,6 +5,7 @@ import {
 	turnWhite,
 	enPassantMove,
 	turn,
+	promotionPiece,
 	pushXToNameMove,
 	changeTurn,
 	setEnPassantMove,
@@ -36,7 +37,6 @@ const blackDefeatedPiece = {
 };
 const whiteMoves = [];
 const blackMoves = [];
-let promotionPiece;
 let turnDraw = 0;
 
 function globalStateRender() {
@@ -250,9 +250,6 @@ function beginPromotionPawn(piece) {
 }
 
 function finishPromotionPawn(name) {
-	OVERLAY.style.zIndex = "-1";
-	GB_CONTAINER.classList.remove("prompt");
-	PROMPT_PIECES.className = "";
 	const color = promotionPiece.piece_name.includes("WHITE") ? "WHITE_" : "BLACK_";
 	name = color + name;
 	let pieceCreate;

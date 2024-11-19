@@ -2,7 +2,9 @@ package com.example.pbl4Version1.enums;
 
 public enum GameStatus {
 	ONGOING,
-	CHECKMATE,
-	STALEMATE,
-	SURRENDER
+	CHECK_MATE,
+	STALE_MATE,
+	SURRENDER,
+	DRAW,
+	TIME_OUT;
 }

@@ -5,12 +5,21 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-public class SocketConnectionHandler extends TextWebSocketHandler{
+public class LobbySocketHandler extends TextWebSocketHandler{
+    private static LobbySocketHandler instance;
+    private LobbySocketHandler() {}
+
+    public static LobbySocketHandler getInstance() {
+        if(instance == null) {
+            instance = new LobbySocketHandler();
+        }
+        return instance;
+    }
+
     List<WebSocketSession> webSocketSessions = Collections.synchronizedList(new ArrayList<>());
 
     @Override

@@ -1,5 +1,6 @@
 package com.example.pbl4Version1.controller;
 
+import com.example.pbl4Version1.dto.request.MatchWithHumanUpdateRequest;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.pbl4Version1.dto.request.MatchCreationRequest;
@@ -33,6 +34,13 @@ public class MatchWithHumanController {
 				.result(matchWithHumanService.getMatch(matchId))
 				.build();
 	}
-	
+
+	@PostMapping("/{matchId}")
+	ApiResponse<MatchWithHumanResponse> update(@PathVariable Long matchId,
+											   @RequestBody MatchWithHumanUpdateRequest request) {
+		return ApiResponse.<MatchWithHumanResponse>builder()
+				.result(matchWithHumanService.updateMatchWithHuman(matchId, request))
+				.build();
+	}
 	//Don't finish yet
 }

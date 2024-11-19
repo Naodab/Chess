@@ -9,8 +9,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MatchWithHumanUpdateRequest {
-    Long matchId;
     Integer timeWhitePlayer;
     Integer timeBlackPlayer;
+    String gameStatus;
     String winnerId;
 }

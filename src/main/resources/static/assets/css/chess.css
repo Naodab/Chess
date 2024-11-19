@@ -367,17 +367,6 @@
 }
 
 #prompt-pieces {
-    z-index: 3;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 340px;
-    transform: translate(-50%, -50%);
-    display: none;
-}
-
-.prompt #prompt-pieces {
-    display: flex;
 }
 
 #prompt-pieces .prompt-piece {

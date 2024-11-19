@@ -11,6 +11,17 @@
     }
 }
 
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        scale: 0;
+    }
+    to {
+        opacity: 1;
+        scale: 1;
+    }
+}
+
 :root {
     --primary: rgb(252, 211, 159);
     --text-color: rgb(252, 211, 159);
@@ -100,6 +111,7 @@ a {
     position: relative;
     display: none;
     min-width: 400px;
+    animation: zoomIn .3s ease;
 }
 
 .modal.active {
@@ -517,4 +529,55 @@ a {
     text-align: center;
     width: 100%;
     margin-bottom: 8px;
+}
+
+.modal__img {
+    width: 60px;
+    height: 40px;
+}
+
+#clock-icon {
+    background: url("../../img/icon/clock.png") no-repeat center center / cover;
+}
+
+#turn-icon {
+    background: url("../../img/icon/turn.png") no-repeat center center / cover;
+}
+
+#win-modal .closure {
+    border: 2px solid var(--text-color);
+}
+
+.modal-closure {
+    display: flex;
+    padding: 8px;
+    align-items: center;
+    border-radius: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 0 10px var(--overlay-color);
+}
+
+.modal-closure-item {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.modal-closure-item.item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    margin-right: 32px;
+}
+
+.modal-closure-item.item-text {
+    flex: 1;
+}
+
+.modal__status {
+    margin-bottom: 16px;
+    color: var(--pink-color);
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
+    text-align: center;
 }
