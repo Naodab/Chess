@@ -159,10 +159,54 @@ public class RoomService {
 		return roomMapper.toRoomResponse(room);
 	}
 
-	public void leaveRoom(Long id, LeaveRoomRequest leaveRoomRequest) {
+	public void leaveRoom(Long id) {
 		Room room = roomRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
-		User user = userRepository.findByUsername(leaveRoomRequest.getUsername()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+		var authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName();
+		User user = userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+		List<RoomUser> roomUsers = roomUserRepository.findByRoomId(id);
+		RoomUser roomUserToRemove = null;
+		for(RoomUser roomUser: roomUsers) {
+			if (roomUser.getUser().getId().equals(user.getId())) {
+				roomUserToRemove = roomUser;
+				break;
+			}
+		}
+		switch (roomUserToRemove.getRole()) {
+			case VIEWER:
+				roomUsers.remove(roomUserToRemove);
+				break;
+			case PLAYER:
+				RoomUser newPlayer = roomUsers.stream().filter(ru -> ru.getRole().equals(Mode.VIEWER)).findFirst().orElse(null);
+				if (newPlayer != null) {
+					newPlayer.setRole(Mode.PLAYER);
+					roomUserRepository.save(newPlayer);
+				} else {
+					//don't have a viewer when player leaves!
+				}
+				break;
+			case HOST:
+				RoomUser newHost = roomUsers.stream().filter(ru -> ru.getRole().equals(Mode.PLAYER)).findFirst().orElse(null);
+				if (newHost != null) {
+					newHost.setRole(Mode.HOST);
+					roomUserRepository.save(newHost);
+					RoomUser newPlayer2 = roomUsers.stream().filter(ru -> ru.getRole().equals(Mode.VIEWER)).findFirst().orElse(null);
+					if (newPlayer2 != null) {
+						newPlayer2.setRole(Mode.PLAYER);
+						roomUserRepository.save(newPlayer2);
+					} else {
+						//don't have a viewer when player leaves!
+
+					}
+				} else {
+					//don't have a player when host leaves!
+
+				}
+				break;
+		}
 		roomUserRepository.deleteByRoomIdAndUsername(room.getId(), user.getId());
+		if (roomUsers != null) roomUsers = new ArrayList<>();
+		room.setRoomUsers(new HashSet<>(roomUsers));
 	}
 	
 	public void deleteRoom(Long id) {

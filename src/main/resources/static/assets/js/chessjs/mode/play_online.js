@@ -25,6 +25,7 @@ import {changeTurn, globalEvent, receiveMoveFromOthers, turnWhite} from "../even
 import {initGameFromFenRender, initGameRender} from "../render/main.js";
 import {STEPS_CONTAINER} from "../helper/constants.js";
 import {resetClock, timeBlack, timeWhite, togglePause} from "../opponents/handleClock.js";
+//import {broadcastLeaveRoom}  from "../../user/home.js";
 
 const $ = document.querySelector.bind(document);
 const modalReadySelector = "#ready-confirm";
@@ -250,18 +251,19 @@ if (MODE === "PLAY_ONLINE") {
     }
 
     //NOTE: TODO: exit room!
-    $("#exit-room-button").onclick = () => {
-        alert("Click exit room!");
-        const data = {
-
-        }
+    $("#exit-room-button").onclick = async () => {
         fetch("../api/rooms/leaveRoom/" + sessionStorage.getItem("ROOM_ID"), {
-            method: "GET",
+            method: "DELETE",
             headers: {
                 "Content-type": "application/json",
                 "Authorization": "Bearer " + localStorage.getItem("TOKEN")
-            }
+            },
+        }).then(response => {
+            return response.ok;
         })
+        //broadcastLeaveRoom(sessionStorage.getItem("ROOM_ID"));
+        //notification
+        window.location.href = "../public/home";
     }
 }
 

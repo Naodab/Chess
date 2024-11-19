@@ -88,10 +88,10 @@ public class RoomController {
 	}
 
 	@DeleteMapping("/leaveRoom/{roomID}")
-	ApiResponse<?> leaveRoom(@PathVariable("roomID") Long id, @RequestBody LeaveRoomRequest request) {
-		roomService.leaveRoom(id, request);
+	ApiResponse<?> leaveRoom(@PathVariable("roomID") Long id) {
+		roomService.leaveRoom(id);
 		return ApiResponse.builder()
-				.message("User " + request.getUsername() + " has left room with roomID = " + request.getRoomId())
+				.message("Delete that user out of roomUser successfully!")
 				.build();
 	}
 }

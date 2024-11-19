@@ -45,6 +45,9 @@ function initializeWebsocket() {
                 else if (data.type === "JOIN_ROOM_AS_PLAYER" || data.type === "JOIN_ROOM_AS_VIEWER") {
                     updateRoomUI(data);
                 }
+                else if (data.type === "LEAVE_ROOM") {
+                    updateLeaveRoomUI(data);
+                }
             }
         });
 }
@@ -513,3 +516,22 @@ function updateRoomUI(room) {
         peopleElement.textContent = (currentPeople + 1) + "";
     }
 }
+
+function broadcastLeaveRoom(roomId) {
+    const dataToSend = {
+        type: "LEAVE_ROOM",
+        id: roomId
+    }
+    ws.send(JSON.stringify(dataToSend))
+}
+
+function updateLeaveRoomUI(roomId) {
+    const roomRow = document.querySelector(`[data-id='${roomId}']`);
+    if (roomRow) {
+        let peopleElement = roomRow.querySelector(".room-people");
+        let currentPeople = parseInt(peopleElement.textContent);
+        peopleElement.textContent = (currentPeople - 1) + "";
+    }
+}
+
+export {broadcastLeaveRoom}
