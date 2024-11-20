@@ -44,6 +44,7 @@ function initializeWebsocket() {
                     updateRoomUI(data);
                 }
                 else if (data.type === "LEAVE_ROOM") {
+                    console.log("Ready to do in leave_room");
                     updateLeaveRoomUI(data);
                 }
             }
@@ -518,21 +519,11 @@ function updateRoomUI(room) {
     }
 }
 
-function broadcastLeaveRoom(roomId) {
-    const dataToSend = {
-        type: "LEAVE_ROOM",
-        id: roomId
-    }
-    ws.send(JSON.stringify(dataToSend))
-}
-
-function updateLeaveRoomUI(roomId) {
-    const roomRow = document.querySelector(`[data-id='${roomId}']`);
+function updateLeaveRoomUI(room) {
+    const roomRow = document.querySelector(`[data-id='${room.id}']`);
     if (roomRow) {
         let peopleElement = roomRow.querySelector(".room-people");
         let currentPeople = parseInt(peopleElement.textContent);
         peopleElement.textContent = (currentPeople - 1) + "";
     }
 }
-
-export {broadcastLeaveRoom}

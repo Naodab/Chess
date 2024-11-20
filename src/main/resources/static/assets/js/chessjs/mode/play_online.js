@@ -309,8 +309,11 @@ if (MODE === "PLAY_ONLINE") {
         }).then(response => {
             return response.ok;
         })
-        //broadcastLeaveRoom(sessionStorage.getItem("ROOM_ID"));
-        //notification
+        const dataToSend = {
+            type: "LEAVE_ROOM",
+            id: sessionStorage.getItem("ROOM_ID")
+        };
+        ws.send(JSON.stringify(dataToSend));
         window.location.href = "../public/home";
     }
 }
