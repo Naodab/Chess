@@ -102,6 +102,7 @@
     align-items: center;
     padding: 8px;
     height: 100%;
+    transition: all .6s ease-in-out;
 }
 
 .player-info .content {

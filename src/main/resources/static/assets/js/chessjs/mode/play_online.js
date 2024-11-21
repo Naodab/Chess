@@ -111,6 +111,7 @@ function initializeWebsocket() {
                     // TODO: render viewers
                 }
                 ROOM.matchActiveId = room.matchActiveId;
+                console.log(ROOM);
                 setRoom(ROOM);
             });
         } else if (data.type === "READY") {
@@ -118,13 +119,14 @@ function initializeWebsocket() {
                 isOpponentReady = true;
                 checkIfBothReady();
             }
-            if (isMatchExecute && ROLE === "VIEWER") {
-                setRoom(ROOM);
+            if (ROLE === "VIEWER") {
+                setRoomAndComponents(ROOM);
             }
         } else if (data.type === "BEGIN_MATCH") {
             setMatchActiveId(data.matchId);
             getMatch("human", data.matchId).then(match => {
                 sessionStorage.setItem("MATCH_ID", match.id);
+                console.log(ROOM.matchNumber);
                 initStepsContainer();
                 reCreateGame();
                 setTurnNumber(0);
@@ -211,27 +213,6 @@ function addMessages(user, message, isOther = false) {
     scrollableElement.scrollTop = scrollableElement.scrollHeight;
 }
 
-const sendMessageBtn = $("#send-message");
-if (sendMessageBtn) {
-    sendMessageBtn.onclick = () => {
-        const messageContent = $("#send-chat-input");
-        if (messageContent !== "") {
-            const user = {
-                "username": sessionStorage.getItem("USERNAME"),
-                "avatar": avatar
-            }
-            const dataToSend = {
-                "type": "SEND_MESSAGE",
-                "user": user,
-                "message": messageContent.value
-            }
-            addMessages(user, messageContent.value);
-            ws.send(JSON.stringify(dataToSend));
-            messageContent.value = "";
-        }
-    }
-}
-
 function handleEndGame(data) {
     turnOnOverlay(renderWinner, data);
 
@@ -242,6 +223,7 @@ function handleEndGame(data) {
         togglePause(timeBlack);
     }
 
+    setMatchNumber(ROOM.matchNumber + 1);
     if (ROLE === "HOST") {
         let winnerId = "DRAW";
         switch (data.winner) {
@@ -304,6 +286,7 @@ function checkIfBothReady() {
             ws.send(JSON.stringify(sendData));
 
             sessionStorage.setItem("MATCH_ID", data.id);
+            console.log(ROOM.matchNumber);
             setMatchActiveId(data.id);
             reCreateGame();
             initStepsContainer();
@@ -317,6 +300,28 @@ function checkIfBothReady() {
 }
 
 if (MODE === "PLAY_ONLINE") {
+    $("#send-message").onclick = () => {
+        const messageContent = $("#send-chat-input");
+        if (messageContent !== "") {
+            const user = {
+                "username": sessionStorage.getItem("USERNAME"),
+                "avatar": me.avatar
+            }
+            const dataToSend = {
+                "type": "SEND_MESSAGE",
+                "user": user,
+                "message": messageContent.value
+            }
+            addMessages(user, messageContent.value);
+            ws.send(JSON.stringify(dataToSend));
+            messageContent.value = "";
+        }
+    }
+
+    $("#send-chat-input").onkeyup = event => {
+        if (event.keyCode === 13) $("#send-message").click();
+    }
+
     $("#flag-lose").onclick = () => {
         //TODO:
     }
