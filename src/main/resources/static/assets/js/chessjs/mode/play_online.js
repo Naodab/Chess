@@ -13,6 +13,7 @@ import {
     reCreateGame,
     initComponent,
     setMatchActiveId,
+    matchNumber,
     setMatchNumber,
     addSteps,
     setRoomAndComponents,
@@ -241,7 +242,6 @@ function handleEndGame(data) {
         togglePause(timeBlack);
     }
 
-    setMatchNumber(ROOM.matchNumber + 1);
     if (ROLE === "HOST") {
         let winnerId = "DRAW";
         switch (data.winner) {
@@ -334,18 +334,22 @@ if (MODE === "PLAY_ONLINE") {
     }
 
     //NOTE: TODO: exit room!
-    $("#exit-room-button").onclick = () => {
-        alert("Click exit room!");
-        const data = {
-
-        }
+    $("#exit-room-button").onclick = async () => {
         fetch("../api/rooms/leaveRoom/" + sessionStorage.getItem("ROOM_ID"), {
-            method: "GET",
+            method: "DELETE",
             headers: {
                 "Content-type": "application/json",
                 "Authorization": "Bearer " + localStorage.getItem("TOKEN")
-            }
+            },
+        }).then(response => {
+            return response.ok;
         })
+        const dataToSend = {
+            type: "LEAVE_ROOM",
+            id: sessionStorage.getItem("ROOM_ID")
+        };
+        ws.send(JSON.stringify(dataToSend));
+        window.location.href = "../public/home";
     }
 }
 

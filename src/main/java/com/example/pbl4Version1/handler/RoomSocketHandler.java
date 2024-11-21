@@ -91,9 +91,8 @@ public class RoomSocketHandler {
                     message = new TextMessage(payload);
                 }
                 case "LEAVE_ROOM" -> {
-                    // TODO: call broadcast of lobby socket handler to send message
-                    // should write a broadcast function in lobbySocketHandler to send this message
-                    // use lobbySocketHandler above
+                    String roomId = jsonNode.get("id").asText();
+                    lobbySocketHandler.broadcastMessage(jsonStringLeaveRoom(roomId));
                 }
             }
         }
@@ -101,6 +100,15 @@ public class RoomSocketHandler {
             if (session.equals(webSocketSession)) continue;
             webSocketSession.sendMessage(message);
         }
+    }
+
+    private String jsonStringLeaveRoom(String roomId) {
+        String jsonString = "";
+        jsonString = "{" +
+                "\"type\": \"LEAVE_ROOM\"," +
+                "\"id\":" + roomId +
+                "}";
+        return jsonString;
     }
 
     private void broadCast(TextMessage message) throws IOException {
