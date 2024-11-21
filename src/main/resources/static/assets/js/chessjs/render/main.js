@@ -313,7 +313,7 @@ function renderStepItem(index) {
 		</div>
 	`;
 	STEPS_CONTAINER.appendChild(div);
-	STEPS_CONTAINER.scrollLeft = STEPS_CONTAINER.scrollWidth;
+	div.scrollIntoView({ behavior: "smooth" });
 }
 
 function renderStep(nameMove, color) {

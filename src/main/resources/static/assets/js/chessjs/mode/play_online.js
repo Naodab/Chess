@@ -1,7 +1,7 @@
 import {
     renderMessage,
     turnOnGameModal,
-    turnOffGameModal, turnOnOverlay, renderWinner, turnOffOverlay
+    turnOffGameModal, turnOnOverlay, renderWinner, turnOffOverlay, innerPerson
 } from "../opponents/message.js";
 import {
     ROLE,
@@ -35,6 +35,7 @@ import {STEPS_CONTAINER} from "../helper/constants.js";
 import {getTimeRemaining, resetClock, timeBlack, timeWhite, togglePause} from "../opponents/handleClock.js";
 
 const $ = document.querySelector.bind(document);
+const $$ = document.querySelectorAll.bind(document);
 const modalReadySelector = "#ready-confirm";
 const modalWaitSelector = "#wait-others";
 
@@ -43,6 +44,9 @@ let me;
 let isMySelfReady = false;
 let isOpponentReady = false;
 let countDownTime;
+let isChatRendered = false;
+
+let persons = [];
 
 function handleReadyModal() {
     turnOnGameModal(modalReadySelector);
@@ -66,6 +70,7 @@ function initializeWebsocket() {
     ws.onopen = function () {
         console.log("Websocket to broadcast in a room is now opened! - RoomID: " + sessionStorage.getItem("ROOM_ID"));
         getRoom(sessionStorage.getItem("ROOM_ID")).then(room => {
+            $("#id-room").textContent = room.id;
             setRoomData(room);
             switch (ROLE) {
                 case "HOST":
@@ -90,6 +95,11 @@ function initializeWebsocket() {
                 time: ROOM.time * 60
             }
             ws.send(JSON.stringify(dataToSend));
+            addPerson(room.host, "HOST");
+            if (room.player)
+                addPerson(room.player, "PLAYER");
+            if (room.viewers)
+                room.viewers.forEach(viewer => addPerson(viewer, "VIEWER"));
         });
     }
 
@@ -99,7 +109,19 @@ function initializeWebsocket() {
             addMessages(data.user, data.message, true);
         } else if (data.type === "ENTER_ROOM") {
             getRoom(ROOM.id).then(room => {
+                let isExisted = false;
                 const other = data.user;
+                if (ROOM.host.username === other.username)
+                    isExisted = true;
+                else if (ROOM.player && ROOM.player.username === other.username)
+                    isExisted = true;
+                else
+                    isExisted = ROOM.viewers.some(viewer => viewer.username === other.username);
+
+                if(!isExisted) {
+                    addPerson(other, other.role);
+                }
+
                 if (other.role === "PLAYER") {
                     ROOM.player = room.player;
                     initComponent(other, OPPONENT.toLowerCase());
@@ -108,8 +130,8 @@ function initializeWebsocket() {
                     }
                 } else if (other.role === "VIEWER") {
                     ROOM.viewers = room.viewers;
-                    // TODO: render viewers
                 }
+
                 ROOM.matchActiveId = room.matchActiveId;
                 console.log(ROOM);
                 setRoom(ROOM);
@@ -208,9 +230,36 @@ function addMessages(user, message, isOther = false) {
         div.classList.add("other");
     }
     div.innerHTML = renderMessage(user, message);
-    document.querySelector(".chat-list").appendChild(div);
-    const scrollableElement = $(".chat-list");
-    scrollableElement.scrollTop = scrollableElement.scrollHeight;
+    const chatList = $(".chat-list");
+    chatList.appendChild(div);
+    div.scrollIntoView({ behavior: "smooth" });
+}
+
+function addPerson(person, role) {
+    person.role = role;
+    persons.push(person);
+    const div = document.createElement('div');
+    div.classList.add("person");
+    div.id = person.username;
+    div.innerHTML = innerPerson(person);
+    if (ROLE !== "HOST" || person.role === "HOST") {
+        div.classList.add("non-host");
+    }
+    $(".person-list").appendChild(div);
+    div.onclick = () => {
+        // TODO: forbidden s.o to join room
+    }
+}
+
+// use for receive leave room from server
+function removePerson({username}) {
+    const index = persons.findIndex(person => person.username === username);
+    if (index > -1) {
+        persons.splice(index, 1);
+    }
+    const personList = $(".person-list");
+    const div = personList.querySelector(`#${username}`);
+    personList.removeChild(div);
 }
 
 function handleEndGame(data) {
@@ -300,25 +349,49 @@ function checkIfBothReady() {
 }
 
 if (MODE === "PLAY_ONLINE") {
-    $("#send-message").onclick = () => {
-        const messageContent = $("#send-chat-input");
-        if (messageContent !== "") {
-            const user = {
-                "username": sessionStorage.getItem("USERNAME"),
-                "avatar": me.avatar
+    const btnHeader = $$(".right-item__header.online-header");
+    btnHeader.forEach(header => {
+        header.onclick = () => {
+            if (isChatRendered) {
+                $(".right-item__header.online-header.header__room")
+                    .classList.add("active");
+                $(".right-item__header.online-header.header__message")
+                    .classList.remove("active");
+
+                $(".persons").classList.add("active");
+                $(".chats").classList.remove("active");
+            } else {
+                $(".right-item__header.online-header.header__room")
+                    .classList.remove("active");
+                $(".right-item__header.online-header.header__message")
+                    .classList.add("active");
+
+                $(".persons").classList.remove("active");
+                $(".chats").classList.add("active");
             }
-            const dataToSend = {
-                "type": "SEND_MESSAGE",
-                "user": user,
-                "message": messageContent.value
-            }
-            addMessages(user, messageContent.value);
-            ws.send(JSON.stringify(dataToSend));
-            messageContent.value = "";
+            isChatRendered = !isChatRendered;
         }
+    });
+
+    const sendChatInput = $("#send-chat-input");
+    $("#send-message").onclick = () => {
+        const messageContent = sendChatInput.value.trim();
+        if (!messageContent) return;
+        const user = {
+            "username": sessionStorage.getItem("USERNAME"),
+            "avatar": me.avatar
+        }
+        const dataToSend = {
+            "type": "SEND_MESSAGE",
+            "user": user,
+            "message": messageContent
+        }
+        addMessages(user, messageContent);
+        ws.send(JSON.stringify(dataToSend));
+        sendChatInput.value = "";
     }
 
-    $("#send-chat-input").onkeyup = event => {
+    sendChatInput.onkeyup = event => {
         if (event.keyCode === 13) $("#send-message").click();
     }
 

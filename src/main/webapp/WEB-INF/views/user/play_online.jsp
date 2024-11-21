@@ -86,20 +86,39 @@
 
         <div class="right-panel">
             <div class="closure right-item chat-function">
-                <div class="right-item__header">
-                    <i class="fa-solid fa-comments header-img"></i>
-                    <div class="right-item__title">Tin nhắn</div>
-                </div>
-                <div class="chats">
-                    <div class="chat-container scrollable-element">
-                        <div class="chat-list"></div>
+                <div class="right-item__header-container">
+                    <div class="right-item__header online-header header__room active">
+                        <i class="fa-solid fa-money-bills header-img"></i>
+                        <div class="right-item__title">Phòng</div>
                     </div>
-                    <div class="chat-input">
-                        <input type="text" id="send-chat-input" placeholder="Nhập tin nhắn" >
-                        <i class="fa-solid fa-paper-plane send-icon" id="send-message"></i>
+                    <div class="right-item__header online-header header__message">
+                        <i class="fa-solid fa-comments header-img"></i>
+                        <div class="right-item__title">Tin nhắn</div>
                     </div>
                 </div>
+                <div class="right-item__body">
+                    <div class="persons body-item active">
+                        <div class="body-header">
+                            Mã phòng:
+                            <span class="id-container" id="id-room"></span>
+                        </div>
+                        <div class="persons-container scrollable-element">
+                            <div class="person-list"></div>
+                        </div>
+                    </div>
+                    <div class="chats body-item">
+                        <div class="chat-container scrollable-element">
+                            <div class="chat-list"></div>
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" id="send-chat-input" placeholder="Nhập tin nhắn" >
+                            <i class="fa-solid fa-paper-plane send-icon" id="send-message"></i>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+
             <div class="closure steps-container right-item">
                 <div class="right-item__header">
                     <i class="fa-solid fa-arrow-right-arrow-left header-img"></i>

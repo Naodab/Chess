@@ -102,6 +102,29 @@ function innerStepAvatar(avatarWhite = "../assets/img/robot.png",
     `;
 }
 
+function innerPerson(person) {
+    let role = "Chủ phòng";
+    switch (person.role) {
+        case "PLAYER":
+            role = "Người chơi";
+            break;
+        case "VIEWER":
+            role = "Người xem";
+            break;
+    }
+    return html`
+        <div class="person-avatar"
+             style="background: url('${person.avatar}') no-repeat center center / cover">
+        </div>
+        <div class="person-info">
+            ${person.username}
+            <span class="person-elo">${person.elo}</span>
+        </div>
+        <div class="person-role">${role}</div>
+        <i class="fa-solid fa-xmark person-delete"></i>
+    `;
+}
+
 function turnOnOverlay(renderFunction, arg) {
     OVERLAY.style.zIndex = "100";
     OVERLAY.innerHTML = renderFunction(arg);
@@ -227,6 +250,7 @@ export {
     turnOffOverlay,
     innerStepAvatar,
     innerStepContainer,
+    innerPerson,
     confirm,
     promotion,
     alertMessage

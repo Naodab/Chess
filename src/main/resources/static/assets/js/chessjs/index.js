@@ -183,6 +183,7 @@ function addSteps(steps) {
                         </div>
                     `;
             STEPS_CONTAINER.appendChild(div);
+            div.scrollIntoView({ behavior: "smooth" });
         } else {
             const steps = document.querySelectorAll('.step');
             const lastStep = steps[steps.length - 1];
