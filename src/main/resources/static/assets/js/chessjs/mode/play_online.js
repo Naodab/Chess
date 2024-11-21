@@ -13,15 +13,22 @@ import {
     reCreateGame,
     initComponent,
     setMatchActiveId,
-    matchNumber,
     setMatchNumber,
     addSteps,
     setRoomAndComponents,
-    ALLIANCE, matchActiveId, globalState
+    ALLIANCE, matchActiveId, globalState, setIsMatchExecute, setRoomData, isMatchExecute, initStepsContainer
 } from "../index.js";
 import {getRoom} from "../../user/api/room.js";
 import {createMatchOnline, getMatch} from "../../user/api/match.js";
-import {changeTurn, globalEvent, receiveMoveFromOthers, turnWhite} from "../event/global.js";
+import {
+    changeTurn,
+    globalEvent,
+    isEndGame,
+    receiveMoveFromOthers,
+    setIsEndGame,
+    setTurnNumber,
+    turnWhite
+} from "../event/global.js";
 import {initGameFromFenRender, initGameRender} from "../render/main.js";
 import {STEPS_CONTAINER} from "../helper/constants.js";
 import {getTimeRemaining, resetClock, timeBlack, timeWhite, togglePause} from "../opponents/handleClock.js";
@@ -47,32 +54,8 @@ function handleReadyModal() {
         ws.send(JSON.stringify(sendData));
         turnOffGameModal(modalReadySelector);
         turnOnGameModal(modalWaitSelector);
+        checkIfBothReady();
     }
-
-    let internal = setInterval(() => {
-        if (isOpponentReady && isMySelfReady) {
-            clearInterval(internal);
-            turnOffGameModal(modalWaitSelector);
-            if (ROLE === "HOST") {
-                createMatchOnline(whitePlayer.id, blackPlayer.id, ROOM.id).then(data => {
-                    const sendData = {
-                        type: "BEGIN_MATCH",
-                        matchId: data.id,
-                        number: matchNumber,
-                        time: ROOM.time * 60
-                    }
-                    ws.send(JSON.stringify(sendData));
-
-                    sessionStorage.setItem("MATCH_ID", data.id);
-                    setMatchActiveId(data.id);
-                    setMatchNumber(matchNumber + 1);
-                    reCreateGame();
-                    resetClock(data.timeWhite, data.timeBlack);
-                    togglePause(timeWhite);
-                });
-            }
-        }
-    }, 200);
 }
 
 function initializeWebsocket() {
@@ -82,7 +65,7 @@ function initializeWebsocket() {
     ws.onopen = function () {
         console.log("Websocket to broadcast in a room is now opened! - RoomID: " + sessionStorage.getItem("ROOM_ID"));
         getRoom(sessionStorage.getItem("ROOM_ID")).then(room => {
-            setRoomAndComponents(room);
+            setRoomData(room);
             switch (ROLE) {
                 case "HOST":
                     me = room.host;
@@ -101,19 +84,69 @@ function initializeWebsocket() {
                     username: sessionStorage.getItem("USERNAME"),
                     avatar: me.avatar,
                     elo: me.elo,
-                    role: ROLE
-                }
+                    role: ROLE,
+                },
+                time: ROOM.time * 60
             }
             ws.send(JSON.stringify(dataToSend));
+        });
+    }
 
-            if (ROLE === "PLAYER" && !matchActiveId) {
+    ws.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        if (data.type === "SEND_MESSAGE") {
+            addMessages(data.user, data.message, true);
+        } else if (data.type === "ENTER_ROOM") {
+            getRoom(ROOM.id).then(room => {
+                const other = data.user;
+                if (other.role === "PLAYER") {
+                    ROOM.player = room.player;
+                    initComponent(other, OPPONENT.toLowerCase());
+                    if (ROLE !== "VIEWER" && !matchActiveId) {
+                        setTimeout(() => handleReadyModal(), 2000);
+                    }
+                } else if (other.role === "VIEWER") {
+                    ROOM.viewers = room.viewers;
+                    // TODO: render viewers
+                }
+                ROOM.matchActiveId = room.matchActiveId;
+                setRoom(ROOM);
+            });
+        } else if (data.type === "READY") {
+            if (data.isReady) {
+                isOpponentReady = true;
+                checkIfBothReady();
+            }
+            if (isMatchExecute && ROLE === "VIEWER") {
+                setRoom(ROOM);
+            }
+        } else if (data.type === "BEGIN_MATCH") {
+            setMatchActiveId(data.matchId);
+            getMatch("human", data.matchId).then(match => {
+                sessionStorage.setItem("MATCH_ID", match.id);
+                initStepsContainer();
+                reCreateGame();
+                setTurnNumber(0);
+                resetClock(match.timeWhite, match.timeBlack);
+                togglePause(timeWhite);
+                changeTurn(true);
+                setIsEndGame(false);
+            });
+        } else if (data.type === "STEP") {
+            receiveMoveFromOthers(data);
+            handleDataTime(data);
+        } else if (data.type === "RESPONSE_ENTER_ROOM") {
+            setMatchNumber(data.matchNumber);
+            setIsMatchExecute(data.isMatchExecute);
+            setRoomAndComponents(ROOM);
+            if (ROLE === "PLAYER" && !isMatchExecute) {
                 setTimeout(() => handleReadyModal(), 2000);
             }
 
-            // for reload page and for when viewers enter room
-            if (matchActiveId) {
+            if (isMatchExecute) {
                 getMatch("human", matchActiveId).then(match => {
                     sessionStorage.setItem("MATCH_ID", match.id);
+                    initStepsContainer();
                     let steps = match.steps;
                     if (steps.length === 0) {
                         initGameRender(globalState);
@@ -130,40 +163,8 @@ function initializeWebsocket() {
                     }
                     if (ROLE !== "VIEWER") globalEvent();
                 });
+                handleDataTime(data);
             }
-        });
-    }
-
-    ws.onmessage = function (event) {
-        const data = JSON.parse(event.data);
-        if (data.type === "SEND_MESSAGE") {
-            addMessages(data.user, data.message, true);
-        } else if (data.type === "ENTER_ROOM") {
-            getRoom(ROOM.id).then(room => {
-                setRoom(room);
-                const other = data.user;
-                if (other.role === "PLAYER") {
-                    initComponent(other, OPPONENT.toLowerCase());
-                    if (ROLE !== "VIEWER" && !matchActiveId) {
-                        setTimeout(() => handleReadyModal(), 2000);
-                    }
-                }
-            });
-        } else if (data.type === "READY") {
-            if (data.isReady) {
-                isOpponentReady = true;
-            }
-        } else if (data.type === "BEGIN_MATCH") {
-            setMatchActiveId(data.matchId);
-            getMatch("human", data.matchId).then(match => {
-                sessionStorage.setItem("MATCH_ID", match.id);
-                reCreateGame();
-                resetClock(match.timeWhite, match.timeBlack);
-                togglePause(timeWhite);
-            });
-        } else if (data.type === "STEP") {
-            receiveMoveFromOthers(data);
-            handleDataTime(data);
         } else if (data.type === "DATA_TIME") {
             handleDataTime(data);
         }
@@ -182,11 +183,13 @@ function handleDataTime(data) {
     resetClock(whiteRemainingTime, blackRemainingTime);
     const isTurnWhite = data.turnWhite;
     changeTurn(isTurnWhite);
-    let timeColor = timeWhite;
-    if (!turnWhite) {
-        timeColor = timeBlack;
+    if (!isEndGame) {
+        let timeColor = timeWhite;
+        if (!turnWhite) {
+            timeColor = timeBlack;
+        }
+        togglePause(timeColor);
     }
-    togglePause(timeColor);
 }
 
 window.addEventListener("load", () => {
@@ -230,6 +233,7 @@ if (sendMessageBtn) {
 
 function handleEndGame(data) {
     turnOnOverlay(renderWinner, data);
+
     if (!timeWhite.isPaused) {
         togglePause(timeWhite);
     }
@@ -237,6 +241,7 @@ function handleEndGame(data) {
         togglePause(timeBlack);
     }
 
+    setMatchNumber(ROOM.matchNumber + 1);
     if (ROLE === "HOST") {
         let winnerId = "DRAW";
         switch (data.winner) {
@@ -247,6 +252,7 @@ function handleEndGame(data) {
                 winnerId = blackPlayer.id;
                 break;
         }
+
         const dataSend = {
             type: "END_MATCH",
             timeWhitePlayer: getTimeRemaining(timeWhite),
@@ -254,6 +260,7 @@ function handleEndGame(data) {
             gameStatus: data.status,
             winnerId
         }
+
         fetch("/chess/api/matches/human/" + matchActiveId, {
             method: "POST",
             headers: {
@@ -262,21 +269,52 @@ function handleEndGame(data) {
             },
             body: JSON.stringify(dataSend)
         }).then(response => response.json())
-            .then(data => {
-                // TODO: reset match
-                setMatchActiveId(0);
-                setMatchNumber(matchNumber + 1);
-                setRoom(ROOM);
-            })
-            .catch(error => console.log(error));
+        .then(data => {
+            ws.send(JSON.stringify({ type: "END_MATCH" }));
+        }).catch(error => console.log(error));
     }
+
     $("#ok").onclick = () => {
         turnOffOverlay();
+        if (ROLE !== "VIEWER") {
+            setTimeout(() => {
+                handleReadyModal();
+            }, 1000);
+        }
     }
-
-
 }
 
+function checkIfBothReady() {
+    if (!(isMySelfReady && isOpponentReady)) return;
+    timeWhite.isPaused = true;
+    timeBlack.isPaused = true;
+    turnOffGameModal(modalWaitSelector);
+    isMySelfReady = false;
+    isOpponentReady = false;
+    if (ROOM.matchNumber !== 0) {
+        setRoomAndComponents(ROOM);
+    }
+    if (ROLE === "HOST") {
+        createMatchOnline(whitePlayer.id, blackPlayer.id, ROOM.id).then(data => {
+            const sendData = {
+                type: "BEGIN_MATCH",
+                matchId: data.id,
+                time: ROOM.time * 60
+            }
+            ws.send(JSON.stringify(sendData));
+
+            sessionStorage.setItem("MATCH_ID", data.id);
+            setMatchActiveId(data.id);
+            reCreateGame();
+            initStepsContainer();
+            changeTurn(true);
+            setIsEndGame(false);
+            setTurnNumber(0);
+            resetClock(sendData.time, sendData.time);
+            togglePause(timeWhite);
+        });
+    }
+}
 
 if (MODE === "PLAY_ONLINE") {
     $("#flag-lose").onclick = () => {

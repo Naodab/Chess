@@ -34,6 +34,7 @@ let turn = 0;
 let nameMove = "";
 let promotionPiece;
 let namePromotion;
+let isEndGame = false;
 
 function pushXToNameMove() {
     nameMove = 'x' + nameMove;
@@ -52,14 +53,8 @@ function setTurnNumber(num) {
     turn = num;
 }
 
-function exchangeTurn() {
-    turnWhite = !turnWhite;
-    if (MODE === "PLAY_ONLINE") {
-        turnWhite = !turnWhite;
-        if (ALLIANCE === "WHITE")
-            togglePause(timeWhite)
-        else togglePause(timeBlack);
-    }
+function setIsEndGame(endGame) {
+    isEndGame = endGame;
 }
 
 function setEnPassantMove(position) {
@@ -878,14 +873,13 @@ async function moveOrCancelMove(square) {
                 finishPromotionPawn(namePromotion);
             }
             const status = moveStatus(OPPONENT.toLowerCase());
-            let isEndgame;
             if (status === "CHECK_MATE" || status === "STALE_MATE") {
                 nameMove += "#";
-                isEndgame = true;
+                isEndGame = true;
             } else if (status === "IN_CHECK") {
                 nameMove += "+";
             }
-            handleNameMove(nameMove);
+            handleNameMove(nameMove, true);
             if (MODE === "PLAY_WITH_BOT")
                 sendStepToServer(oldMove, square.id);
             else if (MODE === "PLAY_ONLINE") {
@@ -893,7 +887,7 @@ async function moveOrCancelMove(square) {
                 namePromotion = "";
             }
             nameMove = "";
-            if (isEndgame) {
+            if (isEndGame) {
                 handleEndGame({
                     title: "Chiến thắng",
                     state: "Hết nước đi!",
@@ -1003,6 +997,7 @@ async function sendStepToServer(from, to) {
 
 function sendStepToOthers(from, to, namePromotion) {
     const fen = generateFen();
+
     // send to server to save in database
     fetch("/chess/api/steps", {
         method: 'POST',
@@ -1020,7 +1015,6 @@ function sendStepToOthers(from, to, namePromotion) {
     if (namePromotion) {
         dataSend.namePromotion = namePromotion;
     }
-    // TODO: promotion to others
     ws.send(JSON.stringify(dataSend));
 }
 
@@ -1037,14 +1031,21 @@ function receiveMoveFromOthers({ from, to, name, namePromotion }) {
     }
     const status = moveStatus(ALLIANCE.toLowerCase());
     if (status === "CHECK_MATE" || status === "STALE_MATE") {
+        isEndGame = true;
+        let title = "";
+        if (ROLE === "VIEWER") {
+            title = (turnWhite ? "Trắng" : "Đen") + " chiến thắng.";
+        } else {
+            title = "Thua cuộc";
+        }
         handleEndGame({
-            title: "Thua cuộc",
+            title,
             state: "Hết nước đi",
             status,
-            time: ALLIANCE === "WHITE" ? getTimeRemaining(timeWhite)
+            time: turnWhite ? getTimeRemaining(timeWhite)
                 : getTimeRemaining(timeBlack),
             turn: Math.floor(turn / 2),
-            winner: OPPONENT
+            winner: turnWhite ? "WHITE" : "BLACK"
         });
     } else if (status === "IN_CHECK") {
         alert(status);
@@ -1058,10 +1059,12 @@ export {
     changeTurn,
     setEnPassantMove,
     setTurnNumber,
+    setIsEndGame,
     pushXToNameMove,
     receiveMoveFromOthers,
+    isEndGame,
     turnWhite,
     enPassantMove,
     turn,
-    promotionPiece
+    promotionPiece,
 }

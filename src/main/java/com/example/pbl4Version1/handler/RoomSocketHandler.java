@@ -11,6 +11,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,8 +24,11 @@ public class RoomSocketHandler {
     List<WebSocketSession> webSocketSessions;
     WebSocketSession hostSession;
     WebSocketSession playerSession;
-    private final ObjectMapper mapper = new ObjectMapper();
-    private TimeState timeState = null;
+    int time;
+    int matchNumber = 0;
+    final ObjectMapper mapper = new ObjectMapper();
+    TimeState timeState = null;
+    boolean isMatchExecute = false;
 
     public RoomSocketHandler() {
         webSocketSessions = Collections.synchronizedList(new ArrayList<>());
@@ -54,18 +58,30 @@ public class RoomSocketHandler {
                     String time = jsonNode.get("time").asText();
                     timeState = new TimeState(Long.parseLong(time));
                     timeState.startTimeWhite();
+                    isMatchExecute = true;
+                }
+                case "END_MATCH" -> {
+                    isMatchExecute = false;
+                    matchNumber++;
+                    timeState.stopAllClocks();
+                    return;
                 }
                 case "ENTER_ROOM" -> {
                     JsonNode user = jsonNode.get("user");
                     String role = user.get("role").asText();
+                    if (timeState == null) {
+                        timeState = new TimeState(Long
+                                .parseLong(jsonNode.get("time").asText()));
+                        timeState.startTimeWhite();
+                        timeState.toggleTimers();
+                        timeState.stopAllClocks();
+                    }
                     switch (role) {
                         case "HOST" -> hostSession = session;
                         case "PLAYER" -> playerSession = session;
                     }
-                    if (timeState != null) {
-                        TextMessage textMessage = getDataTime();
-                        session.sendMessage(textMessage);
-                    }
+                    session.sendMessage(getRoomInfo());
+                    log.info("send message to this session");
                 }
                 case "STEP" -> {
                     timeState.toggleTimers();
@@ -87,6 +103,26 @@ public class RoomSocketHandler {
         }
     }
 
+    private void broadCast(TextMessage message) throws IOException {
+        for (WebSocketSession webSocketSession : webSocketSessions) {
+            webSocketSession.sendMessage(message);
+        }
+    }
+
+    private TextMessage getRoomInfo() {
+        long timeWhite = timeState.getTimeWhiteRemaining();
+        long timeBlack = timeState.getTimeBlackRemaining();
+        String jsonString = "{" +
+                "\"type\": \"RESPONSE_ENTER_ROOM\"," +
+                "\"timeWhite\":" + timeWhite + "," +
+                "\"timeBlack\":" + timeBlack + "," +
+                "\"turnWhite\":" + timeState.isTurnWhite() + "," +
+                "\"isMatchExecute\":" + isMatchExecute + "," +
+                "\"matchNumber\":" + matchNumber +
+                 "}";
+        return new TextMessage(jsonString);
+    }
+
     private TextMessage getDataTime() {
         long timeWhite = timeState.getTimeWhiteRemaining();
         long timeBlack = timeState.getTimeBlackRemaining();
@@ -95,7 +131,7 @@ public class RoomSocketHandler {
                 "\"timeWhite\":" + timeWhite + "," +
                 "\"timeBlack\":" + timeBlack + "," +
                 "\"turnWhite\":" + timeState.isTurnWhite() +
-                 "}";
+                "}";
         return new TextMessage(jsonString);
     }
 
@@ -116,18 +152,21 @@ public class RoomSocketHandler {
     class TimeState {
         long timeWhiteDuration;
         long timeBlackDuration;
-        Instant timeWhiteEndTime;
-        Instant timeBlackEndTime;
+        Instant timeWhiteEndTime = Instant.now();
+        Instant timeBlackEndTime = Instant.now();
         boolean turnWhite = true;
+        boolean turnBlack = false;
 
         public synchronized void startTimeWhite() {
             timeWhiteEndTime = Instant.now().plusSeconds(timeWhiteDuration);
             turnWhite = true;
+            turnBlack = false;
         }
 
         public synchronized void startTimeBlack() {
             timeBlackEndTime = Instant.now().plusSeconds(timeBlackDuration);
             turnWhite = false;
+            turnBlack = true;
         }
 
         public synchronized long getTimeWhiteRemaining() {
@@ -140,6 +179,13 @@ public class RoomSocketHandler {
                     Instant.now().getEpochSecond()) : timeBlackDuration;
         }
 
+        public synchronized void stopAllClocks() {
+            timeWhiteDuration = getTimeWhiteDuration();
+            timeBlackDuration = getTimeWhiteDuration();
+            turnWhite = false;
+            turnBlack = false;
+        }
+
         public synchronized void toggleTimers() {
             if (turnWhite) {
                 timeWhiteDuration = getTimeWhiteRemaining();
@@ -148,6 +194,10 @@ public class RoomSocketHandler {
                 timeBlackDuration = getTimeBlackRemaining();
                 startTimeWhite();
             }
+        }
+
+        public synchronized boolean isStop() {
+            return !turnBlack && !turnWhite;
         }
 
         // call when createMatch

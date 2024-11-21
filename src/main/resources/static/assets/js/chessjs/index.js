@@ -1,11 +1,9 @@
 import { initGame } from "./data/data.js";
-import { initGameRender, initGameFromFenRender } from "./render/main.js";
+import {initGameRender, initGameFromFenRender, handleNameMove} from "./render/main.js";
 import { globalEvent } from "./event/global.js";
 import {ROOT_DIV, STEPS_CONTAINER} from "./helper/constants.js";
-import { renderMessage } from "./opponents/message.js";
+import {innerStepAvatar} from "./opponents/message.js";
 
-const playerInfo = document.querySelectorAll(".player-info");
-const defeatedPieces = document.querySelectorAll(".defeated-pieces");
 const gbContainer = document.querySelector(".game-board-container");
 
 let globalState = initGame();
@@ -22,6 +20,11 @@ let matchActiveId;
 let matchNumber = 0;
 let blackPlayer;
 let whitePlayer;
+let isMatchExecute = false;
+
+function setIsMatchExecute(execute) {
+    isMatchExecute = execute;
+}
 
 function reCreateGame() {
     globalState = initGame();
@@ -31,26 +34,30 @@ function reCreateGame() {
 }
 
 function setMatchNumber(number) {
-    matchNumber = number;
-    localStorage.setItem("MATCH_NUMBER", matchNumber);
+    ROOM.matchNumber = number;
 }
 
 function setMatchActiveId(id) {
     matchActiveId = id;
 }
 
-function setRoom(data) {
+function setRoomData(data) {
     ROOM = data;
     ROLE = getRole(sessionStorage.getItem("USERNAME"));
-    matchNumber = ROOM.matchNumber;
-    if (ROOM.matchActiveId)
-        matchNumber -= 1;
-    if (matchNumber % 2 === 0) {
+    matchActiveId = data.matchActiveId;
+}
+
+function setRoom(data) {
+    setRoomData(data);
+    if (ROOM.matchNumber % 2 === 0) {
         whitePlayer = ROOM.host;
         blackPlayer = ROOM.player;
         if (ROLE === "PLAYER") {
             ALLIANCE = "BLACK";
             OPPONENT = "WHITE";
+        } else {
+            ALLIANCE = "WHITE";
+            OPPONENT = "BLACK";
         }
     } else {
         whitePlayer = ROOM.player;
@@ -58,6 +65,9 @@ function setRoom(data) {
         if (ROLE === "HOST" || ROLE === "VIEWER") {
             ALLIANCE = "BLACK";
             OPPONENT = "WHITE"
+        } else {
+            ALLIANCE = "WHITE";
+            OPPONENT = "BLACK";
         }
     }
     matchActiveId = ROOM.matchActiveId;
@@ -73,6 +83,9 @@ function setRoomAndComponents(data) {
 }
 
 function loadPageFunction(alliance) {
+    const playerInfo = document.querySelectorAll(".player-info");
+    const defeatedPieces = document.querySelectorAll(".defeated-pieces");
+
     playerInfo.forEach(info => {
         if (info.classList.contains("alliance-black")) {
             info.classList.remove("alliance-black");
@@ -162,10 +175,10 @@ function addSteps(steps) {
             div.classList.add("step-item");
             div.innerHTML = `
                         <div class="step-index">${Math.floor(index / 2) + 1}</div>
-                        <div class="step-container">
+                        <div class="step-container alliance-white">
                             <div class="step">${step.name}</div>
                         </div>
-                        <div class="step-container">
+                        <div class="step-container alliance-black">
                             <div class="step"></div>
                         </div>
                     `;
@@ -195,6 +208,14 @@ function initComponent(player, color) {
     name.innerText = player.username;
     elo.innerText = player.elo;
     avatar.style.background = `url('${player.avatar}') no-repeat center center / cover`;
+}
+
+function initStepsContainer() {
+    const div = document.createElement("div");
+    div.classList.add("step-item");
+    div.innerHTML = innerStepAvatar(whitePlayer.avatar, blackPlayer.avatar);
+    STEPS_CONTAINER.innerHTML = "";
+    STEPS_CONTAINER.appendChild(div);
 }
 
 document.body.onload = async function () {
@@ -244,10 +265,14 @@ export {
     matchNumber,
     whitePlayer,
     blackPlayer,
+    isMatchExecute,
     addSteps,
+    initStepsContainer,
     setRoom,
     setRoomAndComponents,
     setMatchActiveId,
+    setIsMatchExecute,
+    setRoomData,
     reCreateGame,
     initComponent,
     setMatchNumber

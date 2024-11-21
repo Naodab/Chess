@@ -87,15 +87,16 @@ function innerStepContainer(step, index) {
     `;
 }
 
-function innerStepAvatar(avatar) {
+function innerStepAvatar(avatarWhite = "../assets/img/robot.png",
+                         avatarBlack = "../assets/img/robot.png") {
     return html`
         <div class="step-index">avatar</div>
         <div class="step-container">
-            <div class="step-avatar" style="background: url('${avatar}')
+            <div class="step-avatar" style="background: url('${avatarWhite}')
                 no-repeat center center / cover;"></div>
         </div>
         <div class="step-container">
-            <div class="step-avatar" style="background: url('../assets/img/robot.png')
+            <div class="step-avatar" style="background: url('${avatarBlack}')
                 no-repeat center center / cover;"></div>
         </div>
     `;

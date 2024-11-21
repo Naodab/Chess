@@ -1,5 +1,5 @@
 import {countDownTime, handleEndGame} from "../mode/play_online.js";
-import {ALLIANCE, ROOM} from "../index.js";
+import {ALLIANCE, ROLE, ROOM} from "../index.js";
 import {turn} from "../event/global.js";
 
 const timeWhite = {
@@ -45,12 +45,19 @@ function updateCountDown(timeColor) {
         secondsDiv.textContent = "00";
 
         clearInterval(timeColor.countDownInterval);
+        let title = ALLIANCE === timeColor.color ? "Thua cuộc" : "Chiến thắng";
+        let time = ALLIANCE === "WHITE" ? getTimeRemaining(timeWhite)
+                : getTimeRemaining(timeBlack);
+
+        if (ROLE === "VIEWER") {
+            title = ("WHITE" === timeColor.color ? "Đen" : "Trắng") + " chiến thắng" ;
+            time = "WHITE" === timeColor ? getTimeRemaining(timeBlack) : getTimeRemaining(timeWhite);
+        }
         handleEndGame({
-            title: ALLIANCE === timeColor.color ? "Thua cuộc" : "Chiến thắng",
+            title,
             state: "Hết giờ",
             status: "TIME_OUT",
-            time: ALLIANCE === "WHITE" ? getTimeRemaining(timeWhite)
-                : getTimeRemaining(timeBlack),
+            time,
             turn: Math.floor(turn / 2),
             winner: timeColor.color === "WHITE" ? "BLACK" : "WHITE",
         });
