@@ -1,15 +1,49 @@
 package com.example.pbl4Version1.utils;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import lombok.extern.slf4j.Slf4j;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Enumeration;
+
+@Slf4j
 public class NetworkUtils {
     public static String getLocalIPAddress() {
         try {
-            InetAddress inetAddress = InetAddress.getLocalHost();
-            return inetAddress.getHostAddress();
-        } catch (UnknownHostException e) {
-            return "Unable to get IP Address";
+            InetAddress result = null;
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+
+            while (networkInterfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = networkInterfaces.nextElement();
+
+                String interfaceName = networkInterface.getDisplayName().toLowerCase();
+                if (!interfaceName.contains("wi-fi") && !interfaceName.contains("wlan")) {
+                    continue;
+                }
+
+                if (!networkInterface.isUp() || networkInterface.isLoopback()) {
+                    continue;
+                }
+
+                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                while (inetAddresses.hasMoreElements()) {
+                    InetAddress inetAddress = inetAddresses.nextElement();
+
+                    if (inetAddress.isLoopbackAddress() || inetAddress.getHostAddress().contains(":")) {
+                        continue;
+                    }
+                    result = inetAddress;
+
+                    System.out.println("Interface: " + networkInterface.getDisplayName());
+                    System.out.println(inetAddress.getHostAddress());
+                }
+            }
+            return result.getHostAddress();
+        } catch (SocketException e) {
+            e.printStackTrace();
         }
+        return null;
     }
 }

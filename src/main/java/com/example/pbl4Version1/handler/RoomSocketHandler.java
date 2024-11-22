@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -21,25 +22,45 @@ import java.util.List;
 public class RoomSocketHandler {
     LobbySocketHandler lobbySocketHandler = LobbySocketHandler.getInstance();
 
+    final Long roomId;
     List<WebSocketSession> webSocketSessions;
+    List<String> forbiddenUsernames = new ArrayList<>();
     WebSocketSession hostSession;
     WebSocketSession playerSession;
-    int time;
     int matchNumber = 0;
     final ObjectMapper mapper = new ObjectMapper();
     TimeState timeState = null;
     boolean isMatchExecute = false;
 
-    public RoomSocketHandler() {
+    public RoomSocketHandler(long roomId) {
         webSocketSessions = Collections.synchronizedList(new ArrayList<>());
+        this.roomId = roomId;
     }
 
     public void add(WebSocketSession session) {
         webSocketSessions.add(session);
     }
 
-    public void remove(WebSocketSession session) {
+    public void remove(WebSocketSession session) throws IOException {
+        String username = session.getAttributes()
+                .get("username").toString();
+        String role = session.getAttributes()
+                .get("role").toString();
+
+        if (role.equals("HOST")) {
+            // update player to host
+            if (playerSession != null) {
+                hostSession = playerSession;
+                playerSession = null;
+            }
+
+        } else if (role.equals("PLAYER")) {
+            playerSession = null;
+        }
+        // update leaveRoom for room service
+        // broadcast user leave room
         webSocketSessions.remove(session);
+        broadCast(leaveRoom(username, role));
     }
 
     public int size() {
@@ -68,7 +89,14 @@ public class RoomSocketHandler {
                 }
                 case "ENTER_ROOM" -> {
                     JsonNode user = jsonNode.get("user");
+                    String username = user.get("username").asText();
+                    if (forbiddenUsernames.contains(username)) {
+                        session.sendMessage(banUser());
+                        return;
+                    }
+                    session.getAttributes().put("username", username);
                     String role = user.get("role").asText();
+                    session.getAttributes().put("role", role);
                     if (timeState == null) {
                         timeState = new TimeState(Long
                                 .parseLong(jsonNode.get("time").asText()));
@@ -83,6 +111,12 @@ public class RoomSocketHandler {
                     session.sendMessage(getRoomInfo());
                     log.info("send message to this session");
                 }
+                case "FORBIDDEN_USER" -> {
+                    String username = jsonNode.get("username").asText();
+                    forbiddenUsernames.add(username);
+                    sendIndividually(username, banUser());
+                    return;
+                }
                 case "STEP" -> {
                     timeState.toggleTimers();
                     session.sendMessage(getDataTime());
@@ -93,6 +127,7 @@ public class RoomSocketHandler {
                 case "LEAVE_ROOM" -> {
                     String roomId = jsonNode.get("id").asText();
                     lobbySocketHandler.broadcastMessage(jsonStringLeaveRoom(roomId));
+                    return;
                 }
             }
         }
@@ -100,6 +135,29 @@ public class RoomSocketHandler {
             if (session.equals(webSocketSession)) continue;
             webSocketSession.sendMessage(message);
         }
+    }
+
+    private void broadCast(TextMessage message) throws IOException {
+        for (WebSocketSession webSocketSession : webSocketSessions) {
+            webSocketSession.sendMessage(message);
+        }
+    }
+
+    private void sendIndividually(String username, TextMessage message)
+            throws IOException {
+        for (WebSocketSession session : webSocketSessions) {
+            if (session.getAttributes().get("username").equals(username)) {
+                session.sendMessage(message);
+                break;
+            }
+        }
+    }
+
+    private TextMessage banUser() {
+        String payload = "{" +
+                "\"type\": \"FORBIDDEN\"" +
+                "}";
+        return new TextMessage(payload);
     }
 
     private String jsonStringLeaveRoom(String roomId) {
@@ -111,10 +169,13 @@ public class RoomSocketHandler {
         return jsonString;
     }
 
-    private void broadCast(TextMessage message) throws IOException {
-        for (WebSocketSession webSocketSession : webSocketSessions) {
-            webSocketSession.sendMessage(message);
-        }
+    private TextMessage leaveRoom(String username, String role) {
+        String payload = "{" +
+                "\"type\": \"USER_LEAVE_ROOM\"," +
+                "\"username\":" + username + "," +
+                "\"role\":" + role + "," +
+                "}";
+        return new TextMessage(payload);
     }
 
     private TextMessage getRoomInfo() {

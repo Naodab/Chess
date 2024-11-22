@@ -195,7 +195,7 @@ function addSteps(steps) {
 function getRole(username) {
     if (ROOM.host.username === username) {
         return "HOST";
-    } else if (ROOM.player.username === username) {
+    } else if (ROOM.player && ROOM.player.username === username) {
         return "PLAYER";
     }
     return "VIEWER";

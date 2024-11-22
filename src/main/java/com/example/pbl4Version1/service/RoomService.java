@@ -1,9 +1,6 @@
 package com.example.pbl4Version1.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import com.example.pbl4Version1.dto.request.JoinRoomRequest;
 import com.example.pbl4Version1.dto.request.LeaveRoomRequest;
@@ -177,7 +174,8 @@ public class RoomService {
 				roomUsers.remove(roomUserToRemove);
 				break;
 			case PLAYER:
-				RoomUser newPlayer = roomUsers.stream().filter(ru -> ru.getRole().equals(Mode.VIEWER)).findFirst().orElse(null);
+				RoomUser newPlayer = roomUsers.stream().filter(ru -> ru.getRole()
+						.equals(Mode.VIEWER)).findFirst().orElse(null);
 				if (newPlayer != null) {
 					newPlayer.setRole(Mode.PLAYER);
 					roomUserRepository.save(newPlayer);
@@ -186,11 +184,13 @@ public class RoomService {
 				}
 				break;
 			case HOST:
-				RoomUser newHost = roomUsers.stream().filter(ru -> ru.getRole().equals(Mode.PLAYER)).findFirst().orElse(null);
+				RoomUser newHost = roomUsers.stream().filter(ru -> ru.getRole()
+						.equals(Mode.PLAYER)).findFirst().orElse(null);
 				if (newHost != null) {
 					newHost.setRole(Mode.HOST);
 					roomUserRepository.save(newHost);
-					RoomUser newPlayer2 = roomUsers.stream().filter(ru -> ru.getRole().equals(Mode.VIEWER)).findFirst().orElse(null);
+					RoomUser newPlayer2 = roomUsers.stream().filter(ru -> ru.getRole()
+							.equals(Mode.VIEWER)).findFirst().orElse(null);
 					if (newPlayer2 != null) {
 						newPlayer2.setRole(Mode.PLAYER);
 						roomUserRepository.save(newPlayer2);
@@ -204,9 +204,41 @@ public class RoomService {
 				}
 				break;
 		}
-		roomUserRepository.deleteByRoomIdAndUsername(room.getId(), user.getId());
+		roomUserRepository.deleteByRoomIdAndUserId(room.getId(), user.getId());
 		if (roomUsers != null) roomUsers = new ArrayList<>();
 		room.setRoomUsers(new HashSet<>(roomUsers));
+	}
+
+	public RoomResponse leaveRoom(Long id, String username) {
+		Room room = roomRepository.findById(id).orElseThrow(
+				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
+		List<RoomUser> roomUsers = roomUserRepository.findByRoomId(id);
+		RoomUser roomUserToRemove = null;
+		for(RoomUser roomUser: roomUsers) {
+			if (roomUser.getUser().getUsername().equals(username)) {
+				roomUserToRemove = roomUser;
+				break;
+			}
+		}
+		if (roomUserToRemove == null) return roomMapper.toRoomResponse(room);
+        if (Objects.requireNonNull(roomUserToRemove.getRole()) == Mode.HOST) {
+            boolean isPlayerExists = false;
+            for (RoomUser roomUser : roomUsers) {
+                if (roomUser.getRole().equals(Mode.PLAYER)) {
+                    roomUser.setRole(Mode.HOST);
+                    roomUserRepository.save(roomUser);
+                    isPlayerExists = true;
+                    break;
+                }
+            }
+            if (!isPlayerExists) {
+                room.setActive(false);
+                roomRepository.save(room);
+            }
+        }
+		roomUsers.remove(roomUserToRemove);
+		roomUserRepository.delete(roomUserToRemove);
+		return roomMapper.toRoomResponse(room);
 	}
 	
 	public void deleteRoom(Long id) {

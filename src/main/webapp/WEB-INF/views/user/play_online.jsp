@@ -147,6 +147,9 @@
                 </div>
             </div>
         </div>
+<%--        <div class="notify-container">--%>
+<%--            --%>
+<%--        </div>--%>
     </div>
     <script>
         const MODE = "PLAY_ONLINE";

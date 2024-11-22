@@ -26,7 +26,7 @@ public class ListRoomSocketHandler extends TextWebSocketHandler {
         session.getAttributes().put("roomId", roomId);
         RoomSocketHandler handler = rooms.get(roomId);
         if (handler == null) {
-            handler = new RoomSocketHandler();
+            handler = new RoomSocketHandler(roomId);
             rooms.put(roomId, handler);
         }
         handler.add(session);

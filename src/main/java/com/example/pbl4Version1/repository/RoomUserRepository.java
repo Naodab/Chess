@@ -17,5 +17,5 @@ public interface RoomUserRepository extends JpaRepository<RoomUser, String> {
     @Modifying
     @Transactional
     @Query("DELETE FROM RoomUser roomuser WHERE roomuser.room.id = :roomId AND roomuser.user.id = :userId")
-    void deleteByRoomIdAndUsername(Long roomId, String userId);
+    void deleteByRoomIdAndUserId(Long roomId, String userId);
 }

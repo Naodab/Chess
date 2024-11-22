@@ -1,7 +1,7 @@
 import {
     renderMessage,
     turnOnGameModal,
-    turnOffGameModal, turnOnOverlay, renderWinner, turnOffOverlay, innerPerson
+    turnOffGameModal, turnOnOverlay, renderWinner, turnOffOverlay, innerPerson, alertMessage
 } from "../opponents/message.js";
 import {
     ROLE,
@@ -33,6 +33,7 @@ import {
 import {initGameFromFenRender, initGameRender} from "../render/main.js";
 import {STEPS_CONTAINER} from "../helper/constants.js";
 import {getTimeRemaining, resetClock, timeBlack, timeWhite, togglePause} from "../opponents/handleClock.js";
+import {getSpiderActivity} from "../../util/spiderActivity.js";
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
@@ -64,135 +65,151 @@ function handleReadyModal() {
 }
 
 function initializeWebsocket() {
-    ws = new WebSocket("ws://localhost:8080/chess/websocket/chatInRoom/"
-        + sessionStorage.getItem("ROOM_ID")
-        + "?roomToken=" + sessionStorage.getItem("ROOM_ID"));
-    ws.onopen = function () {
-        console.log("Websocket to broadcast in a room is now opened! - RoomID: " + sessionStorage.getItem("ROOM_ID"));
-        getRoom(sessionStorage.getItem("ROOM_ID")).then(room => {
-            $("#id-room").textContent = room.id;
-            setRoomData(room);
-            switch (ROLE) {
-                case "HOST":
-                    me = room.host;
-                    break;
-                case "PLAYER":
-                    me = room.player;
-                    break;
-                case "VIEWER":
-                    me = room.viewers.find(viewer => viewer.username ===
-                        sessionStorage.getItem("USERNAME"));
-                    break;
+    getSpiderActivity().then(data => {
+        const ipAddress = data.result;
+        ws = new WebSocket(`ws://${ipAddress}:8080/chess/websocket/chatInRoom/`
+            + sessionStorage.getItem("ROOM_ID")
+            + "?roomToken=" + sessionStorage.getItem("ROOM_ID"));
+        ws.onopen = handleOpenSocket;
+        ws.onmessage = handleSocketMessage;
+    });
+}
+
+function handleOpenSocket() {
+    console.log("Websocket to broadcast in a room is now opened! - RoomID: "
+        + sessionStorage.getItem("ROOM_ID"));
+    getRoom(sessionStorage.getItem("ROOM_ID")).then(room => {
+        $("#id-room").textContent = room.id;
+        setRoomData(room);
+        switch (ROLE) {
+            case "HOST":
+                me = room.host;
+                break;
+            case "PLAYER":
+                me = room.player;
+                break;
+            case "VIEWER":
+                me = room.viewers.find(viewer => viewer.username ===
+                    sessionStorage.getItem("USERNAME"));
+                break;
+        }
+        const dataToSend = {
+            type: "ENTER_ROOM",
+            user: {
+                username: sessionStorage.getItem("USERNAME"),
+                avatar: me.avatar,
+                elo: me.elo,
+                role: ROLE,
+            },
+            time: ROOM.time * 60
+        }
+        ws.send(JSON.stringify(dataToSend));
+        addPerson(room.host, "HOST");
+        if (room.player)
+            addPerson(room.player, "PLAYER");
+        if (room.viewers)
+            room.viewers.forEach(viewer => addPerson(viewer, "VIEWER"));
+    });
+}
+
+function handleSocketMessage(event) {
+    const data = JSON.parse(event.data);
+    if (data.type === "SEND_MESSAGE") {
+        addMessages(data.user, data.message, true);
+    } else if (data.type === "ENTER_ROOM") {
+        getRoom(ROOM.id).then(room => {
+            let isExisted = false;
+            const other = data.user;
+            if (ROOM.host.username === other.username)
+                isExisted = true;
+            else if (ROOM.player && ROOM.player.username === other.username)
+                isExisted = true;
+            else
+                isExisted = ROOM.viewers.some(viewer => viewer.username === other.username);
+
+            if(!isExisted) {
+                addPerson(other, other.role);
             }
-            const dataToSend = {
-                type: "ENTER_ROOM",
-                user: {
-                    username: sessionStorage.getItem("USERNAME"),
-                    avatar: me.avatar,
-                    elo: me.elo,
-                    role: ROLE,
-                },
-                time: ROOM.time * 60
+
+            if (other.role === "PLAYER") {
+                ROOM.player = room.player;
+                initComponent(other, OPPONENT.toLowerCase());
+                if (ROLE !== "VIEWER" && !matchActiveId) {
+                    setTimeout(() => handleReadyModal(), 2000);
+                }
+            } else if (other.role === "VIEWER") {
+                ROOM.viewers = room.viewers;
             }
-            ws.send(JSON.stringify(dataToSend));
-            addPerson(room.host, "HOST");
-            if (room.player)
-                addPerson(room.player, "PLAYER");
-            if (room.viewers)
-                room.viewers.forEach(viewer => addPerson(viewer, "VIEWER"));
+
+            ROOM.matchActiveId = room.matchActiveId;
+            console.log(ROOM);
+            setRoom(ROOM);
         });
-    }
-
-    ws.onmessage = function (event) {
-        const data = JSON.parse(event.data);
-        if (data.type === "SEND_MESSAGE") {
-            addMessages(data.user, data.message, true);
-        } else if (data.type === "ENTER_ROOM") {
-            getRoom(ROOM.id).then(room => {
-                let isExisted = false;
-                const other = data.user;
-                if (ROOM.host.username === other.username)
-                    isExisted = true;
-                else if (ROOM.player && ROOM.player.username === other.username)
-                    isExisted = true;
-                else
-                    isExisted = ROOM.viewers.some(viewer => viewer.username === other.username);
-
-                if(!isExisted) {
-                    addPerson(other, other.role);
-                }
-
-                if (other.role === "PLAYER") {
-                    ROOM.player = room.player;
-                    initComponent(other, OPPONENT.toLowerCase());
-                    if (ROLE !== "VIEWER" && !matchActiveId) {
-                        setTimeout(() => handleReadyModal(), 2000);
-                    }
-                } else if (other.role === "VIEWER") {
-                    ROOM.viewers = room.viewers;
-                }
-
-                ROOM.matchActiveId = room.matchActiveId;
-                console.log(ROOM);
-                setRoom(ROOM);
-            });
-        } else if (data.type === "READY") {
-            if (data.isReady) {
-                isOpponentReady = true;
-                checkIfBothReady();
-            }
-            if (ROLE === "VIEWER") {
-                setRoomAndComponents(ROOM);
-            }
-        } else if (data.type === "BEGIN_MATCH") {
-            setMatchActiveId(data.matchId);
-            getMatch("human", data.matchId).then(match => {
-                sessionStorage.setItem("MATCH_ID", match.id);
-                console.log(ROOM.matchNumber);
-                initStepsContainer();
-                reCreateGame();
-                setTurnNumber(0);
-                resetClock(match.timeWhite, match.timeBlack);
-                togglePause(timeWhite);
-                changeTurn(true);
-                setIsEndGame(false);
-            });
-        } else if (data.type === "STEP") {
-            receiveMoveFromOthers(data);
-            handleDataTime(data);
-        } else if (data.type === "RESPONSE_ENTER_ROOM") {
-            setMatchNumber(data.matchNumber);
-            setIsMatchExecute(data.isMatchExecute);
+    } else if (data.type === "READY") {
+        if (data.isReady) {
+            isOpponentReady = true;
+            checkIfBothReady();
+        }
+        if (ROLE === "VIEWER") {
             setRoomAndComponents(ROOM);
-            if (ROLE === "PLAYER" && !isMatchExecute) {
-                setTimeout(() => handleReadyModal(), 2000);
-            }
+        }
+    } else if (data.type === "BEGIN_MATCH") {
+        setMatchActiveId(data.matchId);
+        getMatch("human", data.matchId).then(match => {
+            sessionStorage.setItem("MATCH_ID", match.id);
+            console.log(ROOM.matchNumber);
+            initStepsContainer();
+            reCreateGame();
+            setTurnNumber(0);
+            resetClock(match.timeWhite, match.timeBlack);
+            togglePause(timeWhite);
+            changeTurn(true);
+            setIsEndGame(false);
+        });
+    } else if (data.type === "STEP") {
+        receiveMoveFromOthers(data);
+        handleDataTime(data);
+    } else if (data.type === "RESPONSE_ENTER_ROOM") {
+        setMatchNumber(data.matchNumber);
+        setIsMatchExecute(data.isMatchExecute);
+        setRoomAndComponents(ROOM);
+        if (ROLE === "PLAYER" && !isMatchExecute) {
+            setTimeout(() => handleReadyModal(), 2000);
+        }
 
-            if (isMatchExecute) {
-                getMatch("human", matchActiveId).then(match => {
-                    sessionStorage.setItem("MATCH_ID", match.id);
-                    initStepsContainer();
-                    let steps = match.steps;
-                    if (steps.length === 0) {
-                        initGameRender(globalState);
-                    } else {
-                        steps.sort((a, b) => {
-                            const numA = parseInt(a.fen.match(/\d+$/)[0]);
-                            const numB = parseInt(b.fen.match(/\d+$/)[0]);
-                            return numA - numB;
-                        });
-                        addSteps(steps);
-                        STEPS_CONTAINER.scrollLeft = STEPS_CONTAINER.scrollWidth;
-                        const fen = steps[steps.length - 1].fen;
-                        initGameFromFenRender(globalState, fen);
-                    }
-                    if (ROLE !== "VIEWER") globalEvent();
-                });
-                handleDataTime(data);
-            }
-        } else if (data.type === "DATA_TIME") {
+        if (isMatchExecute) {
+            getMatch("human", matchActiveId).then(match => {
+                sessionStorage.setItem("MATCH_ID", match.id);
+                initStepsContainer();
+                let steps = match.steps;
+                if (steps.length === 0) {
+                    initGameRender(globalState);
+                } else {
+                    steps.sort((a, b) => {
+                        const numA = parseInt(a.fen.match(/\d+$/)[0]);
+                        const numB = parseInt(b.fen.match(/\d+$/)[0]);
+                        return numA - numB;
+                    });
+                    addSteps(steps);
+                    STEPS_CONTAINER.scrollLeft = STEPS_CONTAINER.scrollWidth;
+                    const fen = steps[steps.length - 1].fen;
+                    initGameFromFenRender(globalState, fen);
+                }
+                if (ROLE !== "VIEWER") globalEvent();
+            });
             handleDataTime(data);
         }
+    } else if (data.type === "DATA_TIME") {
+        handleDataTime(data);
+    } else if (data.type === "FORBIDDEN") {
+        alertMessage("Không có quyền truy cập vào phòng chơi này.");
+
+        $("#confirm").onclick = () => {
+            turnOffOverlay();
+            window.history.back();
+        }
+    } else if (data.type === "USER_LEAVE_ROOM") {
+
     }
 }
 
@@ -246,13 +263,23 @@ function addPerson(person, role) {
         div.classList.add("non-host");
     }
     $(".person-list").appendChild(div);
+
     div.onclick = () => {
-        // TODO: forbidden s.o to join room
+        // TODO: render information about user
+    }
+
+    div.querySelector(".person-delete").onclick = () => {
+        if (ROLE !== "HOST" || isMatchExecute) return;
+        const sendData = {
+            type: "FORBIDDEN_USER",
+            username: person.username
+        }
+        ws.send(JSON.stringify(sendData));
     }
 }
 
 // use for receive leave room from server
-function removePerson({username}) {
+function removePersonFromUI(username) {
     const index = persons.findIndex(person => person.username === username);
     if (index > -1) {
         persons.splice(index, 1);
@@ -261,6 +288,14 @@ function removePerson({username}) {
     const div = personList.querySelector(`#${username}`);
     personList.removeChild(div);
 }
+
+// function removePerson(username) {
+//     const sendData = {
+//         type: "FORBIDDEN_USER",
+//         username
+//     }
+//     ws.send(sendData);
+// }
 
 function handleEndGame(data) {
     turnOnOverlay(renderWinner, data);

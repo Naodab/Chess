@@ -9,6 +9,7 @@ import {
     renderFindRoom,
     renderEnterRoomWithPassword
 } from "./render.js";
+import {getSpiderActivity} from "../util/spiderActivity.js";
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
@@ -21,34 +22,27 @@ const topUsers = [];
 let ws;
 
 function initializeWebsocket() {
-    fetch("../api/network/local-ip", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+    getSpiderActivity().then(data => {
+        const ipAddress = data.result;
+        ws = new WebSocket(`ws://${ipAddress}:8080/chess/websocket`);
+        ws.onopen = function () {
+            console.log("Websocket is now opened!");
         }
-    })  .then(response => response.json())
-        .then(data => {
-            const ipAddress = data.result;
-            ws = new WebSocket(`ws://${ipAddress}:8080/chess/websocket`);
-            ws.onopen = function () {
-                console.log("Websocket is now opened!");
+        ws.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            console.log(data);
+            if (data.type === "CREATE_ROOM") {
+                addRoom(data);
             }
-            ws.onmessage = function (event) {
-                const data = JSON.parse(event.data);
-                console.log(data);
-                if (data.type === "CREATE_ROOM") {
-                    addRoom(data);
-                }
-                else if (data.type === "JOIN_ROOM_AS_PLAYER" || data.type === "JOIN_ROOM_AS_VIEWER") {
-                    updateRoomUI(data);
-                }
-                else if (data.type === "LEAVE_ROOM") {
-                    console.log("Ready to do in leave_room");
-                    updateLeaveRoomUI(data);
-                }
+            else if (data.type === "JOIN_ROOM_AS_PLAYER" || data.type === "JOIN_ROOM_AS_VIEWER") {
+                updateRoomUI(data);
             }
-        });
+            else if (data.type === "LEAVE_ROOM") {
+                console.log("Ready to do in leave_room");
+                updateLeaveRoomUI(data);
+            }
+        }
+    });
 }
 
 function addEventForEye() {
