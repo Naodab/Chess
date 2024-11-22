@@ -5,22 +5,13 @@ import java.util.Set;
 
 import com.example.pbl4Version1.enums.OperatingStatus;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -57,10 +48,10 @@ public class User {
 	@Enumerated(EnumType.STRING)
     OperatingStatus operatingStatus;
 	
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	Set<Role> roles;
 	
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	Set<Achievement> achievements;
 
 	@Builder.Default

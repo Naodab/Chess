@@ -1,34 +1,47 @@
 import {
+    confirm,
+    innerPerson,
+    renderWinner,
+    alertMessage,
     renderMessage,
+    turnOnOverlay,
+    turnOffOverlay,
     turnOnGameModal,
-    turnOffGameModal, turnOnOverlay, renderWinner, turnOffOverlay, innerPerson, alertMessage
+    turnOffGameModal,
+    renderPersonalInformation
 } from "../opponents/message.js";
 import {
     ROLE,
+    ROOM,
     OPPONENT,
-    setRoom,
+    ALLIANCE,
     whitePlayer,
     blackPlayer,
-    ROOM,
+    globalState,
+    matchActiveId,
+    isMatchExecute,
+    setRoom,
+    addSteps,
+    setRoomData,
     reCreateGame,
     initComponent,
-    setMatchActiveId,
-    matchNumber,
     setMatchNumber,
-    addSteps,
+    setMatchActiveId,
+    setIsMatchExecute,
+    initStepsContainer,
     setRoomAndComponents,
-    ALLIANCE, matchActiveId, globalState, setIsMatchExecute, setRoomData, isMatchExecute, initStepsContainer
 } from "../index.js";
 import {getRoom} from "../../user/api/room.js";
 import {createMatchOnline, getMatch} from "../../user/api/match.js";
 import {
+    turn,
+    turnWhite,
+    isEndGame,
     changeTurn,
     globalEvent,
-    isEndGame,
-    receiveMoveFromOthers,
     setIsEndGame,
     setTurnNumber,
-    turnWhite
+    receiveMoveFromOthers,
 } from "../event/global.js";
 import {initGameFromFenRender, initGameRender} from "../render/main.js";
 import {STEPS_CONTAINER} from "../helper/constants.js";
@@ -118,15 +131,8 @@ function handleSocketMessage(event) {
         addMessages(data.user, data.message, true);
     } else if (data.type === "ENTER_ROOM") {
         getRoom(ROOM.id).then(room => {
-            let isExisted = false;
             const other = data.user;
-            if (ROOM.host.username === other.username)
-                isExisted = true;
-            else if (ROOM.player && ROOM.player.username === other.username)
-                isExisted = true;
-            else
-                isExisted = ROOM.viewers.some(viewer => viewer.username === other.username);
-
+            const isExisted = persons.some(person => person.username === other.username);
             if(!isExisted) {
                 addPerson(other, other.role);
             }
@@ -134,7 +140,7 @@ function handleSocketMessage(event) {
             if (other.role === "PLAYER") {
                 ROOM.player = room.player;
                 initComponent(other, OPPONENT.toLowerCase());
-                if (ROLE !== "VIEWER" && !matchActiveId) {
+                if (ROLE !== "VIEWER" && !isMatchExecute) {
                     setTimeout(() => handleReadyModal(), 2000);
                 }
             } else if (other.role === "VIEWER") {
@@ -157,7 +163,6 @@ function handleSocketMessage(event) {
         setMatchActiveId(data.matchId);
         getMatch("human", data.matchId).then(match => {
             sessionStorage.setItem("MATCH_ID", match.id);
-            console.log(ROOM.matchNumber);
             initStepsContainer();
             reCreateGame();
             setTurnNumber(0);
@@ -165,6 +170,7 @@ function handleSocketMessage(event) {
             togglePause(timeWhite);
             changeTurn(true);
             setIsEndGame(false);
+            setIsMatchExecute(true);
         });
     } else if (data.type === "STEP") {
         receiveMoveFromOthers(data);
@@ -173,7 +179,7 @@ function handleSocketMessage(event) {
         setMatchNumber(data.matchNumber);
         setIsMatchExecute(data.isMatchExecute);
         setRoomAndComponents(ROOM);
-        if (ROLE === "PLAYER" && !isMatchExecute) {
+        if (ROLE !== "VIEWER" && !isMatchExecute && ROOM.player) {
             setTimeout(() => handleReadyModal(), 2000);
         }
 
@@ -209,7 +215,76 @@ function handleSocketMessage(event) {
             window.history.back();
         }
     } else if (data.type === "USER_LEAVE_ROOM") {
+        if (data.isActive) {
+            switch (data.role) {
+                case "HOST":
+                    ROOM.host = ROOM.player;
+                    ROOM.player = null;
+                    removePlayerFromUI(data.username);
+                    setRoomData(ROOM);
+                    clearPersonList();
+                    addPerson(ROOM.host, "HOST");
+                    if (ROOM.viewers)
+                        ROOM.viewers.forEach(viewer => addPerson(viewer, "VIEWER"));
+                    if(ROLE !== "VIEWER") {
+                        turnOffGameModal(modalReadySelector);
+                    }
+                    break;
+                case "PLAYER":
+                    removePlayerFromUI(data.username);
+                    removePersonFromUI(data.username);
+                    if(ROLE !== "VIEWER") {
+                        turnOffGameModal(modalReadySelector);
+                    }
+                    break;
+                case "VIEWER":
+                    removePersonFromUI(data.username);
+                    break;
+            }
+        } else {
+            alertMessage("Phòng hiện đã đóng.");
+            $("#confirm").onclick = () => {
+                turnOffOverlay();
+                window.history.back();
+            }
+        }
 
+        if (isMatchExecute && data.role !== "VIEWER") {
+            let title = "Chiến thắng";
+            if (ROLE === "VIEWER")
+                title = (ALLIANCE === "WHITE" ? "Trắng " : "Đen ") + title;
+            let time = ALLIANCE === "WHITE" ? getTimeRemaining(timeWhite)
+                : getTimeRemaining(timeBlack);
+            let winner = ALLIANCE;
+            handleEndGame({
+                title,
+                state: "Đối thủ rời phòng",
+                status: "SURRENDER",
+                time,
+                turn: Math.floor(turn / 2),
+                winner
+            });
+        }
+    } else if (data.type === "SURRENDER") {
+        let title = "Chiến thắng";
+        let time = ALLIANCE === "WHITE" ? getTimeRemaining(timeWhite)
+            : getTimeRemaining(timeBlack);
+        let winner = ALLIANCE;
+        if (ROLE === "VIEWER") {
+            title = (data.alliance === "WHITE" ? "Đen " : "Trắng ") + title;
+            time = data.alliance === "WHITE" ? getTimeRemaining(timeBlack)
+                : getTimeRemaining(timeWhite);
+            winner = data.alliance === "WHITE" ? "BLACK" : "WHITE"
+        }
+
+        handleEndGame({
+            title,
+            state: "Đối thủ đầu hàng",
+            status: "SURRENDER",
+            time,
+            turn: Math.floor(turn / 2),
+            winner
+        });
     }
 }
 
@@ -265,7 +340,18 @@ function addPerson(person, role) {
     $(".person-list").appendChild(div);
 
     div.onclick = () => {
-        // TODO: render information about user
+        fetch(`/chess/api/users/username/${div.id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            }
+        }).then(response => {
+            if (response.ok)
+                return response.json();
+        }).then(data => {
+            turnOnOverlay(renderPersonalInformation, data.result);
+        });
     }
 
     div.querySelector(".person-delete").onclick = () => {
@@ -285,17 +371,25 @@ function removePersonFromUI(username) {
         persons.splice(index, 1);
     }
     const personList = $(".person-list");
-    const div = personList.querySelector(`#${username}`);
+    const div = document.getElementById(`${username}`);
     personList.removeChild(div);
 }
 
-// function removePerson(username) {
-//     const sendData = {
-//         type: "FORBIDDEN_USER",
-//         username
-//     }
-//     ws.send(sendData);
-// }
+function removePlayerFromUI(username) {
+    const allianceDelete = whitePlayer.username === username ? "alliance-white" : "alliance-black";
+    const alliance = document.querySelector(`.player-info.${allianceDelete}`);
+    const name = alliance.querySelector(".name");
+    const elo = alliance.querySelector(".elo");
+    const avatar = alliance.querySelector(".avatar");
+    name.innerText = "";
+    elo.innerHTML = "";
+    avatar.style.background = ` no-repeat center center / cover`;
+}
+
+function clearPersonList() {
+    persons = [];
+    $(".person-list").innerHTML = "";
+}
 
 function handleEndGame(data) {
     turnOnOverlay(renderWinner, data);
@@ -308,6 +402,7 @@ function handleEndGame(data) {
     }
 
     setMatchNumber(ROOM.matchNumber + 1);
+    setIsMatchExecute(false);
     if (ROLE === "HOST") {
         let winnerId = "DRAW";
         switch (data.winner) {
@@ -342,7 +437,7 @@ function handleEndGame(data) {
 
     $("#ok").onclick = () => {
         turnOffOverlay();
-        if (ROLE !== "VIEWER") {
+        if (ROLE !== "VIEWER" && ROOM.player) {
             setTimeout(() => {
                 handleReadyModal();
             }, 1000);
@@ -379,6 +474,7 @@ function checkIfBothReady() {
             setTurnNumber(0);
             resetClock(sendData.time, sendData.time);
             togglePause(timeWhite);
+            setIsMatchExecute(true);
         });
     }
 }
@@ -430,8 +526,23 @@ if (MODE === "PLAY_ONLINE") {
         if (event.keyCode === 13) $("#send-message").click();
     }
 
-    $("#flag-lose").onclick = () => {
-        //TODO:
+    $("#flag-lose").onclick = async () => {
+        if (!isMatchExecute || ROLE === "VIEWER") return;
+        const result = await confirm("Bạn chắc chứ?");
+        if (!result) return;
+        const dataSend = {
+            type: "SURRENDER",
+            alliance: ALLIANCE
+        }
+        ws.send(JSON.stringify(dataSend));
+        handleEndGame({
+            title: "Thua cuộc",
+            status: "SURRENDER",
+            state: "Đầu hàng",
+            time: ALLIANCE === "WHITE" ? getTimeRemaining(timeWhite)
+                : getTimeRemaining(timeBlack),
+            winner: ALLIANCE === "WHITE" ? blackPlayer.id : whitePlayer.id
+        });
     }
 
     $("#handshake").onclick = () => {
@@ -446,23 +557,21 @@ if (MODE === "PLAY_ONLINE") {
         //TODO:
     }
 
-    //NOTE: TODO: exit room!
     $("#exit-room-button").onclick = async () => {
-        fetch("../api/rooms/leaveRoom/" + sessionStorage.getItem("ROOM_ID"), {
-            method: "DELETE",
-            headers: {
-                "Content-type": "application/json",
-                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
-            },
-        }).then(response => {
-            return response.ok;
-        })
-        const dataToSend = {
-            type: "LEAVE_ROOM",
-            id: sessionStorage.getItem("ROOM_ID")
-        };
-        ws.send(JSON.stringify(dataToSend));
-        window.location.href = "../public/home";
+        if (isMatchExecute) {
+            const result = await confirm("Bạn sẽ thua nếu bạn thoát");
+            if (result) {
+                const dataSend = {
+                    type: "LEAVE_ROOM_ACTIVELY",
+                    username: me.username,
+                    role: ROLE
+                }
+                ws.send(JSON.stringify(dataSend));
+                window.history.back();
+            }
+        } else {
+            window.history.back();
+        }
     }
 }
 

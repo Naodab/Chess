@@ -1,5 +1,6 @@
 package com.example.pbl4Version1.handler;
 
+import com.example.pbl4Version1.service.RoomService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketMessage;
@@ -14,6 +15,11 @@ import java.util.Map;
 @Slf4j
 public class ListRoomSocketHandler extends TextWebSocketHandler {
     Map<Long, RoomSocketHandler> rooms = Collections.synchronizedMap(new HashMap<>());
+    RoomService roomService;
+
+    public ListRoomSocketHandler(RoomService roomService) {
+        this.roomService = roomService;
+    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -26,25 +32,25 @@ public class ListRoomSocketHandler extends TextWebSocketHandler {
         session.getAttributes().put("roomId", roomId);
         RoomSocketHandler handler = rooms.get(roomId);
         if (handler == null) {
-            handler = new RoomSocketHandler(roomId);
+            handler = new RoomSocketHandler(roomId, roomService);
             rooms.put(roomId, handler);
         }
         handler.add(session);
-        log.info(session.getId() + " room: " + roomId + " connected!");
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        super.afterConnectionClosed(session, status);
-        Long roomId = (Long) session.getAttributes().get("roomId");
-        var handler = rooms.get(roomId);
-        if (handler != null) {
-            handler.remove(session);
-            if (handler.size() == 0) {
-                rooms.remove(roomId);
+        try {
+            super.afterConnectionClosed(session, status);
+            Long roomId = (Long) session.getAttributes().get("roomId");
+            var handler = rooms.get(roomId);
+            if (handler != null) {
+                handler.remove(session);
+                if (handler.size() == 0) {
+                    rooms.remove(roomId);
+                }
             }
-        }
-        log.info(session.getId() + " room: " + roomId + " disconnected!");
+        } catch (Exception ignored) {}
     }
 
     @Override

@@ -238,6 +238,7 @@ public class RoomService {
         }
 		roomUsers.remove(roomUserToRemove);
 		roomUserRepository.delete(roomUserToRemove);
+		room.setRoomUsers(new HashSet<>(roomUsers));
 		return roomMapper.toRoomResponse(room);
 	}
 	

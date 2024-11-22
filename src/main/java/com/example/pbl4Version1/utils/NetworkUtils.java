@@ -35,9 +35,6 @@ public class NetworkUtils {
                         continue;
                     }
                     result = inetAddress;
-
-                    System.out.println("Interface: " + networkInterface.getDisplayName());
-                    System.out.println(inetAddress.getHostAddress());
                 }
             }
             return result.getHostAddress();

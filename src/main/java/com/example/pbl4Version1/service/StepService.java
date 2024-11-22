@@ -78,7 +78,7 @@ public class StepService {
 					.build();
 		}
 
-		MoveStrategy minmax = new AlphaBetaWithMoveOrdering(4);
+		MoveStrategy minmax = new AlphaBetaWithMoveOrdering(5);
 		Move bestMove = minmax.execute(board);
         Board executeBoard = board.getCurrentPlayer().makeMove(bestMove).getTransitionBoard();
 

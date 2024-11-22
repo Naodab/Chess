@@ -14,6 +14,38 @@ function html([first, ...strings], ...values) {
         .join('');
 }
 
+function renderPersonalInformation(user) {
+    return html`
+        <div class="modal closure active" id="info-user">
+            <h1 class="modal__title">Thông tin cá nhân</h1>
+            <i class="fa-solid fa-xmark btn-icon btn-close" id="back"></i>
+            <div class="main-modal">
+                <img src="${user.avatar}" alt="avatar" class="modal__avatar">
+                <h2 class="modal__username modal-item">${user.username}</h2>
+                <h4 class="modal__email modal-item">${user.rank}</h4>
+                <h3 class="modal__elo modal-item">${user.elo}</h3>
+                <div class="modal__numbers modal-item">
+                    <div class="number-item closure closure--green">
+                        <div class="number__title">THẮNG</div>
+                        ${user.winNumber}
+                    </div>
+                    <div class="number-item closure closure--blue">
+                        <div class="number__title">HÒA</div>
+                        ${user.drawNumber}
+                    </div>
+                    <div class="number-item closure closure--pink end">
+                        <div class="number__title">THUA</div>
+                        ${user.battleNumber - user.winNumber - user.drawNumber}
+                    </div>
+                </div>
+            </div>
+            <div class="achievements-container modal-item">
+
+            </div>
+        </div>
+    `;
+}
+
 function renderMessage(user, message) {
     return html`
         <div class="message__avatar"
@@ -126,7 +158,7 @@ function innerPerson(person) {
 }
 
 function turnOnOverlay(renderFunction, arg) {
-    OVERLAY.style.zIndex = "100";
+    OVERLAY.style.zIndex = "10000";
     OVERLAY.innerHTML = renderFunction(arg);
 
     const backBtn = $("#back");
@@ -148,8 +180,11 @@ function turnOnGameModal(selector) {
 }
 
 function turnOffGameModal(selector) {
-    $(".ready-container").classList.remove("active");
-    $(selector).classList.remove("active");
+    const readyContainer = $(".ready-container");
+    if (readyContainer.classList.contains("active")) {
+        readyContainer.classList.remove("active");
+        $(selector).classList.remove("active");
+    }
 }
 
 let confirmResolve;
@@ -244,6 +279,7 @@ export {
     renderMessage,
     renderConfirmModal,
     renderWinner,
+    renderPersonalInformation,
     turnOnGameModal,
     turnOffGameModal,
     turnOnOverlay,
