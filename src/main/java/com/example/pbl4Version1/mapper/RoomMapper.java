@@ -52,6 +52,7 @@ public class RoomMapper {
 				.player(player)
 				.time(room.getTime())
 				.viewers(viewers)
+				.matchActiveId(room.getMatchActiveId())
 				.playDay(room.getPlayDay())
 				.build();
 	}

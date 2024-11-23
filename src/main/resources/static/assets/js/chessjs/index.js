@@ -1,7 +1,7 @@
 import { initGame } from "./data/data.js";
 import { initGameRender, initGameFromFenRender } from "./render/main.js";
 import { globalEvent } from "./event/global.js";
-import { STEPS_CONTAINER } from "./helper/constants.js";
+import {ROOT_DIV, STEPS_CONTAINER} from "./helper/constants.js";
 import { renderMessage } from "./opponents/message.js";
 
 const playerInfo = document.querySelectorAll(".player-info");
@@ -13,21 +13,88 @@ let globalState = initGame();
 const matchID = localStorage.getItem("MATCH_ID");
 
 let apiBot = "/chess/api/matches/bot/" + matchID;
-let apiHuman = "/chess/api/matches/human/" + matchID;
 
 let ALLIANCE = "WHITE";
 let OPPONENT = "BLACK";
 let ROOM;
-let ROLE;
+let ROLE = "PLAYER";
+let matchActiveId;
 let matchNumber = localStorage.getItem("MATCH_NUMBER") ? localStorage.getItem("MATCH_NUMBER") : 0;
 let blackPlayer;
 let whitePlayer;
 
 function reCreateGame() {
     globalState = initGame();
+    ROOT_DIV.innerHTML = "";
+    initGameRender(globalState);
+    globalEvent();
+}
+
+function setMatchNumber(number) {
+    matchNumber = number;
+    localStorage.setItem("MATCH_NUMBER", matchNumber);
+}
+
+function setMatchActiveId(id) {
+    matchActiveId = id;
+}
+
+function setRoom(data) {
+    ROOM = data;
+    ROLE = getRole(sessionStorage.getItem("USERNAME"));
+    if (matchNumber % 2 === 0) {
+        whitePlayer = ROOM.host;
+        blackPlayer = ROOM.player;
+        if (ROLE === "PLAYER") {
+            ALLIANCE = "BLACK";
+            OPPONENT = "WHITE";
+        }
+    } else {
+        whitePlayer = ROOM.player;
+        blackPlayer = ROOM.host;
+        if (ROLE === "HOST" || ROLE === "VIEWER") {
+            ALLIANCE = "BLACK";
+            OPPONENT = "WHITE"
+        }
+    }
+    matchActiveId = ROOM.matchActiveId;
+}
+
+function setRoomAndComponents(data) {
+    setRoom(data);
+    loadPageFunction(ALLIANCE);
+    if (whitePlayer)
+        initComponent(whitePlayer, "white");
+    if (blackPlayer)
+        initComponent(blackPlayer, "black");
 }
 
 function loadPageFunction(alliance) {
+    playerInfo.forEach(info => {
+        if (info.classList.contains("alliance-black")) {
+            info.classList.remove("alliance-black");
+        }
+        if (info.classList.contains("alliance-white")) {
+            info.classList.remove("alliance-white");
+        }
+    });
+
+    defeatedPieces.forEach(info => {
+        if (info.classList.contains("alliance-black")) {
+            info.classList.remove("alliance-black");
+        }
+        if (info.classList.contains("alliance-white")) {
+            info.classList.remove("alliance-white");
+        }
+    });
+
+    const digitContainers =
+        gbContainer.querySelectorAll(".game-board-container-digit");
+    digitContainers.forEach(div => gbContainer.removeChild(div));
+    const characterContainers =
+        gbContainer.querySelectorAll(".game-board-container-character");
+    characterContainers.forEach(div => gbContainer.removeChild(div));
+
     if (alliance === "BLACK") {
         playerInfo[0].classList.add("alliance-black");
         playerInfo[1].classList.add("alliance-white");
@@ -155,11 +222,9 @@ document.body.onload = async function () {
             throw new Error("Match has been deleted or already finished");
         }).then(data => data.result)
         .then(data => {
-            console.log(data);
             loadPageFunction(ALLIANCE);
             initComponent(data.player, "white");
             let steps = data.steps;
-            console.log(steps.length === 0);
             if (steps.length === 0) {
                 initGameRender(globalState);
                 globalEvent();
@@ -176,39 +241,23 @@ document.body.onload = async function () {
             initGameFromFenRender(globalState, fen);
             globalEvent();
         });
-    } else {
-        await fetch(`/chess/api/rooms/ ${sessionStorage.getItem("ROOM_ID")}`, {
-            method: 'GET',
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
-            }
-        }).then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-        }).then(data => data.result)
-        .then(data => {
-            ROOM = data;
-            ROLE = getRole(sessionStorage.getItem("USERNAME"));
-            if (matchNumber % 2 === 0) {
-                whitePlayer = ROOM.host;
-                blackPlayer = ROOM.player;
-                if (ROLE === "PLAYER") {
-                    ALLIANCE = "BLACK";
-                }
-            } else {
-                whitePlayer = ROOM.player;
-                blackPlayer = ROOM.host;
-                if (ROLE === "HOST" || ROLE === "VIEWER") {
-                    ALLIANCE = "BLACK";
-                }
-            }
-            loadPageFunction(ALLIANCE);
-            initComponent(whitePlayer, "white");
-            initComponent(blackPlayer, "black");
-        });
     }
 }
 
-export { globalState, ALLIANCE, OPPONENT, reCreateGame };
+export {
+    globalState,
+    ALLIANCE,
+    OPPONENT,
+    ROLE,
+    ROOM,
+    matchActiveId,
+    matchNumber,
+    whitePlayer,
+    blackPlayer,
+    setRoom,
+    setRoomAndComponents,
+    setMatchActiveId,
+    reCreateGame,
+    initComponent,
+    setMatchNumber
+};

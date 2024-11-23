@@ -3,12 +3,12 @@ function createMatchOnline(whitePlayerId, blackPlayerId, roomId) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("token")
+            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
         },
         body: JSON.stringify({ whitePlayerId, blackPlayerId, roomId })
     }).then(response => {
         if (response.ok) {
-            return response.ok;
+            return response.json();
         }
     }).then(data => data.result);
 }
@@ -29,8 +29,8 @@ function createMatchBot() {
     }).then(data => data.result);
 }
 
-function getMatch(matchId) {
-    return fetch("/chess/api/matches/" + matchId, {
+function getMatch(type, matchId) {
+    return fetch(`/chess/api/matches/${type}/${matchId}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -38,7 +38,7 @@ function getMatch(matchId) {
         }
     }).then(response => {
         if (response.ok) {
-            return response.ok;
+            return response.json();
         }
     }).then(data => data.result);
 }

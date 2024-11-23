@@ -1,6 +1,5 @@
 package com.example.pbl4Version1.service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -10,11 +9,9 @@ import com.example.pbl4Version1.enums.PlayerType;
 import com.example.pbl4Version1.repository.StepRepisitory;
 import org.springframework.stereotype.Service;
 
-import com.example.pbl4Version1.dto.request.MatchBotCreationRequest;
 import com.example.pbl4Version1.dto.request.MatchCreationRequest;
 import com.example.pbl4Version1.dto.response.MatchWithHumanResponse;
 import com.example.pbl4Version1.entity.MatchWithHuman;
-import com.example.pbl4Version1.entity.User;
 import com.example.pbl4Version1.exception.AppException;
 import com.example.pbl4Version1.exception.ErrorCode;
 import com.example.pbl4Version1.mapper.MatchMapper;
@@ -53,6 +50,9 @@ public class MatchWithHumanService {
 		match.setTimeWhiteUser(room.getTime());
 
 		match = matchRepository.save(match);
+
+		room.setMatchActiveId(match.getId());
+		roomRepository.save(room);
 		return matchMapper.toMatchWithHumanResponse(match);
 	}
 	

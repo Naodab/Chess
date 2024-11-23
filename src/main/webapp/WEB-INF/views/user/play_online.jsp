@@ -30,22 +30,32 @@
         <div class="play-area">
             <div class="player-info-container">
                 <div class="player-info">
-                    <div class="avatar" style="background: url('${avatar}')
-                    no-repeat center center / cover;">
-                    </div>
+                    <div class="avatar"></div>
                     <span class="content">
-                        <span class="name">Computer</span>
-                        <span class="elo">200</span>
+                        <span class="name"></span>
+                        <div class="ele-wrap">
+                            <span class="elo"></span>
+                            <div class="clock">
+                                <span class="minutes">00</span>
+                                :
+                                <span class="seconds">00</span>
+                            </div>
+                        </div>
                     </span>
                 </div>
                 <div class="player-info">
                     <span class="content">
-                        <span class="name">Computer</span>
-                        <span class="elo">200</span>
+                        <span class="name"></span>
+                        <div class="ele-wrap">
+                            <span class="elo"></span>
+                            <div class="clock">
+                                <span class="minutes">00</span>
+                                :
+                                <span class="seconds">00</span>
+                            </div>
+                        </div>
                     </span>
-                    <div class="avatar" style="background: url('../assets/img/robot.png')
-                    no-repeat center center / cover;">
-                    </div>
+                    <div class="avatar"></div>
                 </div>
             </div>
 
@@ -63,6 +73,21 @@
                 <span class="defeated-pieces"></span>
                 <span class="defeated-pieces "></span>
             </div>
+
+            <div class="ready-container">
+                <div class="modal closure active" id="ready-confirm">
+                    <h1 class="modal__title">Bạn đã sẵn sàng?</h1>
+                    <div class="main-modal">
+                        <div class="modal__function top--margin">
+                            <div class="btn btn--green modal__btn" id="ready">Sẵn sàng</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal closure" id="wait-others">
+                    <h1 class="modal__title">Chờ người chơi khác sẵn sàng</h1>
+                </div>
+            </div>
         </div>
 
         <div class="right-panel">
@@ -73,30 +98,7 @@
                 </div>
                 <div class="chats">
                     <div class="chat-container scrollable-element">
-                        <div class="chat-list">
-                            <div class="message other">
-                                <div class="message__avatar"
-                                     style="background: url('../assets/img/robot.png') no-repeat center center / cover">
-                                </div>
-                                <div class="chat closure">
-                                    ba doan nay dep trai qua di ba doan nay dep trai qua di ba doan nay dep trai qua di
-                                </div>
-                                <div class="chat-username">
-                                    badoan
-                                </div>
-                            </div>
-                            <div class="message">
-                                <div class="message__avatar"
-                                     style="background: url('../assets/img/robot.png') no-repeat center center / cover">
-                                </div>
-                                <div class="chat closure">
-                                    ta cung thay day
-                                </div>
-                                <div class="chat-username">
-                                    badoan
-                                </div>
-                            </div>
-                        </div>
+                        <div class="chat-list"></div>
                     </div>
                     <div class="chat-input">
                         <input type="text" id="send-chat-input" placeholder="Nhập tin nhắn" >
@@ -114,8 +116,8 @@
                         <div class="step-item">
                             <div class="step-index">avatar</div>
                             <div class="step-container">
-                                <div class="step-avatar" style="background: url('${avatar}')
-                                    no-repeat center center / cover;"></div>
+                                <div class="step-avatar" style="background: url('../assets/img/robot.png')
+                                    no-repeat center center / cover;" ></div>
                             </div>
                             <div class="step-container">
                                 <div class="step-avatar" style="background: url('../assets/img/robot.png')
@@ -125,17 +127,20 @@
                     </div>
                 </div>
                 <div class="step__footer">
-                    <div class="btn btn--blue step__function"><i class="fa-regular fa-flag"></i></div>
-                    <div class="btn btn--green step__function"><i class="fa-regular fa-handshake"></i></div>
-                    <div class="btn btn--pink step__function"><i class="fa-solid fa-angle-left"></i></div>
-                    <div class="btn btn--pink step__function"><i class="fa-solid fa-angle-right"></i></div>
+                    <div class="btn btn--blue step__function"   id="flag-lose"><i class="fa-regular fa-flag"></i></div>
+                    <div class="btn btn--green step__function"  id="handshake"><i class="fa-regular fa-handshake"></i></div>
+                    <div class="btn btn--pink step__function"   id="return-left"><i class="fa-solid fa-angle-left"></i></div>
+                    <div class="btn btn--pink step__function"   id="return-right"><i class="fa-solid fa-angle-right"></i></div>
                 </div>
             </div>
         </div>
     </div>
     <script>
         const MODE = "PLAY_ONLINE";
+        let avatar = "${user.avatar}";
+        let elo = "${user.elo}";
     </script>
     <script type="module" src="../assets/js/chessjs/index.js"></script>
+    <script type="module" src="../assets/js/chessjs/mode/play_online.js"></script>
 </body>
 </html>
