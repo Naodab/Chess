@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/user/base.css">
     <link rel="stylesheet" href="../assets/css/chess.css">
-    <link rel="stylesheet" href="../assets/css/play_online.css">
+    <link rel="stylesheet" href="../assets/css/review.css">
     <title>Chess</title>
 </head>
 <body>
@@ -68,7 +68,7 @@
             <div class="steps scrollable-element-x">
                 <div class="steps-table">
                     <div class="step-item">
-                        <div class="step-index">avatar</div>
+                        <div class="step-index-review">avatar</div>
                         <div class="step-container">
                             <div class="step-avatar" style="background: url('../assets/img/robot.png')
                                     no-repeat center center / cover;" ></div>

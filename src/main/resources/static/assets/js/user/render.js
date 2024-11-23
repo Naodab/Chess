@@ -20,6 +20,23 @@ function renderLoading() {
         </div>
     `;
 }
+function renderWaitingForOthers() {
+    return html`
+        <div class="modal closure active" id="update-avatar">
+            <h1 class="modal__title">Chờ đợi</h1>
+            <div class="main-modal">
+                <div class="loading-container">
+                    <div class="circle-loading"></div>
+                    <div class="circle-loading"></div>
+                </div>
+                <div class="modal__function top--margin">
+                    <div class="btn btn--pink modal__btn" id="cancel">Hủy</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 
 function renderPlayerInformation(player) {
     return html`
@@ -331,5 +348,6 @@ export {
     renderEnterRoomWithPassword,
     renderLoading,
     renderModalMatches,
-    renderMatches
+    renderMatches,
+    renderWaitingForOthers
 }

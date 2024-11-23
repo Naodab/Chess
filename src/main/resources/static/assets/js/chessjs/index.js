@@ -168,7 +168,7 @@ function resize() {
 
 window.onresize = resize;
 
-function addSteps(steps) {
+function addSteps(steps, isReview = false) {
     steps.forEach((step, index) => {
         if (index % 2 === 0) {
             const div = document.createElement("div");
@@ -211,10 +211,10 @@ function initComponent(player, color) {
     avatar.style.background = `url('${player.avatar}') no-repeat center center / cover`;
 }
 
-function initStepsContainer() {
+function initStepsContainer(white = whitePlayer, black = blackPlayer) {
     const div = document.createElement("div");
     div.classList.add("step-item");
-    div.innerHTML = innerStepAvatar(whitePlayer.avatar, blackPlayer.avatar);
+    div.innerHTML = innerStepAvatar(white.avatar, black.avatar);
     STEPS_CONTAINER.innerHTML = "";
     STEPS_CONTAINER.appendChild(div);
 }
@@ -280,6 +280,10 @@ document.body.onload = async function () {
                 const numB = parseInt(b.fen.match(/\d+$/)[0]);
                 return numA - numB;
             });
+            if (ALLIANCE === "WHITE")
+                initStepsContainer(me, opponent);
+            else
+                initStepsContainer(opponent, me);
             addSteps(steps);
             STEPS_CONTAINER.scrollLeft = STEPS_CONTAINER.scrollWidth;
             const fen = steps[steps.length - 1].fen;
