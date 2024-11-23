@@ -2,8 +2,7 @@ package com.example.pbl4Version1.service;
 
 import java.util.*;
 
-import com.example.pbl4Version1.dto.request.JoinRoomRequest;
-import com.example.pbl4Version1.dto.request.LeaveRoomRequest;
+import com.example.pbl4Version1.dto.request.*;
 import com.example.pbl4Version1.entity.RoomUser;
 import com.example.pbl4Version1.enums.Mode;
 import com.example.pbl4Version1.repository.RoomUserRepository;
@@ -13,8 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.pbl4Version1.dto.request.RoomCreateRequest;
-import com.example.pbl4Version1.dto.request.RoomUpdateRequest;
 import com.example.pbl4Version1.dto.response.RoomResponse;
 import com.example.pbl4Version1.entity.Room;
 import com.example.pbl4Version1.entity.User;
@@ -49,6 +46,27 @@ public class RoomService {
 		String username = authentication.getName();
 		User host = userRepository
 				.findByUsername(username).orElseThrow(
+						() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+		log.info(host.getId() + "/" + host.getUsername());
+		RoomUser roomUser = RoomUser.builder()
+				.user(host)
+				.room(room)
+				.role(Mode.HOST)
+				.build();
+		roomUserRepository.save(roomUser);
+		Set<RoomUser> roomUsers = new HashSet<>();
+		roomUsers.add(roomUser);
+		room.setRoomUsers(roomUsers);
+		return roomMapper.toRoomResponse(room);
+	}
+
+	public RoomResponse autoCreate(RoomAutoCreateRequest request) {
+		Room room = roomMapper.toRoom(request);
+		if (request.getPassword() != null)
+			room.setPassword(passwordEncoder.encode(request.getPassword()));
+		room = roomRepository.save(room);
+		User host = userRepository
+				.findByUsername(request.getHostUsername()).orElseThrow(
 						() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 		log.info(host.getId() + "/" + host.getUsername());
 		RoomUser roomUser = RoomUser.builder()

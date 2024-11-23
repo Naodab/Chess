@@ -229,9 +229,10 @@ function handleMatchClick() {
         match.onclick = () => {
             const matchId = match.getAttribute("data-id");
             turnOffModal();
-
+            sessionStorage.setItem("MATCH_ID", matchId);
+            window.location.href = "/chess/public/review";
         }
-    })
+    });
 }
 
 $("#change-avatar-btn").addEventListener("click", event => {

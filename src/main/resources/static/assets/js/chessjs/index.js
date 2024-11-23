@@ -1,8 +1,9 @@
 import { initGame } from "./data/data.js";
-import {initGameRender, initGameFromFenRender, handleNameMove} from "./render/main.js";
+import {initGameRender, initGameFromFenRender } from "./render/main.js";
 import { globalEvent } from "./event/global.js";
 import {ROOT_DIV, STEPS_CONTAINER} from "./helper/constants.js";
 import {innerStepAvatar} from "./opponents/message.js";
+import {getMatch} from "../user/api/match.js";
 
 const gbContainer = document.querySelector(".game-board-container");
 
@@ -251,6 +252,38 @@ document.body.onload = async function () {
             const fen = steps[steps.length - 1].fen;
             initGameFromFenRender(globalState, fen);
             globalEvent();
+        });
+    } else if (MODE === "REVIEW") {
+        getMatch("human", sessionStorage.getItem("MATCH_ID")).then(match => {
+            let me, opponent;
+            if (match.white.username === sessionStorage.getItem("USERNAME")) {
+                me = match.white;
+                ALLIANCE = "WHITE";
+                opponent = match.black;
+                OPPONENT = "BLACK";
+            } else {
+                me = match.black;
+                ALLIANCE = "BLACK";
+                opponent = match.white;
+                OPPONENT = "WHITE";
+            }
+            loadPageFunction(ALLIANCE);
+            initComponent(me, ALLIANCE.toLowerCase());
+            initComponent(opponent, OPPONENT.toLowerCase());
+            let steps = match.steps;
+            if (steps.length === 0) {
+                initGameRender(globalState);
+                return;
+            }
+            steps.sort((a, b) => {
+                const numA = parseInt(a.fen.match(/\d+$/)[0]);
+                const numB = parseInt(b.fen.match(/\d+$/)[0]);
+                return numA - numB;
+            });
+            addSteps(steps);
+            STEPS_CONTAINER.scrollLeft = STEPS_CONTAINER.scrollWidth;
+            const fen = steps[steps.length - 1].fen;
+            initGameFromFenRender(globalState, fen);
         });
     }
 }
