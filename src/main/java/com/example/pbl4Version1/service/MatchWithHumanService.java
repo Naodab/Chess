@@ -1,13 +1,22 @@
 package com.example.pbl4Version1.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 import com.example.pbl4Version1.dto.request.MatchWithHumanUpdateRequest;
+import com.example.pbl4Version1.dto.response.MatchWithHumanMinimalResponse;
+import com.example.pbl4Version1.dto.response.UserForMatchResponse;
 import com.example.pbl4Version1.entity.Room;
+import com.example.pbl4Version1.entity.User;
 import com.example.pbl4Version1.enums.GameStatus;
 import com.example.pbl4Version1.enums.PlayerType;
 import com.example.pbl4Version1.repository.StepRepisitory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.example.pbl4Version1.dto.request.MatchCreationRequest;
@@ -60,12 +69,64 @@ public class MatchWithHumanService {
 		userRepository.save(match.getWhitePlayer());
 		return matchMapper.toMatchWithHumanResponse(match);
 	}
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	public List<MatchWithHumanResponse> getAll() {
 		return matchRepository.findAll()
 				.stream()
 				.map(matchMapper::toMatchWithHumanResponse)
 				.toList();
+	}
+
+	public List<MatchWithHumanMinimalResponse> getMyMatches(int page) {
+		var authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName();
+		User user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+		Pageable pageable = PageRequest.of(page, 10,
+				Sort.by(Sort.Direction.DESC, "createdAt"));
+		List<MatchWithHuman> matchWithHumen = matchRepository
+				.findMatchesByUserId(user.getId(), pageable).getContent();
+
+		List<MatchWithHumanMinimalResponse> result = new ArrayList<>();
+		for (MatchWithHuman m : matchWithHumen) {
+			UserForMatchResponse white = UserForMatchResponse.builder()
+					.username(m.getWhitePlayer().getUsername())
+					.avatar(m.getBlackPlayer().getAvatar())
+					.color("white")
+					.build();
+			UserForMatchResponse black = UserForMatchResponse.builder()
+					.username(m.getBlackPlayer().getUsername())
+					.avatar(m.getWhitePlayer().getAvatar())
+					.color("black")
+					.build();
+
+			UserForMatchResponse me, opponent;
+			String state;
+			if (m.getWhitePlayer().getId().equals(user.getId())) {
+				me = white;
+				opponent = black;
+			} else {
+				me = black;
+				opponent = white;
+			}
+			if (m.getWinner().name().equalsIgnoreCase(me.getColor())) {
+				state = "WIN";
+			} else if (m.getWinner().name().equalsIgnoreCase(opponent.getColor())) {
+				state = "LOSE";
+			} else {
+				state = "DRAW";
+			}
+			result.add(MatchWithHumanMinimalResponse
+					.builder()
+					.id(m.getId())
+					.me(me)
+					.opponent(opponent)
+					.state(state)
+					.build());
+		}
+		return result;
 	}
 	
 	public MatchWithHumanResponse getMatch(Long id) {

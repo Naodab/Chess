@@ -7,9 +7,10 @@ import {
     renderRoom,
     renderTopUser,
     renderFindRoom,
-    renderEnterRoomWithPassword
+    renderEnterRoomWithPassword, renderLoading, renderMatches, renderModalMatches
 } from "./render.js";
 import {getSpiderActivity} from "../util/spiderActivity.js";
+import {getPageMatch} from "./api/match.js";
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
@@ -20,6 +21,7 @@ const activityList = $(".activity-list");
 const topUsers = [];
 
 let ws;
+let activePageMatches = 0;
 
 function initializeWebsocket() {
     getSpiderActivity().then(data => {
@@ -88,10 +90,7 @@ window.addEventListener("load", () => {
             player.onclick = () => turnOnModal(renderPersonalInformation, topUsers[index]);
         });
     });
-    //NOTE: next initializeWebsocket when loading page jsp
     initializeWebsocket();
-    console.log(localStorage.getItem("TOKEN"));
-    //NOTE: fetch to get all active rooms
     loadAllRooms();
 });
 
@@ -191,15 +190,56 @@ $("#see-my-information").addEventListener("click", event => {
         const user = data.result;
         turnOnModal(renderPersonalInformation, user);
 
-        // TODO: catch event see matches
+        $(".matches-history").onclick = () => {
+            turnOffModal();
+            turnOnModal(renderLoading);
+            getPageMatch(activePageMatches).then(matches => {
+                turnOffModal();
+                const attrs = {};
+                attrs.matches = matches;
+                attrs.size = user.battleNumber;
+                console.log(attrs);
+                turnOnModal(renderModalMatches, attrs);
+                handleMatchClick();
+                const pages = $$(".page");
+                pages.forEach((page, index) => {
+                    if (index === activePageMatches) {
+                        page.classList.add("active");
+                    }
+
+                    page.onclick = () => {
+                        if (index === activePageMatches) return;
+                        getPageMatch(index).then(matches => {
+                            pages[activePageMatches].classList.remove("active");
+                            activePageMatches = index;
+                            pages[activePageMatches].classList.add("active");
+                            const matchesContainer = $(".matches-container");
+                            matchesContainer.innerHTML = renderMatches(matches);
+                            handleMatchClick();
+                        });
+                    }
+                })
+            });
+        }
     });
 });
+
+function handleMatchClick() {
+    $$(".match").forEach(match => {
+        match.onclick = () => {
+            const matchId = match.getAttribute("data-id");
+            turnOffModal();
+
+        }
+    })
+}
 
 $("#change-avatar-btn").addEventListener("click", event => {
     event.preventDefault();
     const user = localStorage.getItem("USER");
     turnOnModal(renderUpdateAvatar, avatar);
 
+    const errorMessage = $(".error-message");
     $("#avatarInput").onchange = event => {
         const file = event.target.files[0];
         if (file) {
@@ -213,10 +253,11 @@ $("#change-avatar-btn").addEventListener("click", event => {
 
     $("#accept-update-avatar").onclick =  () => {
         const file = $("#avatarInput").files[0];
-        console.log(file);
         const formData = new FormData();
         formData.append("file", file);
         if (file) {
+            turnOffModal();
+            turnOnModal(renderLoading);
             fetch("/chess/api/avatar", {
                 method: "POST",
                 headers: {
@@ -233,7 +274,9 @@ $("#change-avatar-btn").addEventListener("click", event => {
                     avatar = data.result;
                     $(".header__avatar").style.background = `url("${avatar}") no-repeat center center / cover`;
                 }
-            })
+            });
+        } else {
+            errorMessage.textContent = "Vui lòng chọn ảnh";
         }
     };
 });

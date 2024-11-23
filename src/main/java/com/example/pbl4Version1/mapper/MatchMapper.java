@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.example.pbl4Version1.dto.response.MatchWithHumanMinimalResponse;
 import com.example.pbl4Version1.dto.response.StepResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,19 +1,15 @@
 package com.example.pbl4Version1.entity;
 
+import java.util.Date;
 import java.util.Set;
 
 import com.example.pbl4Version1.enums.GameStatus;
 import com.example.pbl4Version1.enums.PlayerType;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @Setter
@@ -32,6 +28,10 @@ public class MatchWithHuman extends Match {
 	@JoinColumn(name = "black_player_id")
 	User blackPlayer;
 
+	@CreationTimestamp
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date createdAt;
+
 	int timeWhiteUser;
 	int timeBlackUser;
 	
@@ -39,12 +39,14 @@ public class MatchWithHuman extends Match {
 
 	public MatchWithHuman(Long id, GameStatus gameStatus, 
 			PlayerType turn, PlayerType winner, Set<Step> steps, 
-			Room room, User whitePlayer, User blackPlayer, int time) {
+			Room room, User whitePlayer, User blackPlayer, int time,
+						  Date createdAt) {
 		super(id, gameStatus, turn, winner, steps);
 		this.room = room;
 		this.whitePlayer = whitePlayer;
 		this.blackPlayer = blackPlayer;
 		this.timeWhiteUser = time;
 		this.timeBlackUser = time;
+		this.createdAt = createdAt;
 	}
 }
