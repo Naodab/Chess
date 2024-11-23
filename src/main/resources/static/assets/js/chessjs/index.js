@@ -44,7 +44,6 @@ function setMatchActiveId(id) {
 function setRoomData(data) {
     ROOM = data;
     ROLE = getRole(sessionStorage.getItem("USERNAME"));
-    matchActiveId = data.matchActiveId;
 }
 
 function setRoom(data) {
@@ -174,14 +173,14 @@ function addSteps(steps) {
             const div = document.createElement("div");
             div.classList.add("step-item");
             div.innerHTML = `
-                        <div class="step-index">${Math.floor(index / 2) + 1}</div>
-                        <div class="step-container alliance-white">
-                            <div class="step">${step.name}</div>
-                        </div>
-                        <div class="step-container alliance-black">
-                            <div class="step"></div>
-                        </div>
-                    `;
+                <div class="step-index">${Math.floor(index / 2) + 1}</div>
+                <div class="step-container alliance-white">
+                    <div class="step">${step.name}</div>
+                </div>
+                <div class="step-container alliance-black">
+                    <div class="step"></div>
+                </div>
+            `;
             STEPS_CONTAINER.appendChild(div);
             div.scrollIntoView({ behavior: "smooth" });
         } else {

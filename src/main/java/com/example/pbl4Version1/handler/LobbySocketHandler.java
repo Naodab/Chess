@@ -28,14 +28,12 @@ public class LobbySocketHandler extends TextWebSocketHandler{
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
-        System.out.println(session.getId() + " connected!");
         webSocketSessions.add(session);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
-        System.out.println(session.getId() + " disconnected!");
         webSocketSessions.remove(session);
     }
 

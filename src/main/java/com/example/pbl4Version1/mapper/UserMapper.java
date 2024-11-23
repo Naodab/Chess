@@ -32,13 +32,13 @@ public class UserMapper {
 	}
 
 	public UserResponse toUserResponse(User user) {
-		Set<RoleResponse> roles = null;
-		if (user.getRoles() != null) {
-			roles = new HashSet<RoleResponse>(user.getRoles()
-					.stream()
-					.map(roleMapper::toRoleResponse)
-					.toList());
-		}
+//		Set<RoleResponse> roles = null;
+//		if (user.getRoles() != null) {
+//			roles = new HashSet<RoleResponse>(user.getRoles()
+//					.stream()
+//					.map(roleMapper::toRoleResponse)
+//					.toList());
+//		}
 		
 		Set<AchievementResponse> achievements = null;
 		if (user.getAchievements() != null) {
@@ -57,7 +57,7 @@ public class UserMapper {
 				.battleNumber(user.getBattleNumber())
 				.winNumber(user.getWinNumber())
 				.drawNumber(user.getDrawNumber())
-				.roles(roles)
+//				.roles(roles)
 				.achievements(achievements)
 				.percent(user.getBattleNumber() != 0 ? (int)((float)user.getWinNumber() /(float) user.getBattleNumber() * 100 ): 0)
 				.rank(rank)

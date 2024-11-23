@@ -78,6 +78,7 @@ public class MatchWithHumanService {
 	public MatchWithHumanResponse updateMatchWithHuman(Long matchId, MatchWithHumanUpdateRequest request) {
 		MatchWithHuman match = matchRepository.findById(matchId)
 				.orElseThrow(() -> new AppException(ErrorCode.MATCH_NOT_EXISTED));
+		log.info(request.getGameStatus());
 		if (request.getTimeWhitePlayer() != null)
 			match.setTimeWhiteUser(request.getTimeWhitePlayer());
 
@@ -106,7 +107,6 @@ public class MatchWithHumanService {
 			match.getBlackPlayer().setElo(newElo[1]);
 			userRepository.save(match.getWhitePlayer());
 			userRepository.save(match.getBlackPlayer());
-			log.info(request.getGameStatus());
 			match.setGameStatus(GameStatus.valueOf(request.getGameStatus()));
 		}
 
