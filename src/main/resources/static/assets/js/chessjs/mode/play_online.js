@@ -563,6 +563,7 @@ if (MODE === "PLAY_ONLINE") {
             if (result) {
                 const dataSend = {
                     type: "LEAVE_ROOM_ACTIVELY",
+                    roomId: sessionStorage.getItem("roomId"),
                     username: me.username,
                     role: ROLE
                 }

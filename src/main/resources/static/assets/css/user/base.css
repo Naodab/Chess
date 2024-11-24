@@ -761,3 +761,7 @@ a {
 .page:hover {
     box-shadow: 0 0 8px var(--text-color);
 }
+
+#find-room {
+    min-width: 420px;
+}

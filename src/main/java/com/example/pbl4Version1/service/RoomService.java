@@ -188,37 +188,45 @@ public class RoomService {
 			}
 		}
 		switch (roomUserToRemove.getRole()) {
+			case PLAYER:
 			case VIEWER:
 				roomUsers.remove(roomUserToRemove);
 				break;
-			case PLAYER:
-				RoomUser newPlayer = roomUsers.stream().filter(ru -> ru.getRole()
-						.equals(Mode.VIEWER)).findFirst().orElse(null);
-				if (newPlayer != null) {
-					newPlayer.setRole(Mode.PLAYER);
-					roomUserRepository.save(newPlayer);
-				} else {
-					//don't have a viewer when player leaves!
-				}
-				break;
+//			case PLAYER:
+//				RoomUser newPlayer = roomUsers.stream().filter(ru -> ru.getRole()
+//						.equals(Mode.VIEWER)).findFirst().orElse(null);
+//				if (newPlayer != null) {
+//					newPlayer.setRole(Mode.PLAYER);
+//					roomUserRepository.save(newPlayer);
+//				} else {
+//					//don't have a viewer when player leaves!
+//				}
+//				break;
 			case HOST:
-				RoomUser newHost = roomUsers.stream().filter(ru -> ru.getRole()
-						.equals(Mode.PLAYER)).findFirst().orElse(null);
-				if (newHost != null) {
-					newHost.setRole(Mode.HOST);
-					roomUserRepository.save(newHost);
-					RoomUser newPlayer2 = roomUsers.stream().filter(ru -> ru.getRole()
-							.equals(Mode.VIEWER)).findFirst().orElse(null);
-					if (newPlayer2 != null) {
-						newPlayer2.setRole(Mode.PLAYER);
-						roomUserRepository.save(newPlayer2);
-					} else {
-						//don't have a viewer when player leaves!
-
+//				RoomUser newHost = roomUsers.stream().filter(ru -> ru.getRole()
+//						.equals(Mode.PLAYER)).findFirst().orElse(null);
+//				if (newHost != null) {
+//					newHost.setRole(Mode.HOST);
+//					roomUserRepository.save(newHost);
+//					RoomUser newPlayer2 = roomUsers.stream().filter(ru -> ru.getRole()
+//							.equals(Mode.VIEWER)).findFirst().orElse(null);
+//					if (newPlayer2 != null) {
+//						newPlayer2.setRole(Mode.PLAYER);
+//						roomUserRepository.save(newPlayer2);
+//					} else {
+//						//don't have a viewer when player leaves!
+//
+//					}
+//				} else {
+//					//don't have a player when host leaves!
+//
+//				}
+//				break;
+				List<RoomUser> listToRemove = roomUserRepository.findByRoomId(id);
+				for (RoomUser roomUser: listToRemove) {
+					if (!roomUser.getUser().getId().equals(user.getId())) {
+						roomUserRepository.deleteByRoomIdAndUserId(room.getId(), roomUser.getUser().getId());
 					}
-				} else {
-					//don't have a player when host leaves!
-
 				}
 				break;
 		}

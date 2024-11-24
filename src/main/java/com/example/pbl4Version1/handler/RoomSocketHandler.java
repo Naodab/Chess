@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -23,7 +24,7 @@ import java.util.List;
 @Slf4j
 public class RoomSocketHandler {
     RoomService roomService;
-    LobbySocketHandler lobbySocketHandler = LobbySocketHandler.getInstance();
+    LobbySocketHandler lobbySocketHandler = LobbySocketHandler.getInstance(roomService);
     DelayAction delayHostAction = new DelayAction();
     DelayAction delayPlayerAction = new DelayAction();
 
@@ -62,6 +63,7 @@ public class RoomSocketHandler {
                     }
                     RoomResponse response = roomService.leaveRoom(roomId, username);
                     broadCast(leaveRoom(username, role, response.isActive()));
+                    lobbySocketHandler.broadcastMessage(leaveRoom(username, role, response.isActive(), roomId + ""));
                 } catch (Exception ignored) {}
             }, 10);
         } else if (role.equals("PLAYER")) {
@@ -84,6 +86,7 @@ public class RoomSocketHandler {
         } else {
             RoomResponse response = roomService.leaveRoom(roomId, username);
             broadCast(leaveRoom(username, role, response.isActive()));
+            lobbySocketHandler.broadcastMessage(leaveRoom(username, role, response.isActive(), roomId + ""));
         }
     }
 
@@ -92,6 +95,7 @@ public class RoomSocketHandler {
             playerSession = null;
             RoomResponse response = roomService.leaveRoom(roomId, username);
             broadCast(leaveRoom(username, role, response.isActive()));
+            lobbySocketHandler.broadcastMessage(leaveRoom(username, role, response.isActive(), roomId + ""));
         } catch (Exception ignored) {}
     }
 
@@ -167,11 +171,7 @@ public class RoomSocketHandler {
                             getDataTimeIgnoreType().getPayload().substring(1);
                     message = new TextMessage(payload);
                 }
-                case "LEAVE_ROOM" -> {
-                    String roomId = jsonNode.get("id").asText();
-                    lobbySocketHandler.broadcastMessage(jsonStringLeaveRoom(roomId));
-                    return;
-                }
+                //former: case "leave room"
             }
         }
         for (WebSocketSession webSocketSession : webSocketSessions) {
@@ -204,13 +204,15 @@ public class RoomSocketHandler {
         return new TextMessage(payload);
     }
 
-    private String jsonStringLeaveRoom(String roomId) {
-        String jsonString = "";
-        jsonString = "{" +
-                "\"type\": \"LEAVE_ROOM\"," +
-                "\"id\":" + roomId +
+    private String leaveRoom(String username, String role, boolean active, String roomId) {
+        String isActive = active ? "true" : "false";
+        return "{" +
+                "\"type\": \"USER_LEAVE_ROOM\"," +
+                "\"roomId\": \"" + roomId + "\"," +
+                "\"username\":" + "\"" + username + "\"" + "," +
+                "\"role\":" + "\"" +  role + "\"" + "," +
+                "\"isActive\":" + isActive +
                 "}";
-        return jsonString;
     }
 
     private TextMessage leaveRoom(String username, String role, boolean active) {
