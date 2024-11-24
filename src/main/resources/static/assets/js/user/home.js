@@ -59,6 +59,11 @@ function initializeWebsocket() {
                     ws.send(JSON.stringify(data));
                     updateLeaveRoomUI(data);
                     break;
+                case "RESPONSE_VALID_ROOM":
+                    alert("find valid room: " + data.id);
+                    joinRoomAsPlayer_Auto(data);
+                    alert("yeah join room successfully!" )
+                    break;
             }
         }
     });
@@ -107,11 +112,10 @@ window.addEventListener("load", () => {
             player.onclick = () => turnOnModal(renderPersonalInformation, topUsers[index]);
         });
     });
-    //NOTE: next initializeWebsocket when loading page jsp
     initializeWebsocket();
     console.log(localStorage.getItem("TOKEN"));
     //NOTE: fetch to get all active rooms
-    loadAllRooms();
+    //loadAllRooms();
 });
 
 function turnOnModal(renderFunction, attr) {
@@ -464,8 +468,12 @@ $("#create-room").onclick = () => {
 }
 
 $("#play-random").onclick = () => {
-    //TODO: display loading screen
-
+    turnOnModal(renderLoading);
+    const dataToSend = {
+        type: "REQUEST_PLAY_RANDOM",
+        username: sessionStorage.getItem("USERNAME")
+    };
+    ws.send(JSON.stringify(dataToSend));
 }
 
 function addRoom(room) {
@@ -559,6 +567,16 @@ function joinRoomAsPlayer(room) {
         type: "JOIN_ROOM_AS_PLAYER",
         roomId: room.id,
         username: sessionStorage.getItem("USERNAME")
+    };
+    ws.send(JSON.stringify(dataToBroadcast));
+    window.location.href = "../public/playonl";
+}
+
+function joinRoomAsPlayer_Auto(room) {
+    const dataToBroadcast = {
+        type: "JOIN_ROOM_AS_PLAYER",
+        roomId: room.id,
+        username: room.username
     };
     ws.send(JSON.stringify(dataToBroadcast));
     window.location.href = "../public/playonl";

@@ -6,6 +6,7 @@ import java.util.*;
 import com.example.pbl4Version1.dto.response.RoomResponse;
 import com.example.pbl4Version1.entity.Room;
 import com.example.pbl4Version1.service.RoomService;
+import com.example.pbl4Version1.service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -132,8 +133,28 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                 }
                 return;
             }
-            case "RANDOM" -> {
-
+            case "REQUEST_PLAY_RANDOM" -> {
+                log.info("Receive a request from a user to play randomly!");
+                boolean isValidRoom = false;
+                String validRoomId = "";
+                String username = jsonNode.get("username").asText();
+                for (RoomLobbyHandler roomLobbyHandler : roomLobbyHandlerList) {
+                    RoomLobbyHandler temp = roomLobbyHandler;
+                    if (temp.getHost() != null && temp.getPlayer() == null && !temp.isHasPassword()) {
+                        isValidRoom = true;
+                        validRoomId = temp.getId() + "";
+                        break;
+                    }
+                }
+                if (isValidRoom && !validRoomId.isEmpty()) {
+                    log.info("test payload");
+                    session.sendMessage(responseValidRoom(validRoomId, username));
+                }
+                log.info("Information when randomly joining as a player:");
+                for (RoomLobbyHandler roomLobbyHandler : roomLobbyHandlerList) {
+                    log.info(roomLobbyHandler.toString());
+                }
+                return;
             }
         }
         for (WebSocketSession webSocketSession : webSocketSessions) {
@@ -152,23 +173,34 @@ public class LobbySocketHandler extends TextWebSocketHandler{
         }
     }
 
+    private TextMessage responseValidRoom(String validRoomId, String username) {
+        String payload = "{" +
+                "\"type\": \"RESPONSE_VALID_ROOM\"," +
+                "\"username\":" + "\"" + username + "\"" + "," +
+                "\"role\":" + "\"" +  "PLAYER" + "\"" + "," +
+                "\"id\":" + validRoomId +
+                "}";
+        log.info(payload);
+        return new TextMessage(payload);
+    }
+
     private TextMessage getRoomsActive() {
-        String jsonString = "{" +
+        String payload = "{" +
                 "\"type\": \"RESPONSE_ENTER_LOBBY\",";
         if (!roomLobbyHandlerList.isEmpty()) {
-            jsonString += "\"rooms\":" + "[" ;
+            payload += "\"rooms\":" + "[" ;
             for(RoomLobbyHandler roomLobbyHandler : roomLobbyHandlerList) {
-                jsonString += (getJsonRooms(roomLobbyHandler) + ",");
+                payload += (getJsonRooms(roomLobbyHandler) + ",");
             }
-            jsonString = jsonString.substring(0, jsonString.length() - 1);
-            jsonString += "]}";
+            payload = payload.substring(0, payload.length() - 1);
+            payload += "]}";
         }
         else {
-            jsonString = jsonString.substring(0, jsonString.length() - 1);
-            jsonString += "}";
+            payload = payload.substring(0, payload.length() - 1);
+            payload += "}";
         }
-        log.info(jsonString);
-        return new TextMessage(jsonString);
+        log.info(payload);
+        return new TextMessage(payload);
     }
 
     private String getJsonRooms(RoomLobbyHandler roomLobbyHandler) {
