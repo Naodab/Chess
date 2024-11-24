@@ -22,7 +22,7 @@
             <a href=""><i class="fas fa-puzzle-piece"></i>Chơi với máy</a>
         </div>
         <div class="sidebar-body">
-            <button class="btn btn--pink logout" id="exit-room-button">Thoát phòng</button>
+            <button class="btn btn--pink logout" id="exit">Trở lại</button>
         </div>
         <a class="settings-link" href=""><i class="fas fa-cog"></i>Cài đặt</a>
     </div>
@@ -81,8 +81,18 @@
                 </div>
             </div>
             <div class="step__footer">
-                <div class="btn btn--pink step__function"   id="return-left"><i class="fa-solid fa-angle-left"></i></div>
-                <div class="btn btn--pink step__function"   id="return-right"><i class="fa-solid fa-angle-right"></i></div>
+                <div class="btn btn--green step__function" id="play">
+                    <i class="fa-solid fa-play"></i>
+                </div>
+                <div class="btn btn--blue step__function" id="pause">
+                    <i class="fa-solid fa-pause"></i>
+                </div>
+                <div class="btn btn--pink step__function" id="return-left">
+                    <i class="fa-solid fa-angle-left"></i>
+                </div>
+                <div class="btn btn--pink step__function" id="return-right">
+                    <i class="fa-solid fa-angle-right"></i>
+                </div>
             </div>
         </div>
     </div>

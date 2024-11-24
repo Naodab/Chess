@@ -16,3 +16,13 @@
     width: 50px;
     border: none;
 }
+
+.step.active {
+    background-color: var(--overlay-color);
+    color: var(--closure-color);
+    border: 2px solid var(--text-color);
+}
+
+#pause {
+    display: none;
+}

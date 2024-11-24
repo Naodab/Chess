@@ -1,9 +1,15 @@
 import { initGame } from "./data/data.js";
-import {initGameRender, initGameFromFenRender } from "./render/main.js";
+import {
+    initGameRender,
+    initGameFromFenRender,
+    deletePieceForReview,
+    createPieceForReview
+} from "./render/main.js";
 import { globalEvent } from "./event/global.js";
-import {ROOT_DIV, STEPS_CONTAINER} from "./helper/constants.js";
+import {BLACK_DEFEATED_PIECES, ROOT_DIV, STEPS_CONTAINER, WHITE_DEFEATED_PIECES} from "./helper/constants.js";
 import {innerStepAvatar} from "./opponents/message.js";
 import {getMatch} from "../user/api/match.js";
+import {getPieceAtPosition} from "./helper/commonHelper.js";
 
 const gbContainer = document.querySelector(".game-board-container");
 
@@ -30,6 +36,8 @@ function setIsMatchExecute(execute) {
 function reCreateGame() {
     globalState = initGame();
     ROOT_DIV.innerHTML = "";
+    document.querySelector(WHITE_DEFEATED_PIECES).innerHTML = "";
+    document.querySelector(BLACK_DEFEATED_PIECES).innerHTML = "";
     initGameRender(globalState);
     globalEvent();
 }
@@ -286,31 +294,127 @@ document.body.onload = async function () {
                 initStepsContainer(opponent, me);
             addSteps(steps);
             STEPS_CONTAINER.scrollLeft = STEPS_CONTAINER.scrollWidth;
-            const fen = steps[steps.length - 1].fen;
-            initGameFromFenRender(globalState, fen);
+            initGameFromFenRender(globalState, steps[0].fen);
+            eventStep(steps);
         });
     }
 }
 
+function compareFENChanges(fen1, fen2) {
+    const parseFEN = (fen) => {
+        const rows = fen.split(' ')[0].split('/');
+        return rows.map(row => {
+            let expandedRow = '';
+            for (let char of row) {
+                if (!isNaN(char)) {
+                    expandedRow += '.'.repeat(Number(char)); // Điền dấu "." cho các ô trống
+                } else {
+                    expandedRow += char;
+                }
+            }
+            return expandedRow;
+        });
+    };
+
+    const board1 = parseFEN(fen1);
+    const board2 = parseFEN(fen2);
+
+    let changes = [];
+    for (let i = 0; i < board1.length; i++) {
+        for (let j = 0; j < board1[i].length; j++) {
+            if (board1[i][j] !== board2[i][j]) {
+                changes.push({
+                    position: `${String.fromCharCode(97 + j)}${8 - i}`, // Chuyển vị trí sang ký hiệu cột và hàng
+                    from: board1[i][j] === '.' ? 'empty' : board1[i][j],
+                    to: board2[i][j] === '.' ? 'empty' : board2[i][j]
+                });
+            }
+        }
+    }
+
+    return changes;
+}
+
+function eventStep(steps) {
+    let activeIndex = 0;
+    const stepDivs = document.querySelectorAll(".step");
+    stepDivs[activeIndex].classList.add("active");
+    stepDivs.forEach((stepDiv, index) => {
+        stepDiv.onclick = () => {
+            pauseBtn.click();
+            if (index === activeIndex) return;
+            stepDivs[activeIndex].classList.remove("active");
+            const changes = compareFENChanges(steps[activeIndex].fen, steps[index].fen);
+            changes.forEach(change => {
+                if (change.from !== "empty") {
+                    deletePieceForReview(getPieceAtPosition(change.position));
+                }
+                if (change.to !== "empty") {
+                    createPieceForReview(change);
+                }
+            });
+            stepDiv.classList.add("active");
+            activeIndex = index;
+        }
+    });
+
+    const right = document.querySelector("#return-right");
+    const left = document.querySelector("#return-left");
+    const playBtn = document.querySelector("#play");
+    const pauseBtn = document.querySelector("#pause");
+
+    right.onclick = () => {
+        if (activeIndex === steps.length - 1) return;
+        stepDivs[activeIndex + 1].click();
+    }
+
+    left.onclick = () => {
+        if (activeIndex === 0) return;
+        stepDivs[activeIndex - 1].click();
+    }
+
+    let internal;
+
+    playBtn.onclick = () => {
+        playBtn.style.display = "none";
+        pauseBtn.style.display = "flex";
+
+        internal = setInterval(() => {
+            if (activeIndex === steps.length - 1) pauseBtn.click();
+            else right.click();
+        }, 1000);
+    }
+
+    pauseBtn.onclick = () => {
+        playBtn.style.display = "flex";
+        pauseBtn.style.display = "none";
+        clearInterval(internal);
+    }
+
+    document.querySelector("#exit").onclick = () => {
+        window.history.back();
+    }
+}
+
 export {
-    globalState,
+    ROOM,
+    ROLE,
     ALLIANCE,
     OPPONENT,
-    ROLE,
-    ROOM,
-    matchActiveId,
     matchNumber,
     whitePlayer,
     blackPlayer,
+    globalState,
+    matchActiveId,
     isMatchExecute,
-    addSteps,
-    initStepsContainer,
     setRoom,
-    setRoomAndComponents,
-    setMatchActiveId,
-    setIsMatchExecute,
+    addSteps,
     setRoomData,
     reCreateGame,
     initComponent,
-    setMatchNumber
+    setMatchNumber,
+    setMatchActiveId,
+    setIsMatchExecute,
+    initStepsContainer,
+    setRoomAndComponents
 };

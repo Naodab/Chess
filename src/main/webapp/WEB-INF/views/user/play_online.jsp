@@ -65,7 +65,7 @@
 
             <div class="defeated-pieces-container">
                 <span class="defeated-pieces"></span>
-                <span class="defeated-pieces "></span>
+                <span class="defeated-pieces"></span>
             </div>
 
             <div class="ready-container">

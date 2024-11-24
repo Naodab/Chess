@@ -573,6 +573,69 @@ function generateFen() {
 	return fen;
 }
 
+function deletePieceForReview(piece) {
+	turnDraw = 0;
+	const flatData = globalState.flat();
+	const pieceOnGlobalState = flatData.find(el => el.id === piece.current_position);
+
+	if (piece.piece_name.includes("WHITE")) {
+		let index = whitePieces.findIndex(ele => ele.current_position === piece.current_position);
+		whitePieces.splice(index, 1);
+	} else {
+		let index = blackPieces.findIndex(ele => ele.current_position === piece.current_position);
+		blackPieces.splice(index, 1);
+	}
+
+	const square = document.getElementById(piece.current_position);
+	square.innerHTML = "";
+	pieceOnGlobalState.piece = null;
+}
+
+function createPieceFromSignal(info) {
+	switch (info.to) {
+		case "p":
+			return pieces.blackPawn(info.position);
+		case "r":
+			return pieces.blackRook(info.position);
+		case "n":
+			return pieces.blackKnight(info.position);
+		case "b":
+			return pieces.blackBishop(info.position);
+		case "q":
+			return pieces.blackQueen(info.position);
+		case "k":
+			return pieces.blackKing(info.position);
+		case "P":
+			return pieces.whitePawn(info.position);
+		case "R":
+			return pieces.whiteRook(info.position);
+		case "N":
+			return pieces.whiteKnight(info.position);
+		case "B":
+			return pieces.whiteBishop(info.position);
+		case "Q":
+			return pieces.whiteQueen(info.position);
+		case "K":
+			return pieces.whiteKing(info.position);
+	}
+}
+
+function createPieceForReview(info) {
+	const newPiece = createPieceFromSignal(info);
+	globalState.forEach(row => {
+		row.forEach(element => {
+			if (element.id === newPiece.current_position) {
+				element.piece = newPiece;
+			}
+		});
+	});
+	const squareEl = document.getElementById(info.position);
+	const piece = document.createElement("img");
+	piece.src = newPiece.img;
+	piece.classList.add("piece");
+	squareEl.appendChild(piece);
+}
+
 export {
 	whiteMoves,
 	blackMoves,
@@ -587,5 +650,7 @@ export {
 	deletePiece,
 	beginPromotionPawn,
 	finishPromotionPawn,
-	handleNameMove
+	handleNameMove,
+	createPieceForReview,
+	deletePieceForReview
 };
