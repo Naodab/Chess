@@ -3,6 +3,7 @@ package com.example.pbl4Version1.mapper;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.example.pbl4Version1.dto.request.RoomAutoCreateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,13 @@ public class RoomMapper {
 	UserMapper userMapper;
 	
 	public Room toRoom(RoomCreateRequest request) {
+		return Room.builder()
+				.password(request.getPassword())
+				.time(request.getTime())
+				.build();
+	}
+
+	public Room toRoom(RoomAutoCreateRequest request) {
 		return Room.builder()
 				.password(request.getPassword())
 				.time(request.getTime())

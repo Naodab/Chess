@@ -22,6 +22,15 @@
     }
 }
 
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 :root {
     --primary: rgb(252, 211, 159);
     --text-color: rgb(252, 211, 159);
@@ -33,6 +42,8 @@
     --yellow-color: rgb(252, 211, 159);
     --overlay-color: rgba(255, 255, 255, 0.5);
     --closure-background-color: rgba(240, 240, 240, 0.6);
+    --white-color: #DEEABA;
+    --black-color: #D88C34;
 }
 
 * {
@@ -580,6 +591,175 @@ a {
     font-weight: bold;
     width: 100%;
     text-align: center;
+}
+
+.loading-container {
+    width: 80px;
+    height: 80px;
+    position: relative;
+}
+
+.circle-loading {
+    width: 100%;
+    height: 100%;
+    border: 8px solid transparent;
+    border-top-color: var(--blue-color);
+    border-radius: 50%;
+    position: absolute;
+    animation: spin 1s linear infinite;
+}
+
+.circle-loading:nth-child(2) {
+    border: 8px solid transparent;
+    border-top-color: var(--pink-color);
+    animation: spin 1s linear infinite reverse;
+}
+
+.matches-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.match {
+    display: flex;
+    position: relative;
+    align-items: center;
+    min-width: 400px;
+    justify-content: space-between;
+    border-radius: 30px;
+    overflow: hidden;
+    margin: 4px 0;
+    box-shadow: 0 0 4px white;
+    animation: zoomIn .3s ease;
+}
+
+.match .player-information {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.match .player-information.alliance-white {
+    color: white;
+}
+
+.match .player-information.alliance-black {
+    color: black;
+}
+
+.match .player-information:first-child.alliance-white {
+    background: linear-gradient(to right, var(--white-color), transparent);
+}
+
+.match .player-information:first-child.alliance-black {
+    background: linear-gradient(to right, var(--black-color), transparent);
+}
+
+.match .player-information:last-child.alliance-white {
+    background: linear-gradient(to left, var(--white-color), transparent);
+}
+
+.match .player-information:last-child.alliance-black {
+    background: linear-gradient(to left, var(--black-color), transparent);
+}
+
+.match .player-information:first-child {
+    border-radius: 30px 0 0 30px;
+}
+
+.match .player-information:last-child {
+    flex-direction: row-reverse;
+    border-radius: 0 30px 30px 0;
+}
+
+.match .player-information .player-avatar {
+    width: 50px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+}
+
+.match .player-information:first-child .player-avatar {
+    margin-right: 16px;
+}
+
+.match .player-information:last-child .player-avatar {
+    margin-left: 16px;
+}
+
+.match .match-state-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 200%;
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--pink-color);
+    cursor: pointer;
+    transition: all .3s ease-in-out;
+    overflow: hidden;
+}
+
+.match .match-state-container .match-state-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 30px;
+}
+
+.match .match-state-container .match-state {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 50%;
+    transition: .3s ease-in-out;
+}
+
+.match .match-state-container .match-details {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    transition: all .3s ease-in-out;
+    background-color: var(--pink-color);
+    color: var(--closure-color);
+}
+
+.match .match-state-container:hover {
+    transform: translateX(-50%);
+}
+
+.pages-container {
+    margin-top: 8px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page {
+    margin: 0 8px;
+    padding: 4px 8px;
+    font-size: 14px;
+    color: var(--text-color);
+    border-radius: 4px;
+    border: 1px solid var(--text-color);
+    cursor: pointer;
+}
+
+.page.active {
+    background: var(--text-color);
+    color: var(--closure-color);
+    box-shadow: 0 0 8px var(--text-color);
+}
+
+.page:hover {
+    box-shadow: 0 0 8px var(--text-color);
 }
 
 #find-room {

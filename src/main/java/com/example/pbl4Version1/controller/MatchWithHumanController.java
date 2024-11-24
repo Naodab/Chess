@@ -1,6 +1,7 @@
 package com.example.pbl4Version1.controller;
 
 import com.example.pbl4Version1.dto.request.MatchWithHumanUpdateRequest;
+import com.example.pbl4Version1.dto.response.MatchWithHumanMinimalResponse;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.pbl4Version1.dto.request.MatchCreationRequest;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MatchWithHumanController {
 	MatchWithHumanService matchWithHumanService;
+
+	@GetMapping
+	ApiResponse<List<MatchWithHumanResponse>> getAll() {
+		return ApiResponse.<List<MatchWithHumanResponse>>builder()
+				.result(matchWithHumanService.getAll())
+				.build();
+	}
 	
 	@PostMapping
 	ApiResponse<MatchWithHumanResponse> create(@RequestBody MatchCreationRequest request) {
@@ -42,5 +52,11 @@ public class MatchWithHumanController {
 				.result(matchWithHumanService.updateMatchWithHuman(matchId, request))
 				.build();
 	}
-	//Don't finish yet
+
+	@GetMapping("/myMatches/{page}")
+	ApiResponse<List<MatchWithHumanMinimalResponse>> getMyMatches(@PathVariable int page) {
+		return ApiResponse.<List<MatchWithHumanMinimalResponse>>builder()
+				.result(matchWithHumanService.getMyMatches(page))
+				.build();
+	}
 }

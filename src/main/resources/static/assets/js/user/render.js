@@ -7,6 +7,90 @@ function html([first, ...strings], ...values) {
         .join('');
 }
 
+function renderLoading() {
+    return html`
+        <div class="modal closure active" id="update-avatar">
+            <h1 class="modal__title">Đang tải</h1>
+            <div class="main-modal">
+                <div class="loading-container">
+                    <div class="circle-loading"></div>
+                    <div class="circle-loading"></div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+function renderWaitingForOthers() {
+    return html`
+        <div class="modal closure active" id="update-avatar">
+            <h1 class="modal__title">Chờ đợi</h1>
+            <div class="main-modal">
+                <div class="loading-container">
+                    <div class="circle-loading"></div>
+                    <div class="circle-loading"></div>
+                </div>
+                <div class="modal__function top--margin">
+                    <div class="btn btn--pink modal__btn" id="cancel">Hủy</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+
+function renderPlayerInformation(player) {
+    return html`
+        <div class="player-information alliance-${player.color}">
+            <div class="player-avatar"
+                 style="background: url('${player.avatar}') no-repeat center center / cover;')">
+            </div>
+            <div class="player-username">${player.username}</div>
+        </div>
+    `;
+}
+
+function renderMatch(match) {
+    return html`
+        <div class="match" data-id="${match.id}">
+            ${renderPlayerInformation(match.me)}
+            <div class="match-state-container">
+                <div class="match-state match-state-item">${match.state}</div>
+                <div class="match-details match-state-item">Xem chi tiết</div>
+            </div>
+            ${renderPlayerInformation(match.opponent)}
+        </div>
+    `;
+}
+
+function renderMatches(matches) {
+    return html`${matches.map(match => renderMatch(match))}`
+}
+
+function renderModalMatches(data) {
+    const pages = [];
+    for (let i = 0; i <= Math.floor(data.size / 8); i++) {
+        pages.push(i);
+    }
+    return html`
+        <div class="modal closure active" id="info-user">
+            <h1 class="modal__title">Trận đấu</h1>
+            <i class="fa-solid fa-xmark btn-icon btn-close" id="back"></i>
+            <div class="main-modal">
+                <div class="matches-container">
+                    ${renderMatches(data.matches)}
+                </div>
+                <div class="pages-container">
+                    ${
+                        pages.map((page) => html`
+                            <div class="page" data-page="${page}">${page + 1}</div>
+                        `)
+                    }
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 function renderPersonalInformation(user) {
     return html`
         <div class="modal closure active" id="info-user">
@@ -35,9 +119,11 @@ function renderPersonalInformation(user) {
             <div class="achievements-container modal-item">
 
             </div>
-            <div class="modal__function">
-                <div class="modal__btn btn">Ván đấu</div>
-            </div>
+            ${ sessionStorage.getItem("USERNAME") === user.username && html`
+                <div class="modal__function">
+                    <div class="modal__btn btn matches-history">Ván đấu</div>
+                </div>
+            `}
         </div>
     `;
 }
@@ -47,6 +133,7 @@ function renderUpdateAvatar(oldAvatar) {
         <div class="modal closure active" id="update-avatar">
             <h1 class="modal__title">Thay đổi ảnh đại diện</h1>
             <i class="fa-solid fa-xmark btn-icon btn-close" id="back"></i>
+            <div class="error-message"></div>
             <div class="main-modal">
                 <img src="${oldAvatar}"
                      alt="avatar" class="modal__avatar" id="img-update">
@@ -258,5 +345,9 @@ export {
     renderCreateRoom,
     renderTopUser,
     renderFindRoom,
-    renderEnterRoomWithPassword
+    renderEnterRoomWithPassword,
+    renderLoading,
+    renderModalMatches,
+    renderMatches,
+    renderWaitingForOthers
 }

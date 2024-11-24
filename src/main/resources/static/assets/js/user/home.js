@@ -7,9 +7,10 @@ import {
     renderRoom,
     renderTopUser,
     renderFindRoom,
-    renderEnterRoomWithPassword
+    renderEnterRoomWithPassword, renderLoading, renderMatches, renderModalMatches
 } from "./render.js";
 import {getSpiderActivity} from "../util/spiderActivity.js";
+import {getPageMatch} from "./api/match.js";
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
@@ -20,6 +21,7 @@ const activityList = $(".activity-list");
 const topUsers = [];
 
 let ws;
+let activePageMatches = 0;
 
 function initializeWebsocket() {
     getSpiderActivity().then(data => {
@@ -105,10 +107,11 @@ window.addEventListener("load", () => {
             player.onclick = () => turnOnModal(renderPersonalInformation, topUsers[index]);
         });
     });
-
+    //NOTE: next initializeWebsocket when loading page jsp
     initializeWebsocket();
     console.log(localStorage.getItem("TOKEN"));
-    //loadAllRooms();
+    //NOTE: fetch to get all active rooms
+    loadAllRooms();
 });
 
 function turnOnModal(renderFunction, attr) {
@@ -207,15 +210,57 @@ $("#see-my-information").addEventListener("click", event => {
         const user = data.result;
         turnOnModal(renderPersonalInformation, user);
 
-        // TODO: catch event see matches
+        $(".matches-history").onclick = () => {
+            turnOffModal();
+            turnOnModal(renderLoading);
+            getPageMatch(activePageMatches).then(matches => {
+                turnOffModal();
+                const attrs = {};
+                attrs.matches = matches;
+                attrs.size = user.battleNumber;
+                console.log(attrs);
+                turnOnModal(renderModalMatches, attrs);
+                handleMatchClick();
+                const pages = $$(".page");
+                pages.forEach((page, index) => {
+                    if (index === activePageMatches) {
+                        page.classList.add("active");
+                    }
+
+                    page.onclick = () => {
+                        if (index === activePageMatches) return;
+                        getPageMatch(index).then(matches => {
+                            pages[activePageMatches].classList.remove("active");
+                            activePageMatches = index;
+                            pages[activePageMatches].classList.add("active");
+                            const matchesContainer = $(".matches-container");
+                            matchesContainer.innerHTML = renderMatches(matches);
+                            handleMatchClick();
+                        });
+                    }
+                })
+            });
+        }
     });
 });
+
+function handleMatchClick() {
+    $$(".match").forEach(match => {
+        match.onclick = () => {
+            const matchId = match.getAttribute("data-id");
+            turnOffModal();
+            sessionStorage.setItem("MATCH_ID", matchId);
+            window.location.href = "/chess/public/review";
+        }
+    });
+}
 
 $("#change-avatar-btn").addEventListener("click", event => {
     event.preventDefault();
     const user = localStorage.getItem("USER");
     turnOnModal(renderUpdateAvatar, avatar);
 
+    const errorMessage = $(".error-message");
     $("#avatarInput").onchange = event => {
         const file = event.target.files[0];
         if (file) {
@@ -233,6 +278,8 @@ $("#change-avatar-btn").addEventListener("click", event => {
         const formData = new FormData();
         formData.append("file", file);
         if (file) {
+            turnOffModal();
+            turnOnModal(renderLoading);
             fetch("/chess/api/avatar", {
                 method: "POST",
                 headers: {
@@ -249,7 +296,9 @@ $("#change-avatar-btn").addEventListener("click", event => {
                     avatar = data.result;
                     $(".header__avatar").style.background = `url("${avatar}") no-repeat center center / cover`;
                 }
-            })
+            });
+        } else {
+            errorMessage.textContent = "Vui lòng chọn ảnh";
         }
     };
 });
@@ -474,7 +523,35 @@ function addRoom(room) {
 }
 
 // TODO: add event when load this jsp load room active to add room and use addRoom to add a room
+// NOTE: get all active rooms when load/reload page
 function loadAllRooms() {
+    fetch("../api/rooms/active", {
+        method: "GET",
+        headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+        }
+    }).then(response => {
+        if (response.ok)
+            return response.json();
+        else
+            throw new Error("Network response was not ok " + response.statusText);
+    }).then(data => {
+        const roomList = data.result;
+        for (let i = 0; i < roomList.length; i++) {
+            const room = roomList[i];
+            let people = 0;
+            if (room.host != null) people++;
+            if (room.player != null) people++;
+            if (room.viewers != null) people += room.viewers.length;
+            const roomData = {
+                id: room.id,
+                time: room.time,
+                people: people
+            };
+            addRoom(roomData);
+        }
+    })
 }
 
 function joinRoomAsPlayer(room) {
