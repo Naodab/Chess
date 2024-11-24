@@ -148,7 +148,6 @@ function handleSocketMessage(event) {
             }
 
             ROOM.matchActiveId = room.matchActiveId;
-            console.log(ROOM);
             setRoom(ROOM);
         });
     } else if (data.type === "READY") {
@@ -354,7 +353,8 @@ function addPerson(person, role) {
         });
     }
 
-    div.querySelector(".person-delete").onclick = () => {
+    div.querySelector(".person-delete").onclick = event => {
+        event.stopPropagation();
         if (ROLE !== "HOST" || isMatchExecute) return;
         const sendData = {
             type: "FORBIDDEN_USER",
@@ -439,7 +439,10 @@ function handleEndGame(data) {
         turnOffOverlay();
         if (ROLE !== "VIEWER" && ROOM.player) {
             setTimeout(() => {
-                handleReadyModal();
+                if (ROLE !== "VIEWER" && ROOM.player) {
+                    console.log(ROOM.player);
+                    handleReadyModal();
+                }
             }, 1000);
         }
     }

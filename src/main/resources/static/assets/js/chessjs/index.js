@@ -307,7 +307,7 @@ function compareFENChanges(fen1, fen2) {
             let expandedRow = '';
             for (let char of row) {
                 if (!isNaN(char)) {
-                    expandedRow += '.'.repeat(Number(char)); // Điền dấu "." cho các ô trống
+                    expandedRow += '.'.repeat(Number(char));
                 } else {
                     expandedRow += char;
                 }
@@ -324,7 +324,7 @@ function compareFENChanges(fen1, fen2) {
         for (let j = 0; j < board1[i].length; j++) {
             if (board1[i][j] !== board2[i][j]) {
                 changes.push({
-                    position: `${String.fromCharCode(97 + j)}${8 - i}`, // Chuyển vị trí sang ký hiệu cột và hàng
+                    position: `${String.fromCharCode(97 + j)}${8 - i}`,
                     from: board1[i][j] === '.' ? 'empty' : board1[i][j],
                     to: board2[i][j] === '.' ? 'empty' : board2[i][j]
                 });

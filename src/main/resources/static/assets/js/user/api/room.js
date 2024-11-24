@@ -12,6 +12,22 @@ function getRoom(roomId) {
     }).then(data => data.result);
 }
 
+function joinRoom(roomId, role, password) {
+    return fetch("../api/rooms/joinRoom/" + roomId, {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+        },
+        body: JSON.stringify({role, password})
+    }).then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+    }).then(data => data.result);
+}
+
 export {
-    getRoom
+    getRoom,
+    joinRoom
 }

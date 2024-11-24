@@ -7,10 +7,11 @@ import {
     renderRoom,
     renderTopUser,
     renderFindRoom,
-    renderEnterRoomWithPassword, renderLoading, renderMatches, renderModalMatches
+    renderEnterRoomWithPassword, renderLoading, renderMatches, renderModalMatches, renderWaitingForOthers
 } from "./render.js";
 import {getSpiderActivity} from "../util/spiderActivity.js";
 import {getPageMatch} from "./api/match.js";
+import {joinRoom} from "./api/room.js";
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
@@ -37,11 +38,10 @@ function initializeWebsocket() {
         }
         ws.onmessage = function (event) {
             const data = JSON.parse(event.data);
-            console.log(data);
             switch (data.type) {
                 case "RESPONSE_ENTER_LOBBY":
                     const roomList = data.rooms;
-                    if (roomList.length != 0) {
+                    if (roomList && roomList.length !== 0) {
                         for (const room of roomList)
                             addRoom(room);
                     }
@@ -55,14 +55,12 @@ function initializeWebsocket() {
                 case "JOIN_ROOM_AS_VIEWER":
                     updateRoomUI(data);
                     break;
-                case "USER_LEAVE_ROOM":
-                    ws.send(JSON.stringify(data));
-                    updateLeaveRoomUI(data);
+                case "DELETE_ROOM":
+                    deleteRoom(data.roomId);
                     break;
                 case "RESPONSE_VALID_ROOM":
                     alert("find valid room: " + data.id);
                     joinRoomAsPlayer_Auto(data);
-                    alert("yeah join room successfully!" )
                     break;
             }
         }
@@ -113,7 +111,6 @@ window.addEventListener("load", () => {
         });
     });
     initializeWebsocket();
-    console.log(localStorage.getItem("TOKEN"));
     //NOTE: fetch to get all active rooms
     //loadAllRooms();
 });
@@ -222,7 +219,6 @@ $("#see-my-information").addEventListener("click", event => {
                 const attrs = {};
                 attrs.matches = matches;
                 attrs.size = user.battleNumber;
-                console.log(attrs);
                 turnOnModal(renderModalMatches, attrs);
                 handleMatchClick();
                 const pages = $$(".page");
@@ -278,7 +274,6 @@ $("#change-avatar-btn").addEventListener("click", event => {
 
     $("#accept-update-avatar").onclick =  () => {
         const file = $("#avatarInput").files[0];
-        console.log(file);
         const formData = new FormData();
         formData.append("file", file);
         if (file) {
@@ -396,7 +391,6 @@ function findRoom(idRoom, passwordRoom, isPlayer) {
         },
         body: JSON.stringify({role, password})
     }).then(response => {
-        console.log(response);
         if (response.ok) {
             return response.json();
         }
@@ -435,7 +429,6 @@ $("#create-room").onclick = () => {
         const time = times[timeActive].getAttribute("data-value");
         const password = $("#roomPassword").value.trim();
         const data = {time, password};
-        console.log(localStorage.getItem("TOKEN"));
         fetch("../api/rooms", {
             method: "POST",
             headers: {
@@ -468,7 +461,7 @@ $("#create-room").onclick = () => {
 }
 
 $("#play-random").onclick = () => {
-    turnOnModal(renderLoading);
+    turnOnModal(renderWaitingForOthers);
     const dataToSend = {
         type: "REQUEST_PLAY_RANDOM",
         username: sessionStorage.getItem("USERNAME")
@@ -493,7 +486,17 @@ function addRoom(room) {
     }
 }
 
- function enterPassword(room, isPlayer = true) {
+function deleteRoom(roomId) {
+    const rooms = $$(".room");
+    for (let i = 0; i < rooms.length; i++) {
+        if (rooms[i].getAttribute("data-id") === String(roomId)) {
+            $(".rooms-list").removeChild(rooms[i]);
+            break;
+        }
+    }
+}
+
+function enterPassword(room, isPlayer = true) {
     turnOnModal(renderEnterRoomWithPassword);
     addEventForEye();
     const role = isPlayer ? "PLAYER" : "VIEWER";
@@ -503,29 +506,16 @@ function addRoom(room) {
 
     $("#enter-room").onclick = () => {
         const password = $("#roomPassword").value;
-        fetch("../api/rooms/joinRoom/" + room.id, {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json",
-                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
-            },
-            body: JSON.stringify({role, password})
-        }).then(response => {
-            console.log(response);
-            if (response.ok) {
-                return response.json();
-            }
-        }).then(data => data.result)
-            .then(room => {
-                sessionStorage.setItem("ROOM_ID", room.id);
-                if (role === "PLAYER")
-                    joinRoomAsPlayer(room);
-                else
-                    joinRoomAsViewer(room);
-            }).catch( () => {
-                if (role === "PLAYER")
-                    errorMessage.innerText = "Phòng đã có đủ người chơi hoặc sai mật khẩu!";
-                else errorMessage.innerText = "Mật khẩu không chính xác!";
+        joinRoom(room.id, role, password).then(room => {
+            sessionStorage.setItem("ROOM_ID", room.id);
+            if (role === "PLAYER")
+                joinRoomAsPlayer(room);
+            else
+                joinRoomAsViewer(room);
+        }).catch( () => {
+            if (role === "PLAYER")
+                errorMessage.innerText = "Phòng đã có đủ người chơi hoặc sai mật khẩu!";
+            else errorMessage.innerText = "Mật khẩu không chính xác!";
         })
     }
 }
@@ -576,9 +566,10 @@ function joinRoomAsPlayer_Auto(room) {
     const dataToBroadcast = {
         type: "JOIN_ROOM_AS_PLAYER",
         roomId: room.id,
-        username: room.username
+        username: sessionStorage.getItem("USERNAME")
     };
     ws.send(JSON.stringify(dataToBroadcast));
+    sessionStorage.setItem("ROOM_ID", room.id);
     window.location.href = "../public/playonl";
 }
 

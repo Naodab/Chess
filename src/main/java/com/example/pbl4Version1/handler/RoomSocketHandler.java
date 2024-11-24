@@ -48,24 +48,25 @@ public class RoomSocketHandler {
         webSocketSessions.add(session);
     }
 
-    public void remove(WebSocketSession session) throws IOException {
+    public void remove(WebSocketSession session) throws Exception {
         webSocketSessions.remove(session);
         String username = session.getAttributes()
                 .get("username").toString();
         String role = session.getAttributes()
                 .get("role").toString();
         if (role.equals("HOST")) {
-            delayHostAction.executeWithDelay(() -> {
-                try {
-                    if (playerSession != null) {
-                        hostSession = playerSession;
-                        playerSession = null;
-                    }
-                    RoomResponse response = roomService.leaveRoom(roomId, username);
-                    broadCast(leaveRoom(username, role, response.isActive()));
-                    lobbySocketHandler.broadcastMessage(leaveRoom(username, role, response.isActive(), roomId + ""));
-                } catch (Exception ignored) {}
-            }, 10);
+            if (!isMatchExecute) {
+                handlerHostDisconnection(username, role);
+            } else {
+                boolean isLeft = session.getAttributes().containsKey("left");
+                if (isLeft) {
+                    handlerHostDisconnection(username, role);
+                } else {
+                    delayPlayerAction.executeWithDelay(() -> {
+                        handlerHostDisconnection(username, role);
+                    }, 10);
+                }
+            }
         } else if (role.equals("PLAYER")) {
             boolean isBanned = session.getAttributes().containsKey("banned");
             if (isBanned) {
@@ -86,8 +87,21 @@ public class RoomSocketHandler {
         } else {
             RoomResponse response = roomService.leaveRoom(roomId, username);
             broadCast(leaveRoom(username, role, response.isActive()));
-            lobbySocketHandler.broadcastMessage(leaveRoom(username, role, response.isActive(), roomId + ""));
+            lobbySocketHandler.handleMessage(null,
+                    leaveRoom(username, role, response.isActive(), roomId + ""));
         }
+    }
+
+    private void handlerHostDisconnection(String username, String role) {
+        try {
+            if (playerSession != null) {
+                hostSession = playerSession;
+                playerSession = null;
+            }
+            RoomResponse response = roomService.leaveRoom(roomId, username);
+            broadCast(leaveRoom(username, role, response.isActive()));
+            lobbySocketHandler.handleMessage(null, leaveRoom(username, role, response.isActive(), roomId + ""));
+        } catch (Exception ignored) {}
     }
 
     private void handlePlayerDisconnection(String username, String role) {
@@ -95,7 +109,7 @@ public class RoomSocketHandler {
             playerSession = null;
             RoomResponse response = roomService.leaveRoom(roomId, username);
             broadCast(leaveRoom(username, role, response.isActive()));
-            lobbySocketHandler.broadcastMessage(leaveRoom(username, role, response.isActive(), roomId + ""));
+            lobbySocketHandler.handleMessage(null, leaveRoom(username, role, response.isActive(), roomId + ""));
         } catch (Exception ignored) {}
     }
 
@@ -204,15 +218,16 @@ public class RoomSocketHandler {
         return new TextMessage(payload);
     }
 
-    private String leaveRoom(String username, String role, boolean active, String roomId) {
+    private TextMessage leaveRoom(String username, String role, boolean active, String roomId) {
         String isActive = active ? "true" : "false";
-        return "{" +
+        String payload = "{" +
                 "\"type\": \"USER_LEAVE_ROOM\"," +
                 "\"roomId\": \"" + roomId + "\"," +
                 "\"username\":" + "\"" + username + "\"" + "," +
                 "\"role\":" + "\"" +  role + "\"" + "," +
                 "\"isActive\":" + isActive +
                 "}";
+        return new TextMessage(payload);
     }
 
     private TextMessage leaveRoom(String username, String role, boolean active) {

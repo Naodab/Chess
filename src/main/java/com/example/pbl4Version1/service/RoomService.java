@@ -138,18 +138,27 @@ public class RoomService {
 	public RoomResponse joinRoom(Long id, JoinRoomRequest request) {
 		Room room = roomRepository.findById(id).orElseThrow(
 				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
-		if (room.getPassword() != null && !passwordEncoder.matches(request.getPassword(), room.getPassword())) {
+		if (room.getPassword() != null &&
+				!passwordEncoder.matches(request.getPassword(), room.getPassword())) {
 			throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
 		}
-
 		var authentication = SecurityContextHolder.getContext().getAuthentication();
 		String username = authentication.getName();
+		return joinRoomSupport(room, request, username);
+	}
 
+	public RoomResponse joinRoom(Long id, JoinRoomRequest request, String username) {
+		Room room = roomRepository.findById(id).orElseThrow(
+				() -> new AppException(ErrorCode.ROOM_NOT_EXISTED));
+		return joinRoomSupport(room, request, username);
+	}
+
+	public RoomResponse joinRoomSupport(Room room, JoinRoomRequest request, String username) {
 		User user = userRepository.findByUsername(username)
 				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
 		boolean isHavingPlayer = false;
-		List<RoomUser> roomUsers = roomUserRepository.findByRoomId(id);
+		List<RoomUser> roomUsers = roomUserRepository.findByRoomId(room.getId());
 		RoomUser roomUser;
 		if (roomUsers != null) {
 			for (RoomUser roomuser : roomUsers) {
