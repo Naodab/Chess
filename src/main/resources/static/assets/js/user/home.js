@@ -27,19 +27,36 @@ function initializeWebsocket() {
         ws = new WebSocket(`ws://${ipAddress}:8080/chess/websocket`);
         ws.onopen = function () {
             console.log("Websocket is now opened!");
+            const dataSend = {
+                type: "ENTER_LOBBY",
+                username: sessionStorage.getItem("USERNAME")
+            }
+            ws.send(JSON.stringify(dataSend));
         }
         ws.onmessage = function (event) {
             const data = JSON.parse(event.data);
             console.log(data);
-            if (data.type === "CREATE_ROOM") {
-                addRoom(data);
-            }
-            else if (data.type === "JOIN_ROOM_AS_PLAYER" || data.type === "JOIN_ROOM_AS_VIEWER") {
-                updateRoomUI(data);
-            }
-            else if (data.type === "LEAVE_ROOM") {
-                console.log("Ready to do in leave_room");
-                updateLeaveRoomUI(data);
+            switch (data.type) {
+                case "RESPONSE_ENTER_LOBBY":
+                    const roomList = data.rooms;
+                    if (roomList.length != 0) {
+                        for (const room of roomList)
+                            addRoom(room);
+                    }
+                    break;
+                case "CREATE_ROOM":
+                    addRoom(data);
+                    break;
+                case "JOIN_ROOM_AS_PLAYER":
+                    updateRoomUI(data);
+                    break;
+                case "JOIN_ROOM_AS_VIEWER":
+                    updateRoomUI(data);
+                    break;
+                case "USER_LEAVE_ROOM":
+                    ws.send(JSON.stringify(data));
+                    updateLeaveRoomUI(data);
+                    break;
             }
         }
     });
@@ -88,11 +105,10 @@ window.addEventListener("load", () => {
             player.onclick = () => turnOnModal(renderPersonalInformation, topUsers[index]);
         });
     });
-    //NOTE: next initializeWebsocket when loading page jsp
+
     initializeWebsocket();
     console.log(localStorage.getItem("TOKEN"));
-    //NOTE: fetch to get all active rooms
-    loadAllRooms();
+    //loadAllRooms();
 });
 
 function turnOnModal(renderFunction, attr) {
@@ -364,7 +380,7 @@ $("#create-room").onclick = () => {
 
     $("#confirm-create-room").onclick = () => {
         const time = times[timeActive].getAttribute("data-value");
-        const password = $("#roomPassword").value;
+        const password = $("#roomPassword").value.trim();
         const data = {time, password};
         console.log(localStorage.getItem("TOKEN"));
         fetch("../api/rooms", {
@@ -381,15 +397,13 @@ $("#create-room").onclick = () => {
                 throw new Error("Network response was not ok " + response.statusText);
         }).then(data => {
             const roomCreateData = data.result;
-            let people = 0;
-            if (roomCreateData.host != null) people++;
-            if (roomCreateData.player != null) people++;
-            if (roomCreateData.viewers.length !== 0) people += roomCreateData.viewers.length;
             const infoToBroadcast = {
                 type: "CREATE_ROOM",
                 id: roomCreateData.id,
                 time: roomCreateData.time,
-                people: people
+                host: sessionStorage.getItem("USERNAME"),
+                people: 1,
+                hasPassword: password.length !== 0
             };
             sessionStorage.setItem("ROOM_ID", roomCreateData.id);
             ws.send(JSON.stringify(infoToBroadcast));
@@ -398,6 +412,11 @@ $("#create-room").onclick = () => {
             console.log("An error has been detected: " + error);
         })
     }
+}
+
+$("#play-random").onclick = () => {
+    //TODO: display loading screen
+
 }
 
 function addRoom(room) {
@@ -455,41 +474,14 @@ function addRoom(room) {
 }
 
 // TODO: add event when load this jsp load room active to add room and use addRoom to add a room
-// NOTE: get all active rooms when load/reload page
 function loadAllRooms() {
-    fetch("../api/rooms/active", {
-        method: "GET",
-        headers: {
-            "Content-type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
-        }
-    }).then(response => {
-        if (response.ok)
-            return response.json();
-        else
-            throw new Error("Network response was not ok " + response.statusText);
-    }).then(data => {
-        const roomList = data.result;
-        for (let i = 0; i < roomList.length; i++) {
-            const room = roomList[i];
-            let people = 0;
-            if (room.host != null) people++;
-            if (room.player != null) people++;
-            if (room.viewers != null) people += room.viewers.length;
-            const roomData = {
-                id: room.id,
-                time: room.time,
-                people: people
-            };
-            addRoom(roomData);
-        }
-    })
 }
 
 function joinRoomAsPlayer(room) {
     const dataToBroadcast = {
         type: "JOIN_ROOM_AS_PLAYER",
-        id: room.id
+        roomId: room.id,
+        username: sessionStorage.getItem("USERNAME")
     };
     ws.send(JSON.stringify(dataToBroadcast));
     window.location.href = "../public/playonl";
@@ -498,14 +490,15 @@ function joinRoomAsPlayer(room) {
 function joinRoomAsViewer(room) {
     const dataToBroadcast = {
         type: "JOIN_ROOM_AS_VIEWER",
-        id: room.id
+        roomId: room.id,
+        username: sessionStorage.getItem("USERNAME")
     };
     ws.send(JSON.stringify(dataToBroadcast));
     window.location.href = "../public/playonl";
 }
 
 function updateRoomUI(room) {
-    const roomRow = document.querySelector(`[data-id='${room.id}']`);
+    const roomRow = document.querySelector(`[data-id='${room.roomId}']`);
     if (roomRow) {
         let peopleElement = roomRow.querySelector(".room-people");
         let currentPeople = parseInt(peopleElement.textContent);
@@ -514,7 +507,7 @@ function updateRoomUI(room) {
 }
 
 function updateLeaveRoomUI(room) {
-    const roomRow = document.querySelector(`[data-id='${room.id}']`);
+    const roomRow = document.querySelector(`[data-id='${room.roomId}']`);
     if (roomRow) {
         let peopleElement = roomRow.querySelector(".room-people");
         let currentPeople = parseInt(peopleElement.textContent);

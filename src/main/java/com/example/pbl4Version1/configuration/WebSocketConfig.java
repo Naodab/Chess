@@ -18,7 +18,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
 		webSocketHandlerRegistry
-				.addHandler(LobbySocketHandler.getInstance(),"/websocket")
+				.addHandler(LobbySocketHandler.getInstance(roomService),"/websocket")
 				.setAllowedOrigins("*");
 
 		webSocketHandlerRegistry
