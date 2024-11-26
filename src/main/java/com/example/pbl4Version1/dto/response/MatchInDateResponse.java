@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @Builder
@@ -11,9 +13,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AccountDataResponse {
-    long userSize;
-    long onlineSize;
-    long trafficSize;
-    long newMemberSize;
+public class MatchInDateResponse {
+    Date matchDate;
+    long size;
 }

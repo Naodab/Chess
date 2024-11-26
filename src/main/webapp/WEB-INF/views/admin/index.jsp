@@ -17,6 +17,9 @@
 </head>
 <body>
     <div id="root"></div>
+    <script>
+        const avatar = "${user.avatar}";
+    </script>
     <script type="module" src="../assets/js/admin/script.js"></script>
 </body>
 </html>

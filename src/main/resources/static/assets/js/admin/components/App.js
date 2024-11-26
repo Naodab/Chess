@@ -7,6 +7,7 @@ import Modal from "./modal/Modal.js";
 function App({ modal }) {
     return html`
         <div id="background"></div>
+        <div id="coating"></div>
         <div id="overlay" style="z-index: ${ modal.activeModal && '10' || '-100' };">
             ${ modal.activeModal &&  Modal()}
         </div>

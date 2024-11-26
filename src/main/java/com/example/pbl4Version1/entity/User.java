@@ -44,6 +44,9 @@ public class User {
 	
 	@Builder.Default
 	int drawNumber = 0;
+
+	@Builder.Default
+	boolean active = true;
 	
 	@Enumerated(EnumType.STRING)
     OperatingStatus operatingStatus;

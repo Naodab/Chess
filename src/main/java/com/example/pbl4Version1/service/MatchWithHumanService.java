@@ -93,12 +93,12 @@ public class MatchWithHumanService {
 		for (MatchWithHuman m : matchWithHumen) {
 			UserForMatchResponse white = UserForMatchResponse.builder()
 					.username(m.getWhitePlayer().getUsername())
-					.avatar(m.getBlackPlayer().getAvatar())
+					.avatar(m.getWhitePlayer().getAvatar())
 					.color("white")
 					.build();
 			UserForMatchResponse black = UserForMatchResponse.builder()
 					.username(m.getBlackPlayer().getUsername())
-					.avatar(m.getWhitePlayer().getAvatar())
+					.avatar(m.getBlackPlayer().getAvatar())
 					.color("black")
 					.build();
 

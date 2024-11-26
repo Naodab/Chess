@@ -1,7 +1,7 @@
 import logout from "../account/logout.js";
 import changePassword from "../account/changePassword.js";
 import {getPageUsers, searchUser, countSearchUser } from "./api/user.js";
-import {getAccountData} from "./api/traffic.js";
+import {getAccountData, getMatchData, getMatchDataChart, getTrafficRecently} from "./api/traffic.js";
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
@@ -13,10 +13,10 @@ const init = {
                 name: "Quản lý tài khoản",
                 icon: "fa-solid fa-users-viewfinder"
             },
-            {
-                name: "Quản lý thành tựu",
-                icon: "fa-solid fa-star"
-            },
+            // {
+            //     name: "Quản lý thành tựu",
+            //     icon: "fa-solid fa-star"
+            // },
             {
                 name: "Quản lý trận đấu",
                 icon: "fa-solid fa-chess"
@@ -109,11 +109,13 @@ const init = {
                     color: "closure--fourth"
                 },
             ],
-            activeIndex: 0,
+            activeIndex: -1,
             detail: {
                 chart: {
                     id: "account__chart",
-                    name: "Biểu đồ: "
+                    name: "Biểu đồ: Lượt truy cập trong những ngày gần đây",
+                    labels: [],
+                    data: []
                 },
                 table: {
                     id: "account__table",
@@ -175,26 +177,98 @@ const init = {
 
         },
         match: {
-
+            id: "content__match",
+            dataList: [
+                {
+                    title: "Số trận đấu online",
+                    quantity: 0,
+                    description: "",
+                    icon: "fa-brands fa-battle-net",
+                    color: "closure--first"
+                },
+                {
+                    title: "Số trận đấu với máy",
+                    quantity: 0,
+                    description: "",
+                    icon: "fa-solid fa-robot",
+                    color: "closure--second"
+                },
+                {
+                    title: "Số trận đấu trong tháng",
+                    quantity: 0,
+                    description: "",
+                    icon: "fa-solid fa-calendar-week",
+                    color: "closure--fourth"
+                },
+            ],
+            activeIndex: -1,
+            detail: {
+                chart: {
+                    id: "match__chart",
+                    name: "Biểu đồ: Sự thay đổi số trận đấu trong những ngày gần đây",
+                    labels: [],
+                    data: [],
+                },
+                table: {
+                    id: "match__table",
+                    recordSize: 0,
+                    columns: [
+                        {
+                            title: "Mã",
+                            width: "20%",
+                            first: true
+                        },
+                        {
+                            title: "Thời gian",
+                            width: "15%"
+                        },
+                        {
+                            title: "Email",
+                            width: "20%"
+                        },
+                        {
+                            title: "Tỉ lệ thắng",
+                        },
+                        {
+                            title: "Elo",
+                            width: "5%",
+                            center: true
+                        },
+                        {
+                            title: "Số trận đấu",
+                            width: "10%",
+                            center: true,
+                            last: true
+                        }
+                    ],
+                    rows: [],
+                    detailPages: [],
+                    activePage: 0
+                },
+                activeDetail: "chart"
+            }
         },
         activeItem: "account"
     },
-    avatar: "../assets/img/avatar/1.jpg",
+    chartRerender: false,
+    avatar: avatar,
 }
 
 init.content.sortFields = init.content.account.detail.table.sortFields;
 init.content.lookupFields = init.content.account.detail.table.lookupFields;
 
-function createChart(ctx) {
+function createChart(ctx, {content}, animation = false,
+                     borderColor = "rgba(145, 221, 198, 1)",
+                     backgroundColor = "rgba(145, 221, 198, 0.4)") {
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+            labels: content[content.activeItem].detail.chart.labels,
             datasets: [{
-                label: 'Quantity',
-                data: [10, 20, 15, 30, 25, 30, 20],
-                borderColor: 'rgba(145, 221, 198, 1)',
-                backgroundColor: 'rgba(145, 221, 198, 0.4)',
+                label: 'Số lượng',
+                data: content[content.activeItem].detail.chart.data,
+                borderColor: borderColor,
+                backgroundColor: backgroundColor,
                 borderWidth: 3,
                 fill: true,
                 tension: 0.4
@@ -203,6 +277,7 @@ function createChart(ctx) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: animation,
             scales: {
                 y: {
                     beginAtZero: true,
@@ -231,7 +306,47 @@ window.onload = () => {
         init.content.account.dataList[1].quantity = data.onlineSize;
         init.content.account.dataList[2].quantity = data.trafficSize;
         init.content.account.dataList[3].quantity = data.newMemberSize;
+        loadAccountChart(0, init.content);
+    });
+}
+
+function loadAccountChart(page, content) {
+    getTrafficRecently(page).then(data => {
+        const labels = [];
+        const sizes = [];
+        for (let i = data.length - 1; i >= 0; i--) {
+            labels.push(data[i].date);
+            sizes.push(data[i].size);
+        }
+        content.account.detail.chart.labels = labels;
+        content.account.detail.chart.data = sizes;
+        init.chartRerender = true;
         dispatch('rerender');
+    });
+}
+
+function loadMatchChart(content) {
+    getMatchDataChart().then(data => {
+        const labels = [];
+        const sizes = [];
+        data.forEach(matchDate => {
+            labels.push(matchDate.matchDate);
+            sizes.push(matchDate.size);
+        });
+        content.match.detail.chart.labels = labels;
+        content.match.detail.chart.data = sizes;
+        init.chartRerender = true;
+        dispatch('rerender');
+    })
+}
+
+function loadMatchData(content) {
+    getMatchData().then(data => {
+        const dataList = content.match.dataList;
+        dataList[0].quantity = data.matchHumanSize;
+        dataList[1].quantity = data.matchBotSize;
+        dataList[2].quantity = data.matchInMonth;
+        loadMatchChart(content);
     });
 }
 
@@ -278,8 +393,16 @@ function saveDataPasswordChangeModal (modal) {
 }
 
 const actions = {
-    changeOption: ({navbar}, index) => {
+    changeOption: ({navbar, content}, index) => {
+        if (navbar.activeIndex === index) return;
         navbar.activeIndex = index;
+        if (index === 0) {
+            content.activeItem = "account";
+            loadAccountChart(0, content);
+        } else if (index === 1) {
+            content.activeItem = "match";
+            loadMatchData(content);
+        }
     },
     closeModal: ({ modal }) => {
         modal.activeModal = "";
@@ -294,12 +417,15 @@ const actions = {
                 detail.table.detailPages.push(i);
             }
 
-            getPageUsers(detail.table.activePage).then(data => {
-                console.log(data)
-                data.forEach(user => detail.table.rows.push(user));
+            if (content.activeItem === "account") {
+                getPageUsers(detail.table.activePage).then(data => {
+                    data.forEach(user => detail.table.rows.push(user));
+                    detail.activeDetail = "table";
+                    dispatch('rerender');
+                });
+            } else {
                 detail.activeDetail = "table";
-                dispatch('rerender');
-            });
+            }
         } else {
             detail.activeDetail = "chart";
         }

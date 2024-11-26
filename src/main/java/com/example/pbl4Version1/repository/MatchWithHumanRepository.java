@@ -15,5 +15,14 @@ import java.util.List;
 public interface MatchWithHumanRepository extends JpaRepository<MatchWithHuman, Long>{
     @Query("SELECT m FROM MatchWithHuman m WHERE m.whitePlayer.id = :userId OR m.blackPlayer.id = :userId")
     Page<MatchWithHuman> findMatchesByUserId(@Param("userId") String userId, Pageable pageable);
+    @Query("SELECT COUNT(m) FROM MatchWithHuman m WHERE MONTH(m.createdAt) = :month AND YEAR(m.createdAt) = :year")
+    long countByMonthAndYear(@Param("month") int month, @Param("year") int year);
 
+    @Query(value =  "SELECT DATE(created_at) AS match_date, COUNT(*) AS match_count " +
+            "FROM match_with_human " +
+            "WHERE created_at >= DATE_SUB(CURRENT_DATE, INTERVAL 7 DAY) " +
+            "GROUP BY DATE(created_at) " +
+            "ORDER BY match_date",
+            nativeQuery = true)
+    List<Object[]> countMatchesPerDayInLast7Days();
 }

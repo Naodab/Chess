@@ -10,16 +10,13 @@ import org.springframework.stereotype.Component;
 import com.example.pbl4Version1.dto.request.UserCreateRequest;
 import com.example.pbl4Version1.dto.request.UserUpdateRequest;
 import com.example.pbl4Version1.dto.response.AchievementResponse;
-import com.example.pbl4Version1.dto.response.RoleResponse;
 import com.example.pbl4Version1.dto.response.UserResponse;
 import com.example.pbl4Version1.entity.User;
 import com.example.pbl4Version1.enums.Rank;
-	
+
 @Slf4j
 @Component
 public class UserMapper {
-	@Autowired
-	RoleMapper roleMapper;
 	@Autowired
 	AchievementMapper achievementMapper;
 	
@@ -32,17 +29,9 @@ public class UserMapper {
 	}
 
 	public UserResponse toUserResponse(User user) {
-//		Set<RoleResponse> roles = null;
-//		if (user.getRoles() != null) {
-//			roles = new HashSet<RoleResponse>(user.getRoles()
-//					.stream()
-//					.map(roleMapper::toRoleResponse)
-//					.toList());
-//		}
-		
 		Set<AchievementResponse> achievements = null;
 		if (user.getAchievements() != null) {
-			achievements = new HashSet<AchievementResponse>(user.getAchievements()
+			achievements = new HashSet<>(user.getAchievements()
 					.stream()
 					.map(achievementMapper::toAchievementResponse)
 					.toList());
@@ -57,7 +46,7 @@ public class UserMapper {
 				.battleNumber(user.getBattleNumber())
 				.winNumber(user.getWinNumber())
 				.drawNumber(user.getDrawNumber())
-//				.roles(roles)
+				.active(user.isActive())
 				.achievements(achievements)
 				.percent(user.getBattleNumber() != 0 ? (int)((float)user.getWinNumber() /(float) user.getBattleNumber() * 100 ): 0)
 				.rank(rank)
