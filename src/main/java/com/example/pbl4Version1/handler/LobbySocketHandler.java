@@ -4,10 +4,9 @@ import java.io.IOException;
 import java.util.*;
 
 import com.example.pbl4Version1.dto.request.JoinRoomRequest;
+import com.example.pbl4Version1.dto.request.RoomAutoCreateRequest;
 import com.example.pbl4Version1.dto.response.RoomResponse;
-import com.example.pbl4Version1.entity.Room;
 import com.example.pbl4Version1.service.RoomService;
-import com.example.pbl4Version1.service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -16,15 +15,14 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import org.w3c.dom.Text;
 
 @Slf4j
 public class LobbySocketHandler extends TextWebSocketHandler{
     private static LobbySocketHandler instance;
     private final ObjectMapper mapper = new ObjectMapper();
-    private List<RoomLobbyHandler> roomLobbyHandlerList = new ArrayList<>();
-    private RoomService roomService;
-    private List<String> waitingPeople;
+    private final List<RoomLobbyHandler> roomLobbyHandlerList = new ArrayList<>();
+    private final RoomService roomService;
+    private final List<String> waitingPeople = new ArrayList<>();
     private LobbySocketHandler(RoomService roomService) {this.roomService = roomService;}
 
     public static LobbySocketHandler getInstance(RoomService roomService) {
@@ -108,6 +106,7 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                 String roomId = jsonNode.get("roomId").asText();
                 String role = jsonNode.get("role").asText();
                 String username = jsonNode.get("username").asText();
+                log.info("roomId=" + roomId + "/role=" + role + "/username=" + username);
                 boolean isActive = jsonNode.get("isActive").asBoolean();
                 for (RoomLobbyHandler roomLobbyHandler : roomLobbyHandlerList) {
                     if (!roomId.equals(roomLobbyHandler.getId() + "")) continue;
@@ -135,10 +134,8 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                     }
                     break;
                 }
-                return;
             }
             case "REQUEST_PLAY_RANDOM" -> {
-                log.info("Receive a request from a user to play randomly!");
                 boolean isValidRoom = false;
                 String validRoomId = "";
                 String username = jsonNode.get("username").asText();
@@ -146,18 +143,41 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                     if (roomLobbyHandler.getHost() != null && roomLobbyHandler.getPlayer() == null &&
                             !roomLobbyHandler.isHasPassword()) {
                         isValidRoom = true;
+                        roomLobbyHandler.setPlayer(username);
                         validRoomId = roomLobbyHandler.getId() + "";
                         break;
                     }
                 }
-                if (isValidRoom && !validRoomId.isEmpty()) {
+                if (isValidRoom) {
                     RoomResponse response = roomService.joinRoom(Long.parseLong(validRoomId), JoinRoomRequest.builder()
                             .role("PLAYER").build(), username);
                     session.sendMessage(responseValidRoom(response.getId() + "", username));
-                }
-                log.info("Information when randomly joining as a player:");
-                for (RoomLobbyHandler roomLobbyHandler : roomLobbyHandlerList) {
-                    log.info(roomLobbyHandler.toString());
+                } else {
+                    if (!waitingPeople.isEmpty()) {
+                        String hostUsername = waitingPeople.get(0);
+                        String password = "";
+                        int time = 15;
+                        RoomAutoCreateRequest roomAutoCreateRequest = new RoomAutoCreateRequest(hostUsername, password, time);
+                        RoomResponse response = roomService.autoCreate(roomAutoCreateRequest);
+
+                        RoomLobbyHandler roomLobbyHandler = new RoomLobbyHandler();
+                        roomLobbyHandler.setId(response.getId());
+                        roomLobbyHandler.setTime(time);
+                        roomLobbyHandler.setHasPassword(false);
+                        roomLobbyHandler.setHost(hostUsername);
+                        roomLobbyHandler.setPlayer(username);
+                        roomLobbyHandlerList.add(roomLobbyHandler);
+
+                        sendMessageToUser(hostUsername,
+                                responseAutoCreateRoomToHost(response.getId(), time, password, hostUsername),
+                                responseCreateRoom(response.getId(), time, password, hostUsername));
+                        sendMessageToUser(username,
+                                responseAutoCreateRoomToPlayer(response.getId(), username),
+                                responseJoinRoom(response.getId(), username));
+                    } else {
+                        waitingPeople.add(username);
+                        log.info("not have enough, just add you!");
+                    }
                 }
                 return;
             }
@@ -174,6 +194,60 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                 session.sendMessage(message);
             } catch (Exception ignored) { }
         }
+    }
+
+    public void sendMessageToUser(String username, String message, TextMessage messageToOther) throws IOException {
+        for (WebSocketSession session : webSocketSessions) {
+            String sessionUsername = (String) session.getAttributes().get("username");
+            if (username.equals(sessionUsername) && session.isOpen()) {
+                session.sendMessage(new TextMessage(message));
+            }
+            else {
+                session.sendMessage(messageToOther);
+            }
+        }
+    }
+
+    private TextMessage responseCreateRoom(Long roomId, int time, String password, String hostname) {
+        String payload = "";
+        payload = "{" +
+                "\"type\": \"CREATE_ROOM\"," +
+                "\"id\":" + roomId + ", " +
+                "\"time\":" + time + ", " +
+                "\"username\":" + "\"" + hostname + "\"" + "," +
+                "\"people\":" + 1 + "," +
+                "\"hasPassword\":" + !password.isEmpty() +
+                "}";
+        return new TextMessage(payload);
+    }
+
+    private TextMessage responseJoinRoom(Long roomId, String username) {
+        String payload = "";
+        payload = "{" +
+                "\"type\": \"JOIN_ROOM_AS_PLAYER\"," +
+                "\"id\":" + roomId + ", " +
+                "\"username\":" + "\"" + username + "\"" +
+                "}";
+        return new TextMessage(payload);
+    }
+
+    private String responseAutoCreateRoomToHost(Long roomId, int time, String password, String hostname) {
+        return "{" +
+                "\"type\": \"RESPONSE_CREATE_ROOM\"," +
+                "\"id\":" + roomId + ", " +
+                "\"time\":" + time + ", " +
+                "\"username\":" + "\"" + hostname + "\"" + "," +
+                "\"people\":" + 1 + "," +
+                "\"hasPassword\":" + !password.isEmpty() +
+                "}";
+    }
+
+    private String responseAutoCreateRoomToPlayer(Long roomId, String username) {
+        return "{" +
+                "\"type\": \"RESPONSE_JOIN_ROOM_AS_PLAYER\"," +
+                "\"id\":" + roomId + ", " +
+                "\"username\":" + "\"" + username + "\"" +
+                "}";
     }
 
     private TextMessage deleteRoomMessage(Long roomId) {

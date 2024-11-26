@@ -38,6 +38,7 @@ function initializeWebsocket() {
         }
         ws.onmessage = function (event) {
             const data = JSON.parse(event.data);
+            console.log(data);
             switch (data.type) {
                 case "RESPONSE_ENTER_LOBBY":
                     const roomList = data.rooms;
@@ -55,11 +56,24 @@ function initializeWebsocket() {
                 case "JOIN_ROOM_AS_VIEWER":
                     updateRoomUI(data);
                     break;
+                case "RESPONSE_CREATE_ROOM":
+                    sessionStorage.setItem("ROOM_ID", data.id);
+                    addRoom(data);
+                    window.location.href = "../public/playonl";
+                    break;
+                case "RESPONSE_JOIN_ROOM_AS_PLAYER":
+                    sessionStorage.setItem("ROOM_ID", data.id);
+                    joinRoom(data.id, "PLAYER", "").then();
+                    updateRoomUI(data);
+                    window.location.href = "../public/playonl";
+                    break;
                 case "DELETE_ROOM":
                     deleteRoom(data.roomId);
                     break;
+                case "USER_LEAVE_ROOM":
+                    updateLeaveRoomUI(data);
+                    break;
                 case "RESPONSE_VALID_ROOM":
-                    alert("find valid room: " + data.id);
                     joinRoomAsPlayer_Auto(data);
                     break;
             }
@@ -111,8 +125,6 @@ window.addEventListener("load", () => {
         });
     });
     initializeWebsocket();
-    //NOTE: fetch to get all active rooms
-    //loadAllRooms();
 });
 
 function turnOnModal(renderFunction, attr) {
