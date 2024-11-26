@@ -798,3 +798,19 @@ a {
 #find-room {
     min-width: 420px;
 }
+
+#about-us-btn {
+    cursor: pointer;
+}
+
+#about-us-btn:hover {
+    text-decoration: underline;
+}
+
+#about-us {
+    max-width: 600px;
+}
+
+#about-us .modal-info {
+    text-align: justify;
+}

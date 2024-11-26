@@ -24,13 +24,13 @@
 		<div class="sidebar-body">
 			<button class="btn btn--pink logout">Đăng xuất</button>
 		</div>
-		<a class="settings-link" href=""><i class="fas fa-cog"></i>Cài đặt</a>
+		<a class="settings-link" id="about-us-btn">Thông tin</a>
 	</div>
 
 	<div class="main-content">
 		<div class="content__body closure">
 			<div class="body__header">
-				<h1 class="content__title">Chào mừng trở lại ${user.username}</h1>
+				<h1 class="content__title">Chào mừng trở lại <span></span></h1>
 				<div class="header__avatar"
 					 style='background: url("${user.avatar}") no-repeat center center / cover;'
 					 id="activity-btn">
@@ -64,8 +64,7 @@
 						<th>Trạng thái</th>
 					</tr>
 					</thead>
-					<tbody class="rooms-list">
-					</tbody>
+					<tbody class="rooms-list"></tbody>
 				</table>
 			</div>
 		</div>
@@ -91,7 +90,8 @@
 	</div>
 </div>
 <script>
-		let avatar = "${user.avatar}";
+	if ("${user.avatar}")
+		sessionStorage.setItem("AVATAR", "${user.avatar}");
 </script>
 <script type="module" src="../assets/js/user/home.js"></script>
 </body>

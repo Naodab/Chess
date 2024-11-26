@@ -7,7 +7,7 @@ import {
     renderRoom,
     renderTopUser,
     renderFindRoom,
-    renderEnterRoomWithPassword, renderLoading, renderMatches, renderModalMatches, renderWaitingForOthers
+    renderEnterRoomWithPassword, renderLoading, renderMatches, renderModalMatches, renderWaitingForOthers, renderAboutUs
 } from "./render.js";
 import {getSpiderActivity} from "../util/spiderActivity.js";
 import {getPageMatch} from "./api/match.js";
@@ -38,7 +38,6 @@ function initializeWebsocket() {
         }
         ws.onmessage = function (event) {
             const data = JSON.parse(event.data);
-            console.log(data);
             switch (data.type) {
                 case "RESPONSE_ENTER_LOBBY":
                     const roomList = data.rooms;
@@ -123,6 +122,9 @@ window.addEventListener("load", () => {
         $$(".player").forEach((player, index) => {
             player.onclick = () => turnOnModal(renderPersonalInformation, topUsers[index]);
         });
+        $(".content__title span").innerText = sessionStorage.getItem("USERNAME");
+        $(".header__avatar").style.background = `background: url("${sessionStorage.getItem("AVATAR")}") 
+                no-repeat center center / cover`;
     });
     initializeWebsocket();
 });
@@ -196,7 +198,12 @@ $$(".logout").forEach(btn => {
                 body: JSON.stringify({token: localStorage.getItem("TOKEN")})
             }).then(response => response.ok).then(data => {
                 if (data) {
-                    location.reload();
+                    localStorage.removeItem("USERNAME");
+                    localStorage.removeItem("AVATAR");
+                    localStorage.removeItem("TOKEN");
+                    sessionStorage.removeItem("AVATAR");
+                    sessionStorage.removeItem("USERNAME");
+                    window.location.href = "./";
                 }
             });
         }
@@ -269,6 +276,10 @@ function handleMatchClick() {
             window.location.href = "/chess/public/review";
         }
     });
+}
+
+$("#about-us-btn").onclick = () => {
+    turnOnModal(renderAboutUs);
 }
 
 $("#change-avatar-btn").addEventListener("click", event => {
@@ -485,6 +496,15 @@ $("#play-random").onclick = () => {
         username: sessionStorage.getItem("USERNAME")
     };
     ws.send(JSON.stringify(dataToSend));
+
+    $("#cancel").onclick = () => {
+        const dataSend = {
+            type: "CANCEL_RANDOM",
+            username: sessionStorage.getItem("USERNAME")
+        }
+        ws.send(JSON.stringify(dataSend));
+        turnOffModal();
+    };
 }
 
 function addRoom(room) {

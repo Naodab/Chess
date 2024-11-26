@@ -125,7 +125,7 @@ function handleOpenSocket() {
     });
 }
 
-function handleSocketMessage(event) {
+async function handleSocketMessage(event) {
     const data = JSON.parse(event.data);
     if (data.type === "SEND_MESSAGE") {
         addMessages(data.user, data.message, true);
@@ -284,6 +284,29 @@ function handleSocketMessage(event) {
             turn: Math.floor(turn / 2),
             winner
         });
+    } else if (data.type === "PEACE") {
+        const result = await confirm("Đối thủ muốn cầu hòa");
+        if (!result) return;
+        const dataSend = {
+            type: "AGREE_PEACE"
+        }
+        ws.send(JSON.stringify(dataSend));
+        handleEndGame({
+            title: "Hòa",
+            state: "Hòa nhau",
+            status: "DRAW",
+            time: ALLIANCE === "WHITE" ? getTimeRemaining(timeWhite) : getTimeRemaining(timeBlack),
+            winner: "DRAW"
+        });
+    } else if (data.type === "AGREE_PEACE") {
+        handleEndGame({
+            title: "Hòa",
+            state: "Hòa nhau",
+            status: "DRAW",
+            time: ALLIANCE === "WHITE" ? getTimeRemaining(timeWhite)
+                : getTimeRemaining(timeBlack),
+            winner: "DRAW"
+        });
     }
 }
 
@@ -355,7 +378,7 @@ function addPerson(person, role) {
 
     div.querySelector(".person-delete").onclick = event => {
         event.stopPropagation();
-        if (ROLE !== "HOST" || isMatchExecute) return;
+        if ((ROLE !== "HOST" || isMatchExecute) && role !== "VIEWER") return;
         const sendData = {
             type: "FORBIDDEN_USER",
             username: person.username
@@ -364,7 +387,6 @@ function addPerson(person, role) {
     }
 }
 
-// use for receive leave room from server
 function removePersonFromUI(username) {
     const index = persons.findIndex(person => person.username === username);
     if (index > -1) {
@@ -531,7 +553,7 @@ if (MODE === "PLAY_ONLINE") {
 
     $("#flag-lose").onclick = async () => {
         if (!isMatchExecute || ROLE === "VIEWER") return;
-        const result = await confirm("Bạn chắc chứ?");
+        const result = await confirm("Bạn muốn đầu hàng?");
         if (!result) return;
         const dataSend = {
             type: "SURRENDER",
@@ -548,8 +570,14 @@ if (MODE === "PLAY_ONLINE") {
         });
     }
 
-    $("#handshake").onclick = () => {
-        //TODO:
+    $("#handshake").onclick = async () => {
+        if (!isMatchExecute || ROLE === "VIEWER") return;
+        const result = await confirm("Bạn muốn cầu hòa?");
+        if (!result) return;
+        const dataSend = {
+            type: "PEACE"
+        }
+        ws.send(JSON.stringify(dataSend));
     }
 
     $("#exit-room-button").onclick = async () => {

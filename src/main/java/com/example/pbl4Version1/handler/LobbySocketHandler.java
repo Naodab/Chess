@@ -66,10 +66,6 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                 String host = jsonNode.get("host").asText();
                 RoomLobbyHandler newRoom = new RoomLobbyHandler(Long.valueOf(id), time, hasPassword, host, null, new ArrayList<>());
                 roomLobbyHandlerList.add(newRoom);
-                log.info("Information when creating a room:");
-                for (RoomLobbyHandler roomLobbyHandler : roomLobbyHandlerList) {
-                    log.info(roomLobbyHandler.toString());
-                }
             }
             case "JOIN_ROOM_AS_PLAYER" -> {
                 String roomId = jsonNode.get("roomId").asText();
@@ -79,10 +75,6 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                         roomLobbyHandler.setPlayer(player);
                         break;
                     }
-                }
-                log.info("Information when joining a room as player:");
-                for (RoomLobbyHandler roomLobbyHandler : roomLobbyHandlerList) {
-                    log.info(roomLobbyHandler.toString());
                 }
             }
             case "JOIN_ROOM_AS_VIEWER" -> {
@@ -96,17 +88,11 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                         break;
                     }
                 }
-                log.info("Information when joining a room as viewer:");
-                for (RoomLobbyHandler roomLobbyHandler : roomLobbyHandlerList) {
-                    log.info(roomLobbyHandler.toString());
-                }
             }
             case "USER_LEAVE_ROOM" -> {
-                log.info("Server catch when user leaves a room!");
                 String roomId = jsonNode.get("roomId").asText();
                 String role = jsonNode.get("role").asText();
                 String username = jsonNode.get("username").asText();
-                log.info("roomId=" + roomId + "/role=" + role + "/username=" + username);
                 boolean isActive = jsonNode.get("isActive").asBoolean();
                 for (RoomLobbyHandler roomLobbyHandler : roomLobbyHandlerList) {
                     if (!roomId.equals(roomLobbyHandler.getId() + "")) continue;
@@ -119,8 +105,12 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                         case "HOST" -> {
                             roomLobbyHandler.setHost(roomLobbyHandler.getPlayer());
                             roomLobbyHandler.setPlayer(null);
+                            handlerLeaveRoomAndAddRandom(roomLobbyHandler);
                         }
-                        case "PLAYER" -> roomLobbyHandler.setPlayer(null);
+                        case "PLAYER" -> {
+                            roomLobbyHandler.setPlayer(null);
+                            handlerLeaveRoomAndAddRandom(roomLobbyHandler);
+                        }
                         case "VIEWER" -> {
                             List<String> newViewers = roomLobbyHandler.getViewers();
                             for (String newViewer : newViewers) {
@@ -176,9 +166,13 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                                 responseJoinRoom(response.getId(), username));
                     } else {
                         waitingPeople.add(username);
-                        log.info("not have enough, just add you!");
                     }
                 }
+                return;
+            }
+            case "CANCEL_RANDOM" -> {
+                String username = jsonNode.get("username").asText();
+                waitingPeople.remove(username);
                 return;
             }
         }
@@ -206,6 +200,27 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                 session.sendMessage(messageToOther);
             }
         }
+    }
+
+    private void sendMessage(String username, TextMessage messageToOther) throws IOException {
+        for (WebSocketSession session : webSocketSessions) {
+            String sessionUsername = (String) session.getAttributes().get("username");
+            if (username.equals(sessionUsername) && session.isOpen()) {
+                session.sendMessage(messageToOther);
+            }
+        }
+    }
+
+    private void handlerLeaveRoomAndAddRandom(RoomLobbyHandler roomLobby) {
+        try {
+            if (waitingPeople.isEmpty() || roomLobby.isHasPassword()) return;
+            String username = waitingPeople.get(0);
+            roomLobby.setPlayer(username);
+            roomService.joinRoom(roomLobby.getId(),
+                    JoinRoomRequest.builder().role("PLAYER").build(),
+                    username);
+            sendMessage(username, responseValidRoom(roomLobby.getId() + "", username));
+        } catch (Exception ignored) { }
     }
 
     private TextMessage responseCreateRoom(Long roomId, int time, String password, String hostname) {
