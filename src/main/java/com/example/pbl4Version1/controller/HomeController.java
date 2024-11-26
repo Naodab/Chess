@@ -12,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class HomeController {
     @GetMapping(value = {"/", "/home"})
 	public String index() {
-		return "user/home";
+		return "home";
 	}
 
     @GetMapping("/login")
@@ -32,7 +32,7 @@ public class HomeController {
         return modelAndView;
     }
 
-    @GetMapping("/test")
+    @GetMapping("user/test")
     public String test() {
         return "user/home";
     }
