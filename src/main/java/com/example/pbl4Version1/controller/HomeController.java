@@ -10,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping("/public")
 public class HomeController {
-    @GetMapping(value = {"/", "/home"})
+    @GetMapping(value = {"/",})
 	public String index() {
 		return "home";
 	}
@@ -32,7 +32,7 @@ public class HomeController {
         return modelAndView;
     }
 
-    @GetMapping("user/test")
+    @GetMapping("home")
     public String test() {
         return "user/home";
     }
@@ -40,11 +40,6 @@ public class HomeController {
     @GetMapping("/forgot")
     public String forgot() {
     	return "forgot";
-    }
-    
-    @GetMapping("/verify")
-    public String verify() {
-    	return "verify";
     }
 
     @GetMapping("/play-with-bot")

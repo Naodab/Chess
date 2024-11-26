@@ -552,14 +552,6 @@ if (MODE === "PLAY_ONLINE") {
         //TODO:
     }
 
-    $("#return-left").onclick = () => {
-        //TODO:
-    }
-
-    $("#return-right").onclick = () => {
-        //TODO:
-    }
-
     $("#exit-room-button").onclick = async () => {
         if (isMatchExecute) {
             const result = await confirm("Bạn sẽ thua nếu bạn thoát");

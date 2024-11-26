@@ -84,7 +84,7 @@ public class MatchWithHumanService {
 		User user = userRepository.findByUsername(username)
 				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-		Pageable pageable = PageRequest.of(page, 10,
+		Pageable pageable = PageRequest.of(page, 7,
 				Sort.by(Sort.Direction.DESC, "createdAt"));
 		List<MatchWithHuman> matchWithHumen = matchRepository
 				.findMatchesByUserId(user.getId(), pageable).getContent();

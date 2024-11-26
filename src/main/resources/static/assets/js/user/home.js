@@ -115,6 +115,10 @@ window.addEventListener("load", () => {
     //loadAllRooms();
 });
 
+function executeWhenExitPage() {
+    $("#container").classList.add("slide-up");
+}
+
 function turnOnModal(renderFunction, attr) {
     overlay.style.zIndex = "100";
     overlay.innerHTML = renderFunction(attr);
@@ -453,10 +457,12 @@ $("#create-room").onclick = () => {
             };
             sessionStorage.setItem("ROOM_ID", roomCreateData.id);
             ws.send(JSON.stringify(infoToBroadcast));
-            window.location.href = "../public/playonl";
+            turnOffModal();
+            executeWhenExitPage();
+            setTimeout(() => window.location.href = "../public/playonl", 600);
         }).catch((error) => {
             console.log("An error has been detected: " + error);
-        })
+        });
     }
 }
 
@@ -520,8 +526,6 @@ function enterPassword(room, isPlayer = true) {
     }
 }
 
-// TODO: add event when load this jsp load room active to add room and use addRoom to add a room
-// NOTE: get all active rooms when load/reload page
 function loadAllRooms() {
     fetch("../api/rooms/active", {
         method: "GET",
@@ -559,7 +563,8 @@ function joinRoomAsPlayer(room) {
         username: sessionStorage.getItem("USERNAME")
     };
     ws.send(JSON.stringify(dataToBroadcast));
-    window.location.href = "../public/playonl";
+    executeWhenExitPage();
+    setTimeout(() => window.location.href = "../public/playonl", 600);
 }
 
 function joinRoomAsPlayer_Auto(room) {
@@ -570,7 +575,8 @@ function joinRoomAsPlayer_Auto(room) {
     };
     ws.send(JSON.stringify(dataToBroadcast));
     sessionStorage.setItem("ROOM_ID", room.id);
-    window.location.href = "../public/playonl";
+    executeWhenExitPage();
+    setTimeout(() => window.location.href = "../public/playonl", 600);
 }
 
 function joinRoomAsViewer(room) {
@@ -580,7 +586,8 @@ function joinRoomAsViewer(room) {
         username: sessionStorage.getItem("USERNAME")
     };
     ws.send(JSON.stringify(dataToBroadcast));
-    window.location.href = "../public/playonl";
+    executeWhenExitPage();
+    setTimeout(() => window.location.href = "../public/playonl", 600);
 }
 
 function updateRoomUI(room) {
