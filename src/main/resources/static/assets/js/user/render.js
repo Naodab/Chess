@@ -91,6 +91,27 @@ function renderModalMatches(data) {
     `;
 }
 
+function renderAboutUs() {
+    return html`
+        <div class="modal closure active" id="about-us">
+            <h1 class="modal__title">Giới thiệu</h1>
+            <i class="fa-solid fa-xmark btn-icon btn-close" id="back"></i>
+            <div class="main-modal modal-info">
+                Chào mừng bạn đến với trò chơi cờ vua trực tuyến!
+                Trò chơi cờ vua trực tuyến mang đến cho bạn một sân chơi đầy thú vị, nơi trí tuệ và chiến lược được đặt lên hàng đầu. 
+                Đây không chỉ là một trò chơi giải trí mà còn là một môn nghệ thuật chiến thuật,
+                nơi từng nước đi đều chứa đựng sự cân nhắc và tính toán. Tham gia nền tảng của chúng tôi,
+                bạn sẽ được hòa mình vào một cộng đồng người chơi đông đảo,
+                từ những người mới bắt đầu đầy đam mê cho đến các kỳ thủ chuyên nghiệp dày dặn kinh nghiệm
+                bạn có thể thử thách bản thân, rèn luyện tư duy, hoặc đơn giản là tận hưởng những phút giây thư giãn.
+                Với giao diện đẹp mắt, hệ thống cá nhân hóa đa dạng, trò chơi cờ vua trực tuyến của chúng tôi chắc chắn sẽ là nơi để bạn khám phá, chinh phục,và khẳng định
+                bản thân.
+                Hãy cùng bước vào thế giới cờ vua, nơi mọi nước đi đều là cơ hội để bạn tỏa sáng!
+            </div>
+        </div>
+    `;
+}
+
 function renderPersonalInformation(user) {
     return html`
         <div class="modal closure active" id="info-user">
@@ -349,5 +370,6 @@ export {
     renderLoading,
     renderModalMatches,
     renderMatches,
-    renderWaitingForOthers
+    renderWaitingForOthers,
+    renderAboutUs
 }

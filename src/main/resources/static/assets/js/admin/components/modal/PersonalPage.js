@@ -2,7 +2,6 @@ import { connect } from "../../store.js";
 import html from "../../core.js";
 
 function PersonalPage({user}) {
-    console.log(user.avatar)
     return html`
         <h1 class="form__title">Thông tin cá nhân</h1>
         <div class="main-info">
@@ -30,6 +29,9 @@ function PersonalPage({user}) {
         </div>
         <div class="info__match">
             <div class="transfer-to-match">Ván đấu</div>
+            <div class="transfer-to-match transfer-to-match--pink">
+                ${(user.active && "Cấm") || "Bỏ cấm"}
+            </div>
         </div>
     `;
 }

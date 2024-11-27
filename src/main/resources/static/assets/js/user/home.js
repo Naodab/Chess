@@ -7,7 +7,7 @@ import {
     renderRoom,
     renderTopUser,
     renderFindRoom,
-    renderEnterRoomWithPassword, renderLoading, renderMatches, renderModalMatches, renderWaitingForOthers
+    renderEnterRoomWithPassword, renderLoading, renderMatches, renderModalMatches, renderWaitingForOthers, renderAboutUs
 } from "./render.js";
 import {getSpiderActivity} from "../util/spiderActivity.js";
 import {getPageMatch} from "./api/match.js";
@@ -122,9 +122,16 @@ window.addEventListener("load", () => {
         $$(".player").forEach((player, index) => {
             player.onclick = () => turnOnModal(renderPersonalInformation, topUsers[index]);
         });
+        $(".content__title span").innerText = sessionStorage.getItem("USERNAME");
+        $(".header__avatar").style.background = `background: url("${sessionStorage.getItem("AVATAR")}") 
+                no-repeat center center / cover`;
     });
     initializeWebsocket();
 });
+
+function executeWhenExitPage() {
+    $("#container").classList.add("slide-up");
+}
 
 function turnOnModal(renderFunction, attr) {
     overlay.style.zIndex = "100";
@@ -191,7 +198,12 @@ $$(".logout").forEach(btn => {
                 body: JSON.stringify({token: localStorage.getItem("TOKEN")})
             }).then(response => response.ok).then(data => {
                 if (data) {
-                    location.reload();
+                    localStorage.removeItem("USERNAME");
+                    localStorage.removeItem("AVATAR");
+                    localStorage.removeItem("TOKEN");
+                    sessionStorage.removeItem("AVATAR");
+                    sessionStorage.removeItem("USERNAME");
+                    window.location.href = "./";
                 }
             });
         }
@@ -264,6 +276,10 @@ function handleMatchClick() {
             window.location.href = "/chess/public/review";
         }
     });
+}
+
+$("#about-us-btn").onclick = () => {
+    turnOnModal(renderAboutUs);
 }
 
 $("#change-avatar-btn").addEventListener("click", event => {
@@ -464,10 +480,12 @@ $("#create-room").onclick = () => {
             };
             sessionStorage.setItem("ROOM_ID", roomCreateData.id);
             ws.send(JSON.stringify(infoToBroadcast));
-            window.location.href = "../public/playonl";
+            turnOffModal();
+            executeWhenExitPage();
+            setTimeout(() => window.location.href = "../public/playonl", 600);
         }).catch((error) => {
             console.log("An error has been detected: " + error);
-        })
+        });
     }
 }
 
@@ -478,6 +496,15 @@ $("#play-random").onclick = () => {
         username: sessionStorage.getItem("USERNAME")
     };
     ws.send(JSON.stringify(dataToSend));
+
+    $("#cancel").onclick = () => {
+        const dataSend = {
+            type: "CANCEL_RANDOM",
+            username: sessionStorage.getItem("USERNAME")
+        }
+        ws.send(JSON.stringify(dataSend));
+        turnOffModal();
+    };
 }
 
 function addRoom(room) {
@@ -531,8 +558,6 @@ function enterPassword(room, isPlayer = true) {
     }
 }
 
-// TODO: add event when load this jsp load room active to add room and use addRoom to add a room
-// NOTE: get all active rooms when load/reload page
 function loadAllRooms() {
     fetch("../api/rooms/active", {
         method: "GET",
@@ -570,7 +595,8 @@ function joinRoomAsPlayer(room) {
         username: sessionStorage.getItem("USERNAME")
     };
     ws.send(JSON.stringify(dataToBroadcast));
-    window.location.href = "../public/playonl";
+    executeWhenExitPage();
+    setTimeout(() => window.location.href = "../public/playonl", 600);
 }
 
 function joinRoomAsPlayer_Auto(room) {
@@ -581,7 +607,8 @@ function joinRoomAsPlayer_Auto(room) {
     };
     ws.send(JSON.stringify(dataToBroadcast));
     sessionStorage.setItem("ROOM_ID", room.id);
-    window.location.href = "../public/playonl";
+    executeWhenExitPage();
+    setTimeout(() => window.location.href = "../public/playonl", 600);
 }
 
 function joinRoomAsViewer(room) {
@@ -591,7 +618,8 @@ function joinRoomAsViewer(room) {
         username: sessionStorage.getItem("USERNAME")
     };
     ws.send(JSON.stringify(dataToBroadcast));
-    window.location.href = "../public/playonl";
+    executeWhenExitPage();
+    setTimeout(() => window.location.href = "../public/playonl", 600);
 }
 
 function updateRoomUI(room) {

@@ -38,10 +38,21 @@ export function createStore(reducer) {
                     search.focus();
                     search.selectionStart = search.selectionEnd = search.value.length;
                 }
-                const canvas = document.querySelector(`#account__chart`);
+                let canvas = document.querySelector(`#account__chart`);
                 if (canvas) {
                     const ctx = canvas.getContext("2d");
-                    createChart(ctx);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    createChart(ctx, state, state.chartRerender);
+                    state.chartRerender = false;
+                }
+                canvas = document.querySelector(`#match__chart`);
+                if (canvas) {
+                    const ctx = canvas.getContext("2d");
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    createChart(ctx, state, state.chartRerender,
+                        "rgba(250, 168, 206, 1)",
+                        "rgba(250, 168, 206, 0.4)",);
+                    state.chartRerender = false;
                 }
             } else {
                 state.canRender = true;

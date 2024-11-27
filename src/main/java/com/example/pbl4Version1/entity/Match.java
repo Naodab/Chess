@@ -1,5 +1,6 @@
 package com.example.pbl4Version1.entity;
 
+import java.util.Date;
 import java.util.Set;
 
 import com.example.pbl4Version1.enums.GameStatus;
@@ -8,6 +9,7 @@ import com.example.pbl4Version1.enums.PlayerType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @Setter
@@ -37,4 +39,8 @@ public class Match {
 	
 	@OneToMany(mappedBy = "match", fetch = FetchType.EAGER)
 	Set<Step> steps;
+
+	@CreationTimestamp
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date createdAt;
 }

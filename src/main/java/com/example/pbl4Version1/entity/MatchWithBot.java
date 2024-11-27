@@ -1,5 +1,6 @@
 package com.example.pbl4Version1.entity;
 
+import java.util.Date;
 import java.util.Set;
 
 import com.example.pbl4Version1.enums.GameStatus;
@@ -26,9 +27,9 @@ public class MatchWithBot extends Match{
 	
 	public MatchWithBot() {}
 
-	public MatchWithBot(Long id, GameStatus gameStatus, 
-			PlayerType turn, PlayerType winner, Set<Step> steps, User player) {
-		super(id, gameStatus, turn, winner, steps);
+	public MatchWithBot(Long id, GameStatus gameStatus,
+						PlayerType turn, PlayerType winner, Set<Step> steps, User player, Date createdAt) {
+		super(id, gameStatus, turn, winner, steps, createdAt);
 		this.player = player;
 	}
 }

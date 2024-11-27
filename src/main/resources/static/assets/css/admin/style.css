@@ -190,6 +190,10 @@
     cursor: pointer;
 }
 
+.data-item:last-child {
+    margin-right: 0;
+}
+
 .data-item--end {
     margin-right: 0;
 }

@@ -185,7 +185,13 @@ public class RoomSocketHandler {
                             getDataTimeIgnoreType().getPayload().substring(1);
                     message = new TextMessage(payload);
                 }
-                //former: case "leave room"
+                case "PEACE" -> {
+                    if (session.equals(hostSession)) {
+                        playerSession.sendMessage(message);
+                    } else {
+                        hostSession.sendMessage(message);
+                    }
+                }
             }
         }
         for (WebSocketSession webSocketSession : webSocketSessions) {

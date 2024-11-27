@@ -11,9 +11,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AccountDataResponse {
-    long userSize;
-    long onlineSize;
-    long trafficSize;
-    long newMemberSize;
+public class MatchDataResponse {
+    long matchBotSize;
+    long matchHumanSize;
+    long matchInMonth;
 }

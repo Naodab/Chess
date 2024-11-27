@@ -90,11 +90,9 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                 }
             }
             case "USER_LEAVE_ROOM" -> {
-                log.info("Server catch when user leaves a room!");
                 String roomId = jsonNode.get("roomId").asText();
                 String role = jsonNode.get("role").asText();
                 String username = jsonNode.get("username").asText();
-                log.info("roomId=" + roomId + "/role=" + role + "/username=" + username);
                 boolean isActive = jsonNode.get("isActive").asBoolean();
                 for (RoomLobbyHandler roomLobbyHandler : roomLobbyHandlerList) {
                     if (!roomId.equals(roomLobbyHandler.getId() + "")) continue;
@@ -107,8 +105,12 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                         case "HOST" -> {
                             roomLobbyHandler.setHost(roomLobbyHandler.getPlayer());
                             roomLobbyHandler.setPlayer(null);
+                            handlerLeaveRoomAndAddRandom(roomLobbyHandler);
                         }
-                        case "PLAYER" -> roomLobbyHandler.setPlayer(null);
+                        case "PLAYER" -> {
+                            roomLobbyHandler.setPlayer(null);
+                            handlerLeaveRoomAndAddRandom(roomLobbyHandler);
+                        }
                         case "VIEWER" -> {
                             List<String> newViewers = roomLobbyHandler.getViewers();
                             for (String newViewer : newViewers) {
@@ -157,8 +159,8 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                         roomLobbyHandlerList.add(roomLobbyHandler);
 
                         sendMessageToUser(hostUsername,
-                                responseAutoCreateRoomToHost(response.getId(), time),
-                                responseCreateRoom(response.getId(), time));
+                                responseAutoCreateRoomToHost(response.getId(), time, password, hostUsername),
+                                responseCreateRoom(response.getId(), time, password, hostUsername));
                         sendMessageToUser(username,
                                 responseAutoCreateRoomToPlayer(response.getId(), username),
                                 responseJoinRoom(response.getId(), username));
@@ -166,6 +168,11 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                         waitingPeople.add(username);
                     }
                 }
+                return;
+            }
+            case "CANCEL_RANDOM" -> {
+                String username = jsonNode.get("username").asText();
+                waitingPeople.remove(username);
                 return;
             }
         }
@@ -195,13 +202,36 @@ public class LobbySocketHandler extends TextWebSocketHandler{
         }
     }
 
-    private TextMessage responseCreateRoom(Long roomId, int time) {
+    private void sendMessage(String username, TextMessage messageToOther) throws IOException {
+        for (WebSocketSession session : webSocketSessions) {
+            String sessionUsername = (String) session.getAttributes().get("username");
+            if (username.equals(sessionUsername) && session.isOpen()) {
+                session.sendMessage(messageToOther);
+            }
+        }
+    }
+
+    private void handlerLeaveRoomAndAddRandom(RoomLobbyHandler roomLobby) {
+        try {
+            if (waitingPeople.isEmpty() || roomLobby.isHasPassword()) return;
+            String username = waitingPeople.get(0);
+            roomLobby.setPlayer(username);
+            roomService.joinRoom(roomLobby.getId(),
+                    JoinRoomRequest.builder().role("PLAYER").build(),
+                    username);
+            sendMessage(username, responseValidRoom(roomLobby.getId() + "", username));
+        } catch (Exception ignored) { }
+    }
+
+    private TextMessage responseCreateRoom(Long roomId, int time, String password, String hostname) {
         String payload = "";
         payload = "{" +
                 "\"type\": \"CREATE_ROOM\"," +
                 "\"id\":" + roomId + ", " +
                 "\"time\":" + time + ", " +
-                "\"people\":" + 1 +
+                "\"username\":" + "\"" + hostname + "\"" + "," +
+                "\"people\":" + 1 + "," +
+                "\"hasPassword\":" + !password.isEmpty() +
                 "}";
         return new TextMessage(payload);
     }
@@ -210,18 +240,20 @@ public class LobbySocketHandler extends TextWebSocketHandler{
         String payload = "";
         payload = "{" +
                 "\"type\": \"JOIN_ROOM_AS_PLAYER\"," +
-                "\"roomId\":" + roomId + ", " +
+                "\"id\":" + roomId + ", " +
                 "\"username\":" + "\"" + username + "\"" +
                 "}";
         return new TextMessage(payload);
     }
 
-    private String responseAutoCreateRoomToHost(Long roomId, int time) {
+    private String responseAutoCreateRoomToHost(Long roomId, int time, String password, String hostname) {
         return "{" +
                 "\"type\": \"RESPONSE_CREATE_ROOM\"," +
                 "\"id\":" + roomId + ", " +
                 "\"time\":" + time + ", " +
-                "\"people\":" + 1 +
+                "\"username\":" + "\"" + hostname + "\"" + "," +
+                "\"people\":" + 1 + "," +
+                "\"hasPassword\":" + !password.isEmpty() +
                 "}";
     }
 

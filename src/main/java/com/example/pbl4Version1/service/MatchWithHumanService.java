@@ -84,7 +84,7 @@ public class MatchWithHumanService {
 		User user = userRepository.findByUsername(username)
 				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-		Pageable pageable = PageRequest.of(page, 10,
+		Pageable pageable = PageRequest.of(page, 7,
 				Sort.by(Sort.Direction.DESC, "createdAt"));
 		List<MatchWithHuman> matchWithHumen = matchRepository
 				.findMatchesByUserId(user.getId(), pageable).getContent();
@@ -93,12 +93,12 @@ public class MatchWithHumanService {
 		for (MatchWithHuman m : matchWithHumen) {
 			UserForMatchResponse white = UserForMatchResponse.builder()
 					.username(m.getWhitePlayer().getUsername())
-					.avatar(m.getBlackPlayer().getAvatar())
+					.avatar(m.getWhitePlayer().getAvatar())
 					.color("white")
 					.build();
 			UserForMatchResponse black = UserForMatchResponse.builder()
 					.username(m.getBlackPlayer().getUsername())
-					.avatar(m.getWhitePlayer().getAvatar())
+					.avatar(m.getBlackPlayer().getAvatar())
 					.color("black")
 					.build();
 

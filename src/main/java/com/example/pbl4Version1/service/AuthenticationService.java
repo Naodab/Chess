@@ -13,6 +13,7 @@ import com.example.pbl4Version1.dto.request.*;
 import com.example.pbl4Version1.entity.Traffic;
 import com.example.pbl4Version1.repository.TrafficRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;

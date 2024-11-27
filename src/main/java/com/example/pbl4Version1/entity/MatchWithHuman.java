@@ -9,7 +9,6 @@ import com.example.pbl4Version1.enums.PlayerType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @Setter
@@ -28,10 +27,6 @@ public class MatchWithHuman extends Match {
 	@JoinColumn(name = "black_player_id")
 	User blackPlayer;
 
-	@CreationTimestamp
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date createdAt;
-
 	int timeWhiteUser;
 	int timeBlackUser;
 	
@@ -41,12 +36,11 @@ public class MatchWithHuman extends Match {
 			PlayerType turn, PlayerType winner, Set<Step> steps, 
 			Room room, User whitePlayer, User blackPlayer, int time,
 						  Date createdAt) {
-		super(id, gameStatus, turn, winner, steps);
+		super(id, gameStatus, turn, winner, steps, createdAt);
 		this.room = room;
 		this.whitePlayer = whitePlayer;
 		this.blackPlayer = blackPlayer;
 		this.timeWhiteUser = time;
 		this.timeBlackUser = time;
-		this.createdAt = createdAt;
 	}
 }

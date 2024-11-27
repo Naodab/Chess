@@ -374,6 +374,9 @@ body {
 
 .info__match {
     width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .transfer-to-match {
@@ -390,6 +393,14 @@ body {
     cursor: pointer;
 }
 
+.transfer-to-match.transfer-to-match--pink {
+    background-color: var(--third-color);
+}
+
 .transfer-to-match:hover {
     box-shadow: 0 0 10px var(--text-color);
+}
+
+.transfer-to-match:hover.transfer-to-match--pink {
+    box-shadow: 0 0 10px var(--third-color);
 }

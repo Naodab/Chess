@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PredefinedAchievement {
+
 	// 1. Welcome
 	private static final Achievement welcome = new Achievement("Chào mừng",
 			"../assets/img/achievement/welcome.png",
@@ -137,6 +138,7 @@ public class PredefinedAchievement {
 	private static final Achievement fingerPaint = new Achievement("Sơn Ngón Tay",
 			"../assets/img/achievement/fingerPaint.png",
 			"Tùy Chỉnh Chủ Đề Của Bạn");
+
 
 	private PredefinedAchievement() {}
 

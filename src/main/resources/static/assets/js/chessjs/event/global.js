@@ -983,6 +983,10 @@ async function sendStepToServer(from, to) {
             const piece = getPieceAtPosition(data.result.from);
             prepareForMoving(piece, data.result.to);
             moveElement(piece, data.result.to);
+            if (piece.piece_name.includes("PAWN") && data.result.to.includes("1")) {
+                promotionPiece = getPieceAtPosition(data.result.to);
+                finishPromotionPawn("QUEEN");
+            }
             const status = moveStatus(ALLIANCE.toLowerCase());
             if (status === "CHECK_MATE" || status === "STALE_MATE") {
                 alertMessage(status);
