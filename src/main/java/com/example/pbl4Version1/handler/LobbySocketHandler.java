@@ -158,6 +158,7 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                         roomLobbyHandler.setPlayer(username);
                         roomLobbyHandlerList.add(roomLobbyHandler);
 
+                        waitingPeople.remove(hostUsername);
                         sendMessageToUser(hostUsername,
                                 responseAutoCreateRoomToHost(response.getId(), time, password, hostUsername),
                                 responseCreateRoom(response.getId(), time, password, hostUsername));

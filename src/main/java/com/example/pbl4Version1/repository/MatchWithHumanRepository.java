@@ -25,4 +25,6 @@ public interface MatchWithHumanRepository extends JpaRepository<MatchWithHuman, 
             "ORDER BY match_date",
             nativeQuery = true)
     List<Object[]> countMatchesPerDayInLast7Days();
+
+    Page<MatchWithHuman> findAll(Pageable pageable);
 }
