@@ -4,15 +4,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.example.pbl4Version1.dto.response.MatchWithHumanMinimalResponse;
-import com.example.pbl4Version1.dto.response.StepResponse;
+import com.example.pbl4Version1.dto.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.example.pbl4Version1.dto.request.MatchBotCreationRequest;
 import com.example.pbl4Version1.dto.request.MatchCreationRequest;
-import com.example.pbl4Version1.dto.response.MatchWithBotResponse;
-import com.example.pbl4Version1.dto.response.MatchWithHumanResponse;
 import com.example.pbl4Version1.entity.MatchWithBot;
 import com.example.pbl4Version1.entity.MatchWithHuman;
 
@@ -74,6 +71,17 @@ public class MatchMapper {
 				.id(match.getId())
 				.winner(winner)
 				.steps(steps)
+				.build();
+	}
+
+	public MatchWithHumanPageResponse toMatchWithHumanPageResponse(MatchWithHuman match) {
+		return MatchWithHumanPageResponse.builder()
+				.id(match.getId())
+				.whiteUsername(match.getWhitePlayer().getUsername())
+				.blackUsername(match.getBlackPlayer().getUsername())
+				.time(match.getRoom().getTime())
+				.winner(match.getWinner().name())
+				.createdAt(match.getCreatedAt())
 				.build();
 	}
 }

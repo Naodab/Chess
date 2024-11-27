@@ -2,6 +2,7 @@ import logout from "../account/logout.js";
 import changePassword from "../account/changePassword.js";
 import {getPageUsers, searchUser, countSearchUser } from "./api/user.js";
 import {getAccountData, getMatchData, getMatchDataChart, getTrafficRecently} from "./api/traffic.js";
+import {getPageMatches} from "./api/match.js";
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
@@ -215,7 +216,7 @@ const init = {
                     columns: [
                         {
                             title: "Mã",
-                            width: "20%",
+                            width: "15%",
                             first: true
                         },
                         {
@@ -223,19 +224,20 @@ const init = {
                             width: "15%"
                         },
                         {
-                            title: "Email",
-                            width: "20%"
-                        },
-                        {
-                            title: "Tỉ lệ thắng",
-                        },
-                        {
-                            title: "Elo",
-                            width: "5%",
+                            title: "Ngày chơi",
+                            width: "20%",
                             center: true
                         },
                         {
-                            title: "Số trận đấu",
+                            title: "Người chơi trắng",
+                        },
+                        {
+                            title: "Người chơi phải",
+                            width: "20%",
+                            center: true
+                        },
+                        {
+                            title: "Chiến thắng",
                             width: "10%",
                             center: true,
                             last: true
@@ -424,7 +426,12 @@ const actions = {
                     dispatch('rerender');
                 });
             } else {
-                detail.activeDetail = "table";
+                getPageMatches(detail.table.activePage).then(data => {
+                    console.log(data);
+                    data.forEach(match => detail.table.rows.push(match));
+                    detail.activeDetail = "table";
+                    dispatch('rerender');
+                });
             }
         } else {
             detail.activeDetail = "chart";
@@ -448,11 +455,19 @@ const actions = {
         let detail = content[content.activeItem].detail;
         if (!detail.table.lookupValue) {
             detail.table.activePage = index;
-            getPageUsers(detail.table.activePage).then(data => {
-                detail.table.rows = [];
-                data.forEach(user => detail.table.rows.push(user));
-                dispatch('rerender');
-            });
+            if (content.activeItem === "account") {
+                getPageUsers(detail.table.activePage).then(data => {
+                    detail.table.rows = [];
+                    data.forEach(user => detail.table.rows.push(user));
+                    dispatch('rerender');
+                });
+            } else {
+                getPageMatches(detail.table.activePage).then(data => {
+                    detail.table.rows = [];
+                    data.forEach(user => detail.table.rows.push(user));
+                    dispatch('rerender');
+                });
+            }
         } else {
             let table = detail.table;
             table.activePage = index;

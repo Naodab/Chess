@@ -2,6 +2,7 @@ package com.example.pbl4Version1.controller;
 
 import com.example.pbl4Version1.dto.request.MatchWithHumanUpdateRequest;
 import com.example.pbl4Version1.dto.response.MatchWithHumanMinimalResponse;
+import com.example.pbl4Version1.dto.response.MatchWithHumanPageResponse;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.pbl4Version1.dto.request.MatchCreationRequest;
@@ -57,6 +58,13 @@ public class MatchWithHumanController {
 	ApiResponse<List<MatchWithHumanMinimalResponse>> getMyMatches(@PathVariable int page) {
 		return ApiResponse.<List<MatchWithHumanMinimalResponse>>builder()
 				.result(matchWithHumanService.getMyMatches(page))
+				.build();
+	}
+
+	@GetMapping("/page/{pageNumber}")
+	ApiResponse<List<MatchWithHumanPageResponse>> getPage(@PathVariable int pageNumber) {
+		return ApiResponse.<List<MatchWithHumanPageResponse>>builder()
+				.result(matchWithHumanService.getPageMatches(pageNumber))
 				.build();
 	}
 }

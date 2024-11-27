@@ -6,12 +6,14 @@ import java.util.List;
 
 import com.example.pbl4Version1.dto.request.MatchWithHumanUpdateRequest;
 import com.example.pbl4Version1.dto.response.MatchWithHumanMinimalResponse;
+import com.example.pbl4Version1.dto.response.MatchWithHumanPageResponse;
 import com.example.pbl4Version1.dto.response.UserForMatchResponse;
 import com.example.pbl4Version1.entity.Room;
 import com.example.pbl4Version1.entity.User;
 import com.example.pbl4Version1.enums.GameStatus;
 import com.example.pbl4Version1.enums.PlayerType;
 import com.example.pbl4Version1.repository.StepRepisitory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -44,7 +46,8 @@ public class MatchWithHumanService {
 	RoomRepository roomRepository;
 	StepRepisitory stepRepisitory;
 	MatchMapper matchMapper;
-	
+	private final MatchWithHumanRepository matchWithHumanRepository;
+
 	public MatchWithHumanResponse create(MatchCreationRequest request) {
 		MatchWithHuman match = matchMapper.toMatchWithHuman(request);
 		
@@ -76,6 +79,13 @@ public class MatchWithHumanService {
 				.stream()
 				.map(matchMapper::toMatchWithHumanResponse)
 				.toList();
+	}
+
+	@PreAuthorize("hasRole('ADMIN')")
+	public List<MatchWithHumanPageResponse> getPageMatches(int page) {
+		Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+		Page<MatchWithHuman> matches = matchWithHumanRepository.findAll(pageable);
+		return matches.getContent().stream().map(matchMapper::toMatchWithHumanPageResponse).toList();
 	}
 
 	public List<MatchWithHumanMinimalResponse> getMyMatches(int page) {

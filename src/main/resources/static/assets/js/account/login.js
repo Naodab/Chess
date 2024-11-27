@@ -28,7 +28,7 @@ Validator({
             localStorage.setItem("USERNAME", data.username);
             sessionStorage.setItem("USERNAME", data.username);
             if (data.username === "admin")
-                window.location.href = "/admin";
+                window.location.href = "./admin";
             else
                 window.location.href = "../public/home";
         }).catch(error => {

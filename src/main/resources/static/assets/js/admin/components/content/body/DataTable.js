@@ -4,6 +4,7 @@ import TableColumn from "./TableColumn.js";
 import AccountRow from "./AccountRow.js";
 import FunctionSort from "./FunctionSort.js";
 import FunctionLookup from "./FunctionLookup.js";
+import MatchRow from "./MatchRow.js";
 
 function DataTable({ table, activeItem }) {
     return html`
@@ -15,12 +16,12 @@ function DataTable({ table, activeItem }) {
                 <h1 class="detail__title">Danh sách</h1>
             </div>
             <div class="table__function">
-                ${FunctionSort({ 
+                ${activeItem === "account" && FunctionSort({ 
                     sortFields: table.sortFields, 
                     activeSort: table.activeSort, 
                     activeSortType: table.activeSortType 
                 })}
-                ${FunctionLookup({ table })}
+                ${activeItem === "account" && FunctionLookup({ table })}
             </div>
             <div class="detail-container">
                 <table id="${ table.id }" class="table">
@@ -31,6 +32,12 @@ function DataTable({ table, activeItem }) {
                         activeItem === "account"
                         && table.rows.map((row, index) => {
                             return AccountRow({row, index});
+                        })
+                    }
+                    ${
+                        activeItem === "match"
+                        && table.rows.map((row, index) => {
+                            return MatchRow({row, index});
                         })
                     }
                 </table>
