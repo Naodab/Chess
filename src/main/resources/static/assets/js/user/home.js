@@ -12,7 +12,7 @@ import {
     renderMatches,
     renderModalMatches,
     renderWaitingForOthers,
-    renderAboutUs,
+    renderAboutUs, alertModal,
 } from "./render.js";
 import {getSpiderActivity} from "../util/spiderActivity.js";
 import {getPageMatch} from "./api/match.js";
@@ -45,8 +45,11 @@ function initializeWebsocket() {
             const data = JSON.parse(event.data);
             switch (data.type) {
                 case "EXIST_USER":
-                    //display UI to inform user!
-                    console.log("your account has been signed!");
+                    turnOnModal(alertModal, "Tài khoản của bạn hiện đang đăng nhập ở một nơi khác!");
+                    $("#confirm").onclick =  function () {
+                        turnOffModal();
+                        fetchLogout();
+                    }
                     break;
                 case "RESPONSE_ENTER_LOBBY":
                     const roomList = data.rooms;
@@ -199,25 +202,29 @@ $$(".logout").forEach(btn => {
         event.preventDefault();
         let result = await confirm("Bạn có chắc chắn không?");
         if (result) {
-            fetch("/chess/api/auth/logout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({token: localStorage.getItem("TOKEN")})
-            }).then(response => response.ok).then(data => {
-                if (data) {
-                    localStorage.removeItem("USERNAME");
-                    localStorage.removeItem("AVATAR");
-                    localStorage.removeItem("TOKEN");
-                    sessionStorage.removeItem("AVATAR");
-                    sessionStorage.removeItem("USERNAME");
-                    window.location.href = "./";
-                }
-            });
+            fetchLogout();
         }
     });
 });
+
+function fetchLogout() {
+    fetch("/chess/api/auth/logout", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({token: localStorage.getItem("TOKEN")})
+    }).then(response => response.ok).then(data => {
+        if (data) {
+            localStorage.removeItem("USERNAME");
+            localStorage.removeItem("AVATAR");
+            localStorage.removeItem("TOKEN");
+            sessionStorage.removeItem("AVATAR");
+            sessionStorage.removeItem("USERNAME");
+            window.location.href = "./";
+        }
+    });
+}
 
 activityBtn.addEventListener("click", () => {
     if (activityList.classList.contains("active")) {

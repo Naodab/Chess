@@ -7,6 +7,21 @@ function html([first, ...strings], ...values) {
         .join('');
 }
 
+function alertModal(message) {
+    return html`
+        <div class="modal closure active" id="alert-message">
+            <h1 class="modal__title">Thông báo</h1>
+            <i class="fa-solid fa-xmark btn-icon btn-close" id="back"></i>
+            <div class="main-modal">
+                <h3 class="modal__elo modal-item">${message}</h3>
+                <div class="modal__function top--margin">
+                    <div class="btn btn--green modal__btn" id="confirm">OK</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 function renderLoading() {
     return html`
         <div class="modal closure active" id="update-avatar">
@@ -358,6 +373,7 @@ function renderEnterRoomWithPassword() {
 }
 
 export {
+    alertModal,
     renderPersonalInformation,
     renderUpdateAvatar,
     renderConfirm,
