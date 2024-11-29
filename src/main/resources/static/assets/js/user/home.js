@@ -7,7 +7,12 @@ import {
     renderRoom,
     renderTopUser,
     renderFindRoom,
-    renderEnterRoomWithPassword, renderLoading, renderMatches, renderModalMatches, renderWaitingForOthers, renderAboutUs
+    renderEnterRoomWithPassword,
+    renderLoading,
+    renderMatches,
+    renderModalMatches,
+    renderWaitingForOthers,
+    renderAboutUs,
 } from "./render.js";
 import {getSpiderActivity} from "../util/spiderActivity.js";
 import {getPageMatch} from "./api/match.js";
@@ -39,6 +44,10 @@ function initializeWebsocket() {
         ws.onmessage = function (event) {
             const data = JSON.parse(event.data);
             switch (data.type) {
+                case "EXIST_USER":
+                    //display UI to inform user!
+                    console.log("your account has been signed!");
+                    break;
                 case "RESPONSE_ENTER_LOBBY":
                     const roomList = data.rooms;
                     if (roomList && roomList.length !== 0) {
