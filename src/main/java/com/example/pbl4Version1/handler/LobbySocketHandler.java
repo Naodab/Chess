@@ -55,8 +55,19 @@ public class LobbySocketHandler extends TextWebSocketHandler{
         switch (type) {
             case "RELOAD" -> {}
             case "ENTER_LOBBY" -> {
-                session.getAttributes().put("username", jsonNode.get("username").asText());
-                session.sendMessage(getRoomsActive());
+                String newUsername = jsonNode.get("username").asText();
+                WebSocketSession newSession = webSocketSessions.get(webSocketSessions.size() - 1);
+                if (!checkExistUserPlaying(newUsername)) {
+                    log.info("exist user is playing");
+                    sendMessageToUser(newUsername, responseExistUser(), null);
+                } else if (!checkExistUserLobby(newUsername)) {
+                    log.info("exist user at lobby");
+                    sendToSession(newSession, responseExistUser());
+                } else {
+                    log.info("not exist user");
+                    session.getAttributes().put("username", newUsername);
+                    session.sendMessage(getRoomsActive());
+                }
                 return;
             }
             case "CREATE_ROOM" -> {
@@ -197,10 +208,14 @@ public class LobbySocketHandler extends TextWebSocketHandler{
             if (username.equals(sessionUsername) && session.isOpen()) {
                 session.sendMessage(new TextMessage(message));
             }
-            else {
+            else if (messageToOther != null) {
                 session.sendMessage(messageToOther);
             }
         }
+    }
+
+    private void sendToSession(WebSocketSession session, String message) throws IOException {
+        session.sendMessage(new TextMessage(message));
     }
 
     private void sendMessage(String username, TextMessage messageToOther) throws IOException {
@@ -222,6 +237,14 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                     username);
             sendMessage(username, responseValidRoom(roomLobby.getId() + "", username));
         } catch (Exception ignored) { }
+    }
+
+    private String responseExistUser() {
+        String payload = "";
+        payload = "{" +
+                "\"type\": \"EXIST_USER\"" +
+                "}";
+        return payload;
     }
 
     private TextMessage responseCreateRoom(Long roomId, int time, String password, String hostname) {
@@ -309,5 +332,32 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                     "\"people\":" + roomLobbyHandler.getAmountPeople() + "," +
                     "\"time\":" + roomLobbyHandler.getTime() +
                 "}";
+    }
+
+    private boolean checkExistUserPlaying(String username) {
+        if (!roomLobbyHandlerList.isEmpty()) {
+            for (RoomLobbyHandler roomLobbyHandler : roomLobbyHandlerList) {
+                if (roomLobbyHandler.getHost().equals(username)) {
+                    return false;
+                }
+                if (roomLobbyHandler.getPlayer() != null && roomLobbyHandler.getPlayer().equals(username)) {
+                    return false;
+                }
+                if (!roomLobbyHandler.getViewers().isEmpty() && roomLobbyHandler.getViewers().contains(username)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean checkExistUserLobby(String username) {
+        for (WebSocketSession session : webSocketSessions) {
+            String sessionUsername = (String) session.getAttributes().get("username");
+            if (username.equals(sessionUsername) && session.isOpen()) {
+                return false;
+            }
+        }
+        return true;
     }
 }
