@@ -427,7 +427,6 @@ const actions = {
                 });
             } else {
                 getPageMatches(detail.table.activePage).then(data => {
-                    console.log(data);
                     data.forEach(match => detail.table.rows.push(match));
                     detail.activeDetail = "table";
                     dispatch('rerender');
@@ -508,6 +507,11 @@ const actions = {
     },
     openActivityList: ({activity}) => {
         activity.active = !activity.active;
+    },
+    openMatchDetail: ({ modal, content }, index) => {
+        const matchId = content.match.detail.table.rows[index].id;
+        sessionStorage.setItem("MATCH_ID", matchId);
+        window.location.href = "/chess/public/review";
     },
     openPersonalPage: ({ modal, content }, index) => {
         modal.activeModal = "personalPage";

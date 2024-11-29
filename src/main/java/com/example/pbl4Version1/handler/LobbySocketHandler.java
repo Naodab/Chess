@@ -241,7 +241,7 @@ public class LobbySocketHandler extends TextWebSocketHandler{
         String payload = "";
         payload = "{" +
                 "\"type\": \"JOIN_ROOM_AS_PLAYER\"," +
-                "\"id\":" + roomId + ", " +
+                "\"roomId\":" + roomId + ", " +
                 "\"username\":" + "\"" + username + "\"" +
                 "}";
         return new TextMessage(payload);

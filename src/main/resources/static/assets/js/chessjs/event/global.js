@@ -575,7 +575,7 @@ function whiteKingClick({ piece }) {
 
     const legalMoves = calculateKingLegalMove(piece, "white");
     const opponentLegalMoves = calculateLegalMoves("black");
-    if (!opponentLegalMoves.attack.includes(piece.current_position) && !piece.moved) {
+    if (!opponentLegalMoves.attack.some(move => move.destination.includes(piece.current_position)) && !piece.moved) {
         const rookValid = [];
         globalState.forEach(row => {
             row.forEach(element => {
@@ -598,7 +598,8 @@ function whiteKingClick({ piece }) {
             let accepted = false;
             for (let i = start + 1; i < end; i++) {
                 const squareId = `${String.fromCharCode(i)}1`;
-                if (checkPieceOfOpponentOnElement(squareId) || opponentLegalMoves.normal.includes(squareId)) {
+                if (checkPieceOfOpponentOnElement(squareId) || opponentLegalMoves.normal.includes(squareId) ||
+                    opponentLegalMoves.normal.some(move => move.destination === squareId)) {
                     break;
                 }
                 accepted = true;

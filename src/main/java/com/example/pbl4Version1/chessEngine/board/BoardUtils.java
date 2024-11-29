@@ -7,44 +7,47 @@ import java.util.List;
 import java.util.Map;
 
 public class BoardUtils {
-	public static final boolean[] FIRST_COLUMN = initColumn(0);
-	public static final boolean[] SECOND_COLUMN = initColumn(1);
-	public static final boolean[] SEVENTH_COLUMN = initColumn(6);
-	public static final boolean[] EIGHTH_COLUMN = initColumn(7);
-	
-	public static final boolean[] EIGHTH_RANK = initRow(0);
-	public static final boolean[] SEVENTH_RANK = initRow(8);
-	public static final boolean[] SIXTH_RANK = initRow(16);
-	public static final boolean[] FIFTH_RANK = initRow(24);
-	public static final boolean[] FOURTH_RANK = initRow(32);
-	public static final boolean[] THIRD_RANK = initRow(40);
-	public static final boolean[] SECOND_RANK = initRow(48);
-	public static final boolean[] FIRST_RANK = initRow(56);
+	public static final List<Boolean> FIRST_COLUMN = initColumn(0);
+	public static final List<Boolean> SECOND_COLUMN = initColumn(1);
+	public static final List<Boolean> THIRD_COLUMN = initColumn(2);
+	public static final List<Boolean> FOURTH_COLUMN = initColumn(3);
+	public static final List<Boolean> FIFTH_COLUMN = initColumn(4);
+	public static final List<Boolean> SIXTH_COLUMN = initColumn(5);
+	public static final List<Boolean> SEVENTH_COLUMN = initColumn(6);
+	public static final List<Boolean> EIGHTH_COLUMN = initColumn(7);
+	public static final List<Boolean> FIRST_ROW = initRow(0);
+	public static final List<Boolean> SECOND_ROW = initRow(8);
+	public static final List<Boolean> THIRD_ROW = initRow(16);
+	public static final List<Boolean> FOURTH_ROW = initRow(24);
+	public static final List<Boolean> FIFTH_ROW = initRow(32);
+	public static final List<Boolean> SIXTH_ROW = initRow(40);
+	public static final List<Boolean> SEVENTH_ROW = initRow(48);
+	public static final List<Boolean> EIGHTH_ROW = initRow(56);
 	
 	public static final int START_TILE_INDEX = 0;
 	public static final int NUM_TILES = 64;
 	public static final int NUM_TILES_PER_ROW = 8;
 	private static final List<String> ALGEBRAIC_NOTATION = initializeAlgebreicNotation();
 	private static final Map<String, Integer> POSITION_TO_COORDINATE = initializePositionToCoordinateMap();
-	
-	private static boolean[] initColumn(int columnNumber) {
-		final boolean[] column = new boolean[NUM_TILES];
-		
+
+	private static List<Boolean> initColumn(int columnNumber) {
+		final Boolean[] column = new Boolean[NUM_TILES];
+		Arrays.fill(column, false);
 		do {
 			column[columnNumber] = true;
 			columnNumber += NUM_TILES_PER_ROW;
-		} while (columnNumber < NUM_TILES);
-		
-		return column;
+		} while(columnNumber < NUM_TILES);
+		return Collections.unmodifiableList(Arrays.asList((column)));
 	}
 
-	private static boolean[] initRow(int rowNumber) {
-		final boolean[] row = new boolean[NUM_TILES];
+	private static List<Boolean> initRow(int rowNumber) {
+		final Boolean[] row = new Boolean[NUM_TILES];
+		Arrays.fill(row, false);
 		do {
 			row[rowNumber] = true;
 			rowNumber++;
-		} while (rowNumber %  NUM_TILES_PER_ROW != 0);
-		return row;
+		} while(rowNumber % NUM_TILES_PER_ROW != 0);
+		return Collections.unmodifiableList(Arrays.asList(row));
 	}
 	
 	private static Map<String, Integer> initializePositionToCoordinateMap() {

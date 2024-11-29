@@ -56,12 +56,17 @@ public class Bishop extends Piece{
 		return ImmutableList.copyOf(legalMoves);
 	}
 
+	@Override
+	public int locationBonus() {
+		return this.pieceAlliance.bishopBonus(this.piecePosition);
+	}
+
 	private static boolean isFirstColumnExclusion(final int currentPosition, final int candidateOffset) {
-		return BoardUtils.FIRST_COLUMN[currentPosition] && (candidateOffset == -9 || candidateOffset == 7);
+		return BoardUtils.FIRST_COLUMN.get(currentPosition) && (candidateOffset == -9 || candidateOffset == 7);
 	}
 
 	private static boolean isEightColumnExclusion(final int currentPosition, final int candidateOffset) {
-		return BoardUtils.EIGHTH_COLUMN[currentPosition] && (candidateOffset == 9 || candidateOffset == -7);
+		return BoardUtils.EIGHTH_COLUMN.get(currentPosition) && (candidateOffset == 9 || candidateOffset == -7);
 	}
 
 	@Override

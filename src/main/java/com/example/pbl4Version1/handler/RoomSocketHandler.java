@@ -23,6 +23,7 @@ import java.util.List;
 
 @Slf4j
 public class RoomSocketHandler {
+    private static final int MAX_STEP_AS_BOT = 5;
     RoomService roomService;
     LobbySocketHandler lobbySocketHandler = LobbySocketHandler.getInstance(roomService);
     DelayAction delayHostAction = new DelayAction();

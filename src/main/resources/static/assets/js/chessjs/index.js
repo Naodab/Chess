@@ -341,7 +341,6 @@ function eventStep(steps) {
     stepDivs[activeIndex].classList.add("active");
     stepDivs.forEach((stepDiv, index) => {
         stepDiv.onclick = () => {
-            pauseBtn.click();
             if (index === activeIndex) return;
             stepDivs[activeIndex].classList.remove("active");
             const changes = compareFENChanges(steps[activeIndex].fen, steps[index].fen);
@@ -380,8 +379,10 @@ function eventStep(steps) {
         pauseBtn.style.display = "flex";
 
         internal = setInterval(() => {
-            if (activeIndex === steps.length - 1) pauseBtn.click();
-            else right.click();
+            if (activeIndex === steps.length - 1) {
+                pauseBtn.click();
+            }
+            else stepDivs[activeIndex + 1].click();
         }, 1000);
     }
 

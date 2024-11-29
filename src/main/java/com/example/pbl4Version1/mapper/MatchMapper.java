@@ -75,12 +75,18 @@ public class MatchMapper {
 	}
 
 	public MatchWithHumanPageResponse toMatchWithHumanPageResponse(MatchWithHuman match) {
+		String winner = null;
+		if (match.getWinner() != null) {
+			winner = match.getWinner().name();
+		} else {
+			winner = "Đang diễn ra";
+		}
 		return MatchWithHumanPageResponse.builder()
 				.id(match.getId())
 				.whiteUsername(match.getWhitePlayer().getUsername())
 				.blackUsername(match.getBlackPlayer().getUsername())
 				.time(match.getRoom().getTime())
-				.winner(match.getWinner().name())
+				.winner(winner)
 				.createdAt(match.getCreatedAt())
 				.build();
 	}

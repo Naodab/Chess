@@ -51,9 +51,9 @@ public class Pawn extends Piece {
 				}
 			} else if (currentCandidate == 16 
 					&& this.isFirstMove()
-					&& ((BoardUtils.SEVENTH_RANK[this.piecePosition] 
+					&& ((BoardUtils.SEVENTH_ROW.get(this.piecePosition)
 							&& this.pieceAlliance.isBlack())
-						|| BoardUtils.SECOND_RANK[this.piecePosition] 
+						|| BoardUtils.SECOND_ROW.get(this.piecePosition)
 								&& this.getPieceAlliance().isWhite())) {
 				final int behindCanDesCoor = this.piecePosition + 
 						this.getPieceAlliance().getDirection() * 8;
@@ -64,9 +64,9 @@ public class Pawn extends Piece {
 							candidateDestinationCoordinate));
 				}
 			} else if (currentCandidate == 7
-					&& !((BoardUtils.EIGHTH_COLUMN[this.piecePosition] 
+					&& !((BoardUtils.EIGHTH_COLUMN.get(this.piecePosition)
 							&& this.pieceAlliance.isWhite())
-						|| (BoardUtils.FIRST_COLUMN[this.piecePosition] 
+						|| (BoardUtils.FIRST_COLUMN.get(this.piecePosition)
 								&& this.pieceAlliance.isBlack()))) {
 				if (board.getTile(candidateDestinationCoordinate).isTileOccupied()) {
 					final Piece pieceOnCandidate = 
@@ -92,9 +92,9 @@ public class Pawn extends Piece {
 					}
 				}
 			} else if (currentCandidate == 9
-					&& !((BoardUtils.FIRST_COLUMN[this.piecePosition] 
+					&& !((BoardUtils.FIRST_COLUMN.get(this.piecePosition)
 							&& this.pieceAlliance.isWhite())
-						|| (BoardUtils.EIGHTH_COLUMN[this.piecePosition] 
+						|| (BoardUtils.EIGHTH_COLUMN.get(this.piecePosition)
 							&& this.pieceAlliance.isBlack()))) {
 				if (board.getTile(candidateDestinationCoordinate).isTileOccupied()) {
 					final Piece pieceOnCandidate = 
@@ -113,6 +113,11 @@ public class Pawn extends Piece {
 			}
 		}
 		return ImmutableList.copyOf(legalMoves);
+	}
+
+	@Override
+	public int locationBonus() {
+		return this.pieceAlliance.pawnBonus(this.piecePosition);
 	}
 
 	@Override

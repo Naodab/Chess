@@ -58,21 +58,26 @@ public class Knight extends Piece {
 	}
 
 	private static boolean isFirstColumnExclusion(final int currentPosition, final int candidateOffset) {
-		return BoardUtils.FIRST_COLUMN[currentPosition]
+		return BoardUtils.FIRST_COLUMN.get(currentPosition)
 				&& (candidateOffset == -17 || candidateOffset == -10 || candidateOffset == 6 || candidateOffset == 15);
 	}
 
 	private static boolean isSecondColumnExclusion(final int currentPosition, final int candidateOffset) {
-		return BoardUtils.SECOND_COLUMN[currentPosition] && (candidateOffset == 6 || candidateOffset == -10);
+		return BoardUtils.SECOND_COLUMN.get(currentPosition) && (candidateOffset == 6 || candidateOffset == -10);
 	}
 
 	private static boolean isSevenColumnExclusion(final int currentPosition, final int candidateOffset) {
-		return BoardUtils.SEVENTH_COLUMN[currentPosition] && (candidateOffset == -6 || candidateOffset == 10);
+		return BoardUtils.SEVENTH_COLUMN.get(currentPosition) && (candidateOffset == -6 || candidateOffset == 10);
 	}
 
 	private static boolean isEightColumnExclusion(final int currentPosition, final int candidateOffset) {
-		return BoardUtils.EIGHTH_COLUMN[currentPosition]
+		return BoardUtils.EIGHTH_COLUMN.get(currentPosition)
 				&& (candidateOffset == 17 || candidateOffset == 10 || candidateOffset == -6 || candidateOffset == -15);
+	}
+
+	@Override
+	public int locationBonus() {
+		return this.pieceAlliance.knightBonus(this.piecePosition);
 	}
 
 	@Override

@@ -9,7 +9,7 @@ const color = [
 function MatchRow({ row, index }) {
     return html`
         <tr style="background-color: ${ index % 2 === 0 && color[0] || color[1]}"
-            onclick="dispatch('openPersonalPage', ${index} )">
+            onclick="dispatch('openMatchDetail', ${index} )">
             <td>${row.id}</td>
             <td class="center">${row.time} phút</td>
             <td class="center">${row.createdAt.substring(0, 10)}</td>

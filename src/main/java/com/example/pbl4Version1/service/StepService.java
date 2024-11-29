@@ -1,6 +1,7 @@
 package com.example.pbl4Version1.service;
 
 import com.example.pbl4Version1.chessEngine.ai.AlphaBetaWithMoveOrdering;
+import com.example.pbl4Version1.chessEngine.ai.MiniMaxVersion2;
 import com.example.pbl4Version1.enums.GameStatus;
 import com.example.pbl4Version1.enums.PlayerType;
 import org.springframework.stereotype.Service;
@@ -54,7 +55,6 @@ public class StepService {
 				.orElseThrow(() -> new AppException(ErrorCode.MATCH_NOT_EXISTED));
 		
 		Step stepUser = stepMapper.toStep(request);
-		log.info(stepUser.toString());
 		stepUser.setMatch(mwb);
 		stepRepository.save(stepUser);
 
@@ -78,7 +78,7 @@ public class StepService {
 					.build();
 		}
 
-		MoveStrategy minmax = new AlphaBetaWithMoveOrdering(5);
+		MoveStrategy minmax = new MiniMax(4);
 		Move bestMove = minmax.execute(board);
         Board executeBoard = board.getCurrentPlayer().makeMove(bestMove).getTransitionBoard();
 

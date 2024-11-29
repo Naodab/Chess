@@ -62,12 +62,17 @@ public class Rook extends Piece{
 
 	private static boolean isFirstColumnExclusion
 		(final int currentPosition, final int candidateOffset) {
-		return BoardUtils.FIRST_COLUMN[currentPosition] && candidateOffset == -1;
+		return BoardUtils.FIRST_COLUMN.get(currentPosition) && candidateOffset == -1;
 	}
 
 	private static boolean isEightColumnExclusion
 		(final int currentPosition, final int candidateOffset) {
-		return BoardUtils.EIGHTH_COLUMN[currentPosition] && candidateOffset == 1;
+		return BoardUtils.EIGHTH_COLUMN.get(currentPosition) && candidateOffset == 1;
+	}
+
+	@Override
+	public int locationBonus() {
+		return this.pieceAlliance.rookBonus(this.piecePosition);
 	}
 
 	@Override

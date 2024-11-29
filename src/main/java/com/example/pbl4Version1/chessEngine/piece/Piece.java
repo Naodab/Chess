@@ -43,6 +43,8 @@ public abstract class Piece {
 
 	public abstract Piece movePiece(Move move);
 
+	public abstract int locationBonus();
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(isFirstMove, pieceAlliance, piecePosition, pieceType);

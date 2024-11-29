@@ -57,13 +57,18 @@ public class King extends Piece {
 	}
 
 	private static boolean isFirstColumnExclusion(final int currentPosition, final int candidateOffset) {
-		return BoardUtils.FIRST_COLUMN[currentPosition]
+		return BoardUtils.FIRST_COLUMN.get(currentPosition)
 				&& (candidateOffset == -9 || candidateOffset == -1 || candidateOffset == 7);
 	}
 
 	private static boolean isEightColumnExclusion(final int currentPosition, final int candidateOffset) {
-		return BoardUtils.EIGHTH_COLUMN[currentPosition]
+		return BoardUtils.EIGHTH_COLUMN.get(currentPosition)
 				&& (candidateOffset == -7 || candidateOffset == 1 || candidateOffset == 9);
+	}
+
+	@Override
+	public int locationBonus() {
+		return this.pieceAlliance.kingBonus(this.piecePosition);
 	}
 
 	@Override
