@@ -453,6 +453,7 @@ function handleEndGame(data) {
             body: JSON.stringify(dataSend)
         }).then(response => response.json())
         .then(data => {
+            ws.send(JSON.stringify({ type: "CHECK_HACKING" }));
             ws.send(JSON.stringify({ type: "END_MATCH" }));
         }).catch(error => console.log(error));
     }

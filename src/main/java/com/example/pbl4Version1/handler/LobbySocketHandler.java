@@ -7,6 +7,8 @@ import com.example.pbl4Version1.dto.request.JoinRoomRequest;
 import com.example.pbl4Version1.dto.request.RoomAutoCreateRequest;
 import com.example.pbl4Version1.dto.response.RoomResponse;
 import com.example.pbl4Version1.service.RoomService;
+import com.example.pbl4Version1.service.UserService;
+import com.example.pbl4Version1.utils.DelayAction;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +24,18 @@ public class LobbySocketHandler extends TextWebSocketHandler{
     private final ObjectMapper mapper = new ObjectMapper();
     private final List<RoomLobbyHandler> roomLobbyHandlerList = new ArrayList<>();
     private final RoomService roomService;
+    private final UserService userService;
+    private final DelayAction delayAction = new DelayAction();
     private final List<String> waitingPeople = new ArrayList<>();
-    private LobbySocketHandler(RoomService roomService) {this.roomService = roomService;}
 
-    public static LobbySocketHandler getInstance(RoomService roomService) {
+    private LobbySocketHandler(RoomService roomService, UserService userService) {
+        this.roomService = roomService;
+        this.userService = userService;
+    }
+
+    public static LobbySocketHandler getInstance(RoomService roomService, UserService userService) {
         if(instance == null) {
-            instance = new LobbySocketHandler(roomService);
+            instance = new LobbySocketHandler(roomService, userService);
         }
         return instance;
     }
@@ -43,7 +51,15 @@ public class LobbySocketHandler extends TextWebSocketHandler{
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
+        String username = (String) session.getAttributes().get("username");
         webSocketSessions.remove(session);
+        if (username == null) return;
+        if (!waitingPeople.isEmpty()) {
+            waitingPeople.remove(username);
+        }
+        if (checkExistUserLobby(username) && checkExistUserPlaying(username)) {
+            userService.logout(username);
+        }
     }
 
     @Override
@@ -56,18 +72,16 @@ public class LobbySocketHandler extends TextWebSocketHandler{
             case "RELOAD" -> {}
             case "ENTER_LOBBY" -> {
                 String newUsername = jsonNode.get("username").asText();
-                WebSocketSession newSession = webSocketSessions.get(webSocketSessions.size() - 1);
-                if (!checkExistUserPlaying(newUsername)) {
-                    log.info("exist user is playing");
-                    sendMessageToUser(newUsername, responseExistUser(), null);
-                } else if (!checkExistUserLobby(newUsername)) {
-                    log.info("exist user at lobby");
-                    sendToSession(newSession, responseExistUser());
-                } else {
-                    log.info("not exist user");
-                    session.getAttributes().put("username", newUsername);
-                    session.sendMessage(getRoomsActive());
-                }
+                session.sendMessage(getRoomsActive());
+                delayAction.executeWithDelay(() -> {
+                    try {
+                        if (!checkExistUserPlaying(newUsername) || !checkExistUserLobby(newUsername)) {
+                            session.sendMessage(new TextMessage(responseExistUser()));
+                        } else {
+                            session.getAttributes().put("username", newUsername);
+                        }
+                    } catch (Exception ignored) {}
+                }, 2000);
                 return;
             }
             case "CREATE_ROOM" -> {
@@ -108,6 +122,7 @@ public class LobbySocketHandler extends TextWebSocketHandler{
                 for (RoomLobbyHandler roomLobbyHandler : roomLobbyHandlerList) {
                     if (!roomId.equals(roomLobbyHandler.getId() + "")) continue;
                     if (!isActive) {
+
                         roomLobbyHandlerList.remove(roomLobbyHandler);
                         broadcastMessage(deleteRoomMessage(Long.parseLong(roomId)));
                         break;
@@ -322,7 +337,6 @@ public class LobbySocketHandler extends TextWebSocketHandler{
             payload = payload.substring(0, payload.length() - 1);
             payload += "}";
         }
-        log.info(payload);
         return new TextMessage(payload);
     }
 

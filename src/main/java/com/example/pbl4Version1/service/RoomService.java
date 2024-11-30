@@ -47,7 +47,6 @@ public class RoomService {
 		User host = userRepository
 				.findByUsername(username).orElseThrow(
 						() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-		log.info(host.getId() + "/" + host.getUsername());
 		RoomUser roomUser = RoomUser.builder()
 				.user(host)
 				.room(room)
@@ -68,7 +67,6 @@ public class RoomService {
 		User host = userRepository
 				.findByUsername(request.getHostUsername()).orElseThrow(
 						() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-		log.info(host.getId() + "/" + host.getUsername());
 		RoomUser roomUser = RoomUser.builder()
 				.user(host)
 				.room(room)

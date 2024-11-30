@@ -1,5 +1,10 @@
 package com.example.pbl4Version1.handler;
 
+import com.example.pbl4Version1.chessEngine.ai.AlphaBetaThreeBest;
+import com.example.pbl4Version1.chessEngine.ai.MoveStrategy;
+import com.example.pbl4Version1.chessEngine.board.Board;
+import com.example.pbl4Version1.chessEngine.board.BoardUtils;
+import com.example.pbl4Version1.chessEngine.board.Move;
 import com.example.pbl4Version1.dto.response.RoomResponse;
 import com.example.pbl4Version1.service.RoomService;
 import com.example.pbl4Version1.utils.DelayAction;
@@ -10,7 +15,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -23,9 +27,8 @@ import java.util.List;
 
 @Slf4j
 public class RoomSocketHandler {
-    private static final int MAX_STEP_AS_BOT = 5;
     RoomService roomService;
-    LobbySocketHandler lobbySocketHandler = LobbySocketHandler.getInstance(roomService);
+    LobbySocketHandler lobbySocketHandler = LobbySocketHandler.getInstance(null, null);
     DelayAction delayHostAction = new DelayAction();
     DelayAction delayPlayerAction = new DelayAction();
 
@@ -35,14 +38,23 @@ public class RoomSocketHandler {
     WebSocketSession hostSession;
     WebSocketSession playerSession;
     int matchNumber = 0;
+    int stepNumber = 0;
+    int bestStepNumber = 0;
     final ObjectMapper mapper = new ObjectMapper();
     TimeState timeState = null;
     boolean isMatchExecute = false;
+
+    AlphaBetaThreeBest moveStrategy;
+    List<MoveHandler> whiteMoves;
+    List<MoveHandler> blackMoves;
+    List<List<MoveHandler>> whiteBestMoves;
+    List<List<MoveHandler>> blackBestMoves;
 
     public RoomSocketHandler(long roomId, RoomService roomService) {
         webSocketSessions = Collections.synchronizedList(new ArrayList<>());
         this.roomId = roomId;
         this.roomService = roomService;
+        this.moveStrategy = new AlphaBetaThreeBest(4);
     }
 
     public void add(WebSocketSession session) {
@@ -131,12 +143,42 @@ public class RoomSocketHandler {
                     timeState = new TimeState(Long.parseLong(time));
                     timeState.startTimeWhite();
                     isMatchExecute = true;
+                    stepNumber = 0;
+                    bestStepNumber = 0;
+                    whiteMoves = new ArrayList<>();
+                    blackMoves = new ArrayList<>();
+                    whiteBestMoves = new ArrayList<>();
+                    blackBestMoves = new ArrayList<>();
+                    new Thread(() -> handleBestMove("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")).start();
                 }
                 case "END_MATCH" -> {
                     isMatchExecute = false;
                     matchNumber++;
                     timeState.stopAllClocks();
                     return;
+                }
+                case "CHECK_HACKING" -> {
+                    int sameWhite = 0;
+                    int sameBlack = 0;
+                    for (int i = 0; i < whiteMoves.size(); i++) {
+                        if (whiteBestMoves.get(i).contains((whiteMoves.get(i)))) {
+                            sameWhite++;
+                        }
+                    }
+                    for (int i = 0; i < blackMoves.size(); i++) {
+                        if (blackBestMoves.get(i).contains(blackMoves.get(i))) {
+                            sameBlack++;
+                        }
+                    }
+                    float percentWhite = (float) sameWhite / (float) whiteMoves.size();
+                    float percentBlack = (float) sameBlack / (float) blackMoves.size();
+                    log.info(sameWhite + " " + sameBlack + " " + percentWhite + " " + percentBlack);
+                    if (percentWhite > 0.8) {
+                        log.info("white hack");
+                    }
+                    if (percentBlack > 0.8) {
+                        log.info("black hack");
+                    }
                 }
                 case "ENTER_ROOM" -> {
                     JsonNode user = jsonNode.get("user");
@@ -167,7 +209,6 @@ public class RoomSocketHandler {
                         }
                     }
                     session.sendMessage(getRoomInfo());
-                    log.info("send message to this session");
                 }
                 case "FORBIDDEN_USER" -> {
                     String username = jsonNode.get("username").asText();
@@ -185,6 +226,14 @@ public class RoomSocketHandler {
                     payload = payload.substring(0, payload.length() - 1) + "," +
                             getDataTimeIgnoreType().getPayload().substring(1);
                     message = new TextMessage(payload);
+                    String from = jsonNode.get("from").asText();
+                    String to = jsonNode.get("to").asText();
+                    if (stepNumber % 2 == 0)
+                        whiteMoves.add(MoveHandler.builder().from(from).to(to).build());
+                    else
+                        blackMoves.add(MoveHandler.builder().from(from).to(to).build());
+                    stepNumber++;
+                    new Thread(() -> handleBestMove(jsonNode.get("fen").asText())).start();
                 }
                 case "PEACE" -> {
                     if (session.equals(hostSession)) {
@@ -205,6 +254,28 @@ public class RoomSocketHandler {
         for (WebSocketSession webSocketSession : webSocketSessions) {
             if (webSocketSession.isOpen()) webSocketSession.sendMessage(message);
         }
+    }
+
+    private void handleBestMove(String fen) {
+        moveStrategy = new AlphaBetaThreeBest(4);
+        Board board = Board.createByFEN(fen);
+        if (board.getCurrentPlayer().isInStaleMate() || board.getCurrentPlayer().isInCheckMate()) return;
+        moveStrategy.execute(board);
+
+        List<MoveHandler> moves = new ArrayList<>();
+        moveStrategy.getMoveValuePairs().stream().limit(3).forEach(move -> {
+            moves.add(MoveHandler.builder()
+                    .from(BoardUtils.getPositionAtCoordinate(move.getFirst().getCurrentCoordinate()))
+                    .to(BoardUtils.getPositionAtCoordinate(move.getFirst().getDestinationCoordinate()))
+                    .build());
+        });
+
+        if (bestStepNumber % 2 == 0) {
+            whiteBestMoves.add(moves);
+        } else {
+            blackBestMoves.add(moves);
+        }
+        bestStepNumber++;
     }
 
     private void sendBanned(String username, TextMessage message)

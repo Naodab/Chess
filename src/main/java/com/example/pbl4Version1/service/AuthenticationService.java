@@ -102,8 +102,6 @@ public class AuthenticationService {
             User user = userRepository.findByUsername(username)
             	.orElseThrow(() -> 
             		new AppException(ErrorCode.USER_NOT_EXISTED));
-			user.setLatestLogin(LocalDate.now());
-            user.setOperatingStatus(OperatingStatus.OFFLINE);
             userRepository.save(user);
             
             invalidatedTokenRepository.save(invalidatedToken);

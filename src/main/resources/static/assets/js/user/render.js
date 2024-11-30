@@ -215,7 +215,7 @@ function renderChangePassword() {
                     </div>
                 </div>
                 <div class="password-item">
-                    <label for="oldPassword" class="modal__label">Mật khẩu cũ</label>
+                    <label for="oldPassword" class="modal__label">Mật khẩu mới</label>
 
                     <div class="password-container">
                         <input type="password" id="newPassword" class="password__input" placeholder="Mật khẩu mới">
@@ -224,7 +224,7 @@ function renderChangePassword() {
                     </div>
                 </div>
                 <div class="password-item">
-                    <label for="oldPassword" class="modal__label">Mật khẩu cũ</label>
+                    <label for="oldPassword" class="modal__label">Nhập lại mật khẩu mới</label>
                     <div class="password-container">
                         <input type="password" id="preNewPassword" class="password__input"
                                placeholder="Nhập lại mật khẩu mói">

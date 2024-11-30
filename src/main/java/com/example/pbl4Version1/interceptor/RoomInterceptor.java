@@ -17,7 +17,6 @@ public class RoomInterceptor implements HandshakeInterceptor {
                                    WebSocketHandler wsHandler, Map<String, Object> attributes) {
         URI uri = request.getURI();
         String query = uri.getQuery();
-        log.info(query);
         return true;
     }
 

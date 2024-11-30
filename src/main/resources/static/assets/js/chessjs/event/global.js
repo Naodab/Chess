@@ -1016,7 +1016,7 @@ function sendStepToOthers(from, to, namePromotion) {
         .catch(error => console.log(error));
 
     // send to others
-    const dataSend = { type: "STEP", from, to, name: nameMove }
+    const dataSend = { type: "STEP", from, to, name: nameMove, fen }
     if (namePromotion) {
         dataSend.namePromotion = namePromotion;
     }

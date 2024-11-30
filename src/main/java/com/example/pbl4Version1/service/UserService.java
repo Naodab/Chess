@@ -114,6 +114,7 @@ public class UserService {
 		return userMapper.toUserResponse(user);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	public List<UserResponse> getUsers(int page) {
 		Page<User> userPage = userRepository.findAll(PageRequest.of(page, USER_PER_PAGE));
 		List<User> users = userPage.getContent();
@@ -124,6 +125,13 @@ public class UserService {
 		List<User> users = userRepository.findAllByOrderByEloDesc
 				(PageRequest.of(0, USER_PER_PAGE)).getContent();
 		return users.stream().map(userMapper::toUserResponse).toList();
+	}
+
+	public void logout(String username) {
+		User user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+		user.setOperatingStatus(OperatingStatus.OFFLINE);
+		userRepository.save(user);
 	}
 	
 	@PreAuthorize("hasRole('ADMIN')")
