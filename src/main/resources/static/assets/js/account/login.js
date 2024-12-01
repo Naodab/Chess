@@ -25,6 +25,7 @@ Validator({
             return response.json();
         }).then(data2 => {
             localStorage.setItem("TOKEN", data2.result.token)
+            sessionStorage.setItem("TOKEN", data2.result.token)
             localStorage.setItem("USERNAME", data.username);
             sessionStorage.setItem("USERNAME", data.username);
             if (data.username === "admin")

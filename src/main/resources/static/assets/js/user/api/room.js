@@ -3,7 +3,7 @@ function getRoom(roomId) {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
         }
     }).then(response => {
         if (response.ok) {
@@ -17,7 +17,7 @@ function joinRoom(roomId, role, password) {
         method: "POST",
         headers: {
             "Content-type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
         },
         body: JSON.stringify({role, password})
     }).then(response => {

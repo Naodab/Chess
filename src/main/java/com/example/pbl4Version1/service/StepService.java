@@ -1,7 +1,6 @@
 package com.example.pbl4Version1.service;
 
 import com.example.pbl4Version1.chessEngine.ai.AlphaBetaWithMoveOrdering;
-import com.example.pbl4Version1.chessEngine.ai.MiniMaxVersion2;
 import com.example.pbl4Version1.enums.GameStatus;
 import com.example.pbl4Version1.enums.PlayerType;
 import org.springframework.stereotype.Service;

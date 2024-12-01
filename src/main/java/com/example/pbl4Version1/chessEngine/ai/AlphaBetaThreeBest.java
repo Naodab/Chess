@@ -140,9 +140,4 @@ public class AlphaBetaThreeBest implements MoveStrategy {
                                          final int depth) {
         return depth - 1;
     }
-
-    private static String calculateTimeTaken(final long start, final long end) {
-        final long timeTaken = (end - start) / 1000000;
-        return timeTaken + " ms";
-    }
 }

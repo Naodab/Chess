@@ -9,7 +9,7 @@ import {
     turnOnGameModal,
     turnOffGameModal,
     renderPersonalInformation
-} from "../opponents/message.js";
+} from "../components/message.js";
 import {
     ROLE,
     ROOM,
@@ -45,7 +45,7 @@ import {
 } from "../event/global.js";
 import {initGameFromFenRender, initGameRender} from "../render/main.js";
 import {STEPS_CONTAINER} from "../helper/constants.js";
-import {getTimeRemaining, resetClock, timeBlack, timeWhite, togglePause} from "../opponents/handleClock.js";
+import {getTimeRemaining, resetClock, timeBlack, timeWhite, togglePause} from "../components/handleClock.js";
 import {getSpiderActivity} from "../../util/spiderActivity.js";
 
 const $ = document.querySelector.bind(document);
@@ -264,26 +264,6 @@ async function handleSocketMessage(event) {
                 winner
             });
         }
-    } else if (data.type === "SURRENDER") {
-        let title = "Chiến thắng";
-        let time = ALLIANCE === "WHITE" ? getTimeRemaining(timeWhite)
-            : getTimeRemaining(timeBlack);
-        let winner = ALLIANCE;
-        if (ROLE === "VIEWER") {
-            title = (data.alliance === "WHITE" ? "Đen " : "Trắng ") + title;
-            time = data.alliance === "WHITE" ? getTimeRemaining(timeBlack)
-                : getTimeRemaining(timeWhite);
-            winner = data.alliance === "WHITE" ? "BLACK" : "WHITE"
-        }
-
-        handleEndGame({
-            title,
-            state: "Đối thủ đầu hàng",
-            status: "SURRENDER",
-            time,
-            turn: Math.floor(turn / 2),
-            winner
-        });
     } else if (data.type === "PEACE") {
         const result = await confirm("Đối thủ muốn cầu hòa");
         if (!result) return;
@@ -307,6 +287,121 @@ async function handleSocketMessage(event) {
                 : getTimeRemaining(timeBlack),
             winner: "DRAW"
         });
+    } else if (data.type === "END_MATCH") {
+        console.log(data);
+        if (!timeWhite.isPaused) {
+            togglePause(timeWhite);
+        }
+        if (!timeBlack.isPaused) {
+            togglePause(timeBlack);
+        }
+
+        setMatchNumber(ROOM.matchNumber + 1);
+        setIsMatchExecute(false);
+
+        let title, state;
+        switch (data.winner) {
+            case "DRAW":
+                title = "Hòa";
+                break;
+            default:
+                if (ALLIANCE === data.winner) {
+                    title = "Chiến thắng";
+                } else {
+                    title = "Thua cuộc";
+                }
+                if (ROLE === "VIEWER") {
+                    title = data.winner === "WHITE" ? whitePlayer.username : blackPlayer.username;
+                    title += " chiến thắng";
+                }
+        }
+        if (data.status) {
+            switch (data.status) {
+                case "BOTH_HACK":
+                    state = "Cả hai người chơi đều hack nước đi";
+                    break;
+                case "WHITE_HACK":
+                    if (ALLIANCE === "WHITE") {
+                        state = "Bạn đã hack nước đi";
+                    } else {
+                        state = "Đối thủ đã hack nước đi";
+                    }
+                    if (ROLE === "VIEWER") {
+                        state = whitePlayer.username + " đã hack nước đi";
+                    }
+                    break;
+                case "BLACK_HACK":
+                    if (ALLIANCE === "BLACK") {
+                        state = "Bạn đã hack nước đi";
+                    } else {
+                        state = "Đối thủ đã hack nước đi";
+                    }
+                    if (ROLE === "VIEWER") {
+                        state = blackPlayer.username + " đã hack nước đi";
+                    }
+                    break;
+                case "SURRENDER":
+                    if (ALLIANCE === data.winner) {
+                        state = "Đối thủ đầu hàng";
+                    } else {
+                        state = "Đầu hàng";
+                    }
+                    if (ROLE === "VIEWER") {
+                        state = data.winner === "WHITE" ? whitePlayer.username : blackPlayer.username;
+                        state += " đầu hàng";
+                    }
+                    break;
+                case "TIME_OUT":
+                    state = "Hết giờ";
+                    break;
+                case "DRAW":
+                    state = "";
+                    break;
+                default:
+                    state = "Hết nước đi";
+                    break;
+            }
+        }
+        turnOnOverlay(renderWinner, { title, state });
+
+        $("#ok").onclick = () => {
+            turnOffOverlay();
+            if (ROLE === "HOST") {
+                let winnerId = "DRAW";
+                switch (data.winner) {
+                    case "WHITE":
+                        winnerId = whitePlayer.id;
+                        break;
+                    case "BLACK":
+                        winnerId = blackPlayer.id;
+                        break;
+                }
+                const dataSend = {
+                    timeWhitePlayer: getTimeRemaining(timeWhite),
+                    timeBlackPlayer: getTimeRemaining(timeBlack),
+                    gameStatus: data.status,
+                    winnerId
+                }
+
+                fetch("/chess/api/matches/human/" + matchActiveId, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
+                    },
+                    body: JSON.stringify(dataSend)
+                }).then(response => response.json())
+                .catch(error => console.log(error));
+            }
+
+            if (ROLE !== "VIEWER" && ROOM.player) {
+                setTimeout(() => {
+                    if (ROLE !== "VIEWER" && ROOM.player) {
+                        handleReadyModal();
+                    }
+                }, 1000);
+            }
+        }
     }
 }
 
@@ -366,7 +461,7 @@ function addPerson(person, role) {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+                "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
             }
         }).then(response => {
             if (response.ok)
@@ -414,60 +509,13 @@ function clearPersonList() {
 }
 
 function handleEndGame(data) {
-    turnOnOverlay(renderWinner, data);
-
-    if (!timeWhite.isPaused) {
-        togglePause(timeWhite);
-    }
-    if (!timeBlack.isPaused) {
-        togglePause(timeBlack);
-    }
-
-    setMatchNumber(ROOM.matchNumber + 1);
-    setIsMatchExecute(false);
     if (ROLE === "HOST") {
-        let winnerId = "DRAW";
-        switch (data.winner) {
-            case "WHITE":
-                winnerId = whitePlayer.id;
-                break;
-            case "BLACK":
-                winnerId = blackPlayer.id;
-                break;
-        }
-
-        const dataSend = {
-            type: "END_MATCH",
-            timeWhitePlayer: getTimeRemaining(timeWhite),
-            timeBlackPlayer: getTimeRemaining(timeBlack),
+        const sendData = {
+            type: "CHECK_HACKING",
             gameStatus: data.status,
-            winnerId
+            winner: data.winner
         }
-
-        fetch("/chess/api/matches/human/" + matchActiveId, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
-            },
-            body: JSON.stringify(dataSend)
-        }).then(response => response.json())
-        .then(data => {
-            ws.send(JSON.stringify({ type: "CHECK_HACKING" }));
-            ws.send(JSON.stringify({ type: "END_MATCH" }));
-        }).catch(error => console.log(error));
-    }
-
-    $("#ok").onclick = () => {
-        turnOffOverlay();
-        if (ROLE !== "VIEWER" && ROOM.player) {
-            setTimeout(() => {
-                if (ROLE !== "VIEWER" && ROOM.player) {
-                    console.log(ROOM.player);
-                    handleReadyModal();
-                }
-            }, 1000);
-        }
+        ws.send(JSON.stringify(sendData));
     }
 }
 
@@ -556,19 +604,12 @@ if (MODE === "PLAY_ONLINE") {
         if (!isMatchExecute || ROLE === "VIEWER") return;
         const result = await confirm("Bạn muốn đầu hàng?");
         if (!result) return;
-        const dataSend = {
-            type: "SURRENDER",
-            alliance: ALLIANCE
+        const sendData = {
+            type: "CHECK_HACKING",
+            gameStatus: "SURRENDER",
+            winner: OPPONENT
         }
-        ws.send(JSON.stringify(dataSend));
-        handleEndGame({
-            title: "Thua cuộc",
-            status: "SURRENDER",
-            state: "Đầu hàng",
-            time: ALLIANCE === "WHITE" ? getTimeRemaining(timeWhite)
-                : getTimeRemaining(timeBlack),
-            winner: ALLIANCE === "WHITE" ? blackPlayer.id : whitePlayer.id
-        });
+        ws.send(JSON.stringify(sendData));
     }
 
     $("#handshake").onclick = async () => {

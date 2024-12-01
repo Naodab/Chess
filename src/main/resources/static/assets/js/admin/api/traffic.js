@@ -3,7 +3,7 @@ function getAccountData() {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
         }
     }).then(response => response.json()).then(data => data.result);
 }
@@ -13,7 +13,7 @@ function getTrafficRecently(page) {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+            "Authorization": `Bearer ${sessionStorage.getItem("TOKEN")}`
         }
     }).then(response => response.json()).then(data => data.result);
 }
@@ -23,7 +23,7 @@ function getMatchData() {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+            "Authorization": `Bearer ${sessionStorage.getItem("TOKEN")}`
         }
     }).then(response => response.json()).then(data => data.result);
 }
@@ -33,7 +33,7 @@ function getMatchDataChart() {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+            "Authorization": `Bearer ${sessionStorage.getItem("TOKEN")}`
         }
     }).then(response => response.json()).then(data => data.result);
 }

@@ -7,7 +7,7 @@ import {
 } from "./render/main.js";
 import { globalEvent } from "./event/global.js";
 import {BLACK_DEFEATED_PIECES, ROOT_DIV, STEPS_CONTAINER, WHITE_DEFEATED_PIECES} from "./helper/constants.js";
-import {innerStepAvatar} from "./opponents/message.js";
+import {innerStepAvatar} from "./components/message.js";
 import {getMatch} from "../user/api/match.js";
 import {getPieceAtPosition} from "./helper/commonHelper.js";
 
@@ -233,7 +233,7 @@ document.body.onload = async function () {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+                "Authorization": `Bearer ${sessionStorage.getItem("TOKEN")}`
             }
         }).then(res => {
             if (res.ok) {

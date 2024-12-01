@@ -6,5 +6,8 @@ public enum GameStatus {
 	STALE_MATE,
 	SURRENDER,
 	DRAW,
+	BOTH_HACK,
+	WHITE_HACK,
+	BLACK_HACK,
 	TIME_OUT;
 }

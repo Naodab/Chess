@@ -1,5 +1,7 @@
 package com.example.pbl4Version1.chessEngine.board;
 
+import com.example.pbl4Version1.chessEngine.piece.Piece;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -93,5 +95,15 @@ public class BoardUtils {
 	public static boolean isEndGame(final Board board) {
 		return board.getCurrentPlayer().isInCheckMate() ||
 				board.getCurrentPlayer().isInStaleMate();
+	}
+
+	public static int mvvlva(final Move move) {
+		final Piece movingPiece = move.getMovedPiece();
+		if(move.isAttack()) {
+			final Piece attackedPiece = move.getAttackedPiece();
+			return (attackedPiece.getPieceValue() - movingPiece.getPieceValue() +
+					Piece.PieceType.KING.getPieceValue()) * 100;
+		}
+		return Piece.PieceType.KING.getPieceValue() - movingPiece.getPieceValue();
 	}
 }

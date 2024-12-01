@@ -1,5 +1,5 @@
-import { OVERLAY } from "../helper/constants.js";
-import { OPPONENT } from "../index.js";
+import {OVERLAY} from "../helper/constants.js";
+import {OPPONENT} from "../index.js";
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
@@ -102,7 +102,7 @@ function renderWaitModal(message) {
 function alertMessage(message) {
     turnOnOverlay(alertModal, message);
 
-    $("#confirm").onclick =  function () {
+    $("#confirm").onclick = function () {
         turnOffOverlay();
     }
 }
@@ -163,7 +163,7 @@ function turnOnOverlay(renderFunction, arg) {
 
     const backBtn = $("#back");
     if (backBtn) {
-        backBtn.onclick =  function () {
+        backBtn.onclick = function () {
             turnOffOverlay();
         };
     }
@@ -188,6 +188,7 @@ function turnOffGameModal(selector) {
 }
 
 let confirmResolve;
+
 function confirm(message) {
     turnOnOverlay(renderConfirmModal, message);
 
@@ -199,7 +200,7 @@ function confirm(message) {
         resolveConfirm(false);
     });
 
-    $("#back").onclick =  function () {
+    $("#back").onclick = function () {
         resolveConfirm(false);
     };
 
@@ -231,6 +232,7 @@ function renderPromotion() {
 }
 
 let confirmPromotion;
+
 function promotion() {
     turnOnOverlay(renderPromotion);
 
@@ -249,30 +251,39 @@ function resolvePromotion(name) {
     confirmPromotion(name);
 }
 
-function renderWinner({title, state, time, turn}) {
+function renderWinner({title, state}) {
     return html`
         <div class="modal closure active" id="win-modal">
             <h1 class="modal__title">${title}</h1>
-            <h3 class="modal__status">${state}!!!</h3>
-            <div class="closure modal-closure">
-                <div class="modal-closure-item item-icon" id="turn-icon"></div>
-                <div class="modal-closure-item item-text">Nước đi</div>
-                <div class="modal-closure-item item-data">${turn}</div>
-            </div>
-            <div class="closure modal-closure">
-                <div class="modal-closure-item item-icon" id="clock-icon"></div>
-                <div class="modal-closure-item item-text">Thời gian</div>
-                <div class="modal-closure-item item-data">${time}</div>
-            </div>
+            ${state && html`<h3 class="modal__status">${state}!!!</h3>`}
             <div class="main-modal">
-                <h3 class="modal__elo modal-item"></h3>
-                <div class="modal__function">
-                    <div class="btn btn--green modal__btn" id="ok">Ok</div>
-                </div>
+               <div class="modal__function">
+                   <div class="btn btn--green modal__btn" id="ok">Ok</div>
+               </div>
             </div>
         </div>
     `;
 }
+
+// function renderContentWinner() {
+// <div className="closure modal-closure">
+//     <div className="modal-closure-item item-icon" id="turn-icon"></div>
+//     <div className="modal-closure-item item-text">Nước đi</div>
+//     <div className="modal-closure-item item-data">${turn}</div>
+// </div>
+// <div className="closure modal-closure">
+//     <div className="modal-closure-item item-icon" id="clock-icon"></div>
+//     <div className="modal-closure-item item-text">Thời gian</div>
+//     <div className="modal-closure-item item-data">${time}</div>
+// </div>
+// <div className="main-modal">
+//     <h3 className="modal__elo modal-item"></h3>
+//     <div className="modal__function">
+//         <div className="btn btn--green modal__btn" id="ok">Ok</div>
+//     </div>
+// </div>
+// }
+
 
 export {
     renderWaitModal,

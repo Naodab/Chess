@@ -120,7 +120,7 @@ window.addEventListener("load", () => {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+            "Authorization": `Bearer ${sessionStorage.getItem("TOKEN")}`
         }
     }).then(response => {
         if (response.ok) {
@@ -213,7 +213,7 @@ function fetchLogout() {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({token: localStorage.getItem("TOKEN")})
+        body: JSON.stringify({token: sessionStorage.getItem("TOKEN")})
     }).then(response => response.ok).then(data => {
         if (data) {
             localStorage.removeItem("USERNAME");
@@ -221,6 +221,7 @@ function fetchLogout() {
             localStorage.removeItem("TOKEN");
             sessionStorage.removeItem("AVATAR");
             sessionStorage.removeItem("USERNAME");
+            sessionStorage.removeItem("TOKEN");
             window.location.href = "./";
         }
     });
@@ -240,7 +241,7 @@ $("#see-my-information").addEventListener("click", event => {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
         }
     }).then(response => {
         if (response.ok) {
@@ -300,8 +301,7 @@ $("#about-us-btn").onclick = () => {
 
 $("#change-avatar-btn").addEventListener("click", event => {
     event.preventDefault();
-    const user = localStorage.getItem("USER");
-    turnOnModal(renderUpdateAvatar, avatar);
+    turnOnModal(renderUpdateAvatar, sessionStorage.getItem("AVATAR"));
 
     const errorMessage = $(".error-message");
     $("#avatarInput").onchange = event => {
@@ -325,7 +325,7 @@ $("#change-avatar-btn").addEventListener("click", event => {
             fetch("/chess/api/avatar", {
                 method: "POST",
                 headers: {
-                   Authorization: `Bearer ${localStorage.getItem("TOKEN")}`
+                   Authorization: `Bearer ${sessionStorage.getItem("TOKEN")}`
                 },
                 body: formData
             }).then(response => {
@@ -335,8 +335,8 @@ $("#change-avatar-btn").addEventListener("click", event => {
             }).then(data => {
                 if (data) {
                     turnOffModal();
-                    avatar = data.result;
-                    $(".header__avatar").style.background = `url("${avatar}") no-repeat center center / cover`;
+                    sessionStorage.setItem("AVATAR", data.result);
+                    $(".header__avatar").style.background = `url("${data.result}") no-repeat center center / cover`;
                 }
             });
         } else {
@@ -368,7 +368,7 @@ $("#change-password-btn").onclick = event => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+                    "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
                 },
                 body: JSON.stringify({ oldPassword, newPassword })
             }).then(response => {
@@ -388,7 +388,7 @@ $("#play-with-bot").onclick = () => {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`
+            Authorization: `Bearer ${sessionStorage.getItem("TOKEN")}`
         },
         redirect: "follow"
     }).then(response => {
@@ -430,7 +430,7 @@ function findRoom(idRoom, passwordRoom, isPlayer) {
         method: "POST",
         headers: {
             "Content-type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
         },
         body: JSON.stringify({role, password})
     }).then(response => {
@@ -476,7 +476,7 @@ $("#create-room").onclick = () => {
             method: "POST",
             headers: {
                 "Content-type": "application/json",
-                "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+                "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
             },
             body: JSON.stringify(data)
         }).then(response => {
@@ -579,7 +579,7 @@ function loadAllRooms() {
         method: "GET",
         headers: {
             "Content-type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
         }
     }).then(response => {
         if (response.ok)

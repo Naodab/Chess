@@ -21,8 +21,8 @@ import {
     moveStatus
 } from "../helper/commonHelper.js";
 import {handleEndGame, ws} from "../mode/play_online.js";
-import {alertMessage, promotion} from "../opponents/message.js";
-import {timeBlack, timeWhite, togglePause, getTimeRemaining } from "../opponents/handleClock.js";
+import {alertMessage, promotion} from "../components/message.js";
+import {timeBlack, timeWhite, togglePause, getTimeRemaining } from "../components/handleClock.js";
 
 let highlight_state = false;
 let previousHighlight = null;
@@ -595,14 +595,14 @@ function whiteKingClick({ piece }) {
                 end = tmp;
                 queenSide = false;
             }
-            let accepted = false;
+            let accepted = true;
             for (let i = start + 1; i < end; i++) {
                 const squareId = `${String.fromCharCode(i)}1`;
                 if (checkPieceOfOpponentOnElement(squareId) || opponentLegalMoves.normal.includes(squareId) ||
                     opponentLegalMoves.normal.some(move => move.destination === squareId)) {
+                    accepted = false;
                     break;
                 }
-                accepted = true;
             }
             if (accepted) {
                 if (queenSide) {
@@ -773,7 +773,7 @@ function blackKingClick({ piece }) {
 
     const legalMoves = calculateKingLegalMove(piece, "black");
     const opponentLegalMoves = calculateLegalMoves("white");
-    if (!opponentLegalMoves.attack.includes(piece.current_position) && !piece.moved) {
+    if (!opponentLegalMoves.attack.some(move => move.destination === piece.current_position) && !piece.moved) {
         const rookValid = [];
         globalState.forEach(row => {
             row.forEach(element => {
@@ -793,13 +793,14 @@ function blackKingClick({ piece }) {
                 end = tmp;
                 queenSide = false;
             }
-            let accepted = false;
+            let accepted = true;
             for (let i = start + 1; i < end; i++) {
                 const squareId = `${String.fromCharCode(i)}8`;
-                if (checkPieceOfOpponentOnElement(squareId) || opponentLegalMoves.normal.includes(squareId)) {
+                if (checkPieceOfOpponentOnElement(squareId) || opponentLegalMoves.normal.includes(squareId) ||
+                    opponentLegalMoves.normal.some(move => move.destination === squareId)) {
+                    accepted = false;
                     break;
                 }
-                accepted = true;
             }
             if (accepted) {
                 if (queenSide) {
@@ -1037,11 +1038,9 @@ function receiveMoveFromOthers({ from, to, name, namePromotion }) {
     const status = moveStatus(ALLIANCE.toLowerCase());
     if (status === "CHECK_MATE" || status === "STALE_MATE") {
         isEndGame = true;
-        let title = "";
+        let title = "Thua cuộc";
         if (ROLE === "VIEWER") {
             title = (turnWhite ? "Trắng" : "Đen") + " chiến thắng.";
-        } else {
-            title = "Thua cuộc";
         }
         handleEndGame({
             title,

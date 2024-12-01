@@ -56,7 +56,7 @@ btnSubmit.addEventListener("click", event => {
             "Mã OTP không hợp lệ.")
             .then(data => {
                 if (data.code === 1000) {
-                    localStorage.setItem('TOKEN', data.result.token);
+                    sessionStorage.setItem('TOKEN', data.result.token);
 
                     input.value = "";
                     input.type = "password";
@@ -96,14 +96,14 @@ btnSubmit.addEventListener("click", event => {
         if (password === prePassword) {
             const headers = new Headers();
             headers.set('Content-Type', 'application/json');
-            headers.set('Authorization', 'Bearer ' + localStorage.getItem('TOKEN'));
+            headers.set('Authorization', 'Bearer ' + sessionStorage.getItem('TOKEN'));
             fetchApi("../api/auth/confirm", "POST", headers,
                 JSON.stringify({password}),
                 "Không thành công.")
                 .then(data => {
                     if (data.code === 1000) {
-                        //TODO: direct to home page
                         alert("Thay đổi mật khẩu thành công");
+                        window.location.href = "./login";
                     }
                 })
                 .catch(err => errorMessage.innerText = "Không thành công.");

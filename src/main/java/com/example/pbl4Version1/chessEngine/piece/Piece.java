@@ -89,7 +89,7 @@ public abstract class Piece {
 				return false;
 			}
 		},
-		BISHOP("B", 300) {
+		BISHOP("B", 330) {
 			@Override
 			public boolean isKing() {
 				return false;

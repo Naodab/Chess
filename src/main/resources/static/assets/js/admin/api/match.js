@@ -3,7 +3,7 @@ function getPageMatches(page) {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
         }
     }).then(response => response.json()).then(data => data.result);
 }

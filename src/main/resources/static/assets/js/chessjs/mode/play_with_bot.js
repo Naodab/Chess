@@ -1,5 +1,5 @@
 import { createMatchBot } from "../../user/api/match.js";
-import {confirm, innerStepAvatar} from "../opponents/message.js";
+import {confirm, innerStepAvatar} from "../components/message.js";
 import { STEPS_CONTAINER } from "../helper/constants.js";
 import { reCreateGame } from "../index.js";
 

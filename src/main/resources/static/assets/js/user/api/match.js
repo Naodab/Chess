@@ -3,7 +3,7 @@ function createMatchOnline(whitePlayerId, blackPlayerId, roomId) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
         },
         body: JSON.stringify({ whitePlayerId, blackPlayerId, roomId })
     }).then(response => {
@@ -18,7 +18,7 @@ function createMatchBot() {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`
+            Authorization: `Bearer ${sessionStorage.getItem("TOKEN")}`
         },
         redirect: "follow"
     }).then(response => {
@@ -34,7 +34,7 @@ function getMatch(type, matchId) {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
         }
     }).then(response => {
         if (response.ok) {
@@ -48,7 +48,7 @@ function getPageMatch(page) {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+            "Authorization": `Bearer ${sessionStorage.getItem("TOKEN")}`
         }
     }).then(response => {
         if (response.ok) {

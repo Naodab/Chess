@@ -1,10 +1,8 @@
 package com.example.pbl4Version1.handler;
 
 import com.example.pbl4Version1.chessEngine.ai.AlphaBetaThreeBest;
-import com.example.pbl4Version1.chessEngine.ai.MoveStrategy;
 import com.example.pbl4Version1.chessEngine.board.Board;
 import com.example.pbl4Version1.chessEngine.board.BoardUtils;
-import com.example.pbl4Version1.chessEngine.board.Move;
 import com.example.pbl4Version1.dto.response.RoomResponse;
 import com.example.pbl4Version1.service.RoomService;
 import com.example.pbl4Version1.utils.DelayAction;
@@ -158,27 +156,40 @@ public class RoomSocketHandler {
                     return;
                 }
                 case "CHECK_HACKING" -> {
-                    int sameWhite = 0;
-                    int sameBlack = 0;
-                    for (int i = 0; i < whiteMoves.size(); i++) {
-                        if (whiteBestMoves.get(i).contains((whiteMoves.get(i)))) {
-                            sameWhite++;
+                    isMatchExecute = false;
+                    matchNumber++;
+                    timeState.stopAllClocks();
+
+                    String gameStatus = jsonNode.get("gameStatus").asText();
+                    String winner = jsonNode.get("winner").asText();
+
+                    if (stepNumber >= 30) {
+                        int sameWhite = 0;
+                        int sameBlack = 0;
+                        for (int i = 15; i < whiteMoves.size(); i++) {
+                            if (whiteBestMoves.get(i).contains((whiteMoves.get(i)))) {
+                                sameWhite++;
+                            }
+                        }
+                        for (int i = 15; i < blackMoves.size(); i++) {
+                            if (blackBestMoves.get(i).contains(blackMoves.get(i))) {
+                                sameBlack++;
+                            }
+                        }
+                        float percentWhite = (float) sameWhite / (float) (whiteMoves.size() - 15);
+                        float percentBlack = (float) sameBlack / (float) (blackMoves.size() - 15);
+                        if (percentWhite > 0.8 && percentBlack > 0.8) {
+                            winner = "DRAW";
+                            gameStatus = "BOTH_HACK";
+                        } else if (winner.equals("BLACK") && percentBlack > 0.8) {
+                            winner = "WHITE";
+                            gameStatus = "BLACK_HACK";
+                        } else if (winner.equals("WHITE") && percentWhite > 0.8) {
+                            winner = "BLACK";
+                            gameStatus = "WHITE_HACK";
                         }
                     }
-                    for (int i = 0; i < blackMoves.size(); i++) {
-                        if (blackBestMoves.get(i).contains(blackMoves.get(i))) {
-                            sameBlack++;
-                        }
-                    }
-                    float percentWhite = (float) sameWhite / (float) whiteMoves.size();
-                    float percentBlack = (float) sameBlack / (float) blackMoves.size();
-                    log.info(sameWhite + " " + sameBlack + " " + percentWhite + " " + percentBlack);
-                    if (percentWhite > 0.8) {
-                        log.info("white hack");
-                    }
-                    if (percentBlack > 0.8) {
-                        log.info("black hack");
-                    }
+                    broadCast(endGameData(gameStatus, winner));
                 }
                 case "ENTER_ROOM" -> {
                     JsonNode user = jsonNode.get("user");
@@ -263,11 +274,14 @@ public class RoomSocketHandler {
         moveStrategy.execute(board);
 
         List<MoveHandler> moves = new ArrayList<>();
+        log.info("Top 3 best move[used for check test catching hack move]: ");
         moveStrategy.getMoveValuePairs().stream().limit(3).forEach(move -> {
             moves.add(MoveHandler.builder()
                     .from(BoardUtils.getPositionAtCoordinate(move.getFirst().getCurrentCoordinate()))
                     .to(BoardUtils.getPositionAtCoordinate(move.getFirst().getDestinationCoordinate()))
                     .build());
+            log.info(BoardUtils.getPositionAtCoordinate(move.getFirst().getCurrentCoordinate())
+                    + " " + BoardUtils.getPositionAtCoordinate(move.getFirst().getDestinationCoordinate()));
         });
 
         if (bestStepNumber % 2 == 0) {
@@ -276,6 +290,15 @@ public class RoomSocketHandler {
             blackBestMoves.add(moves);
         }
         bestStepNumber++;
+    }
+
+    private TextMessage endGameData(String gameStatus, String winner) {
+        String payload = "{" +
+                "\"type\": \"END_MATCH\"," +
+                "\"status\":" + "\"" + gameStatus + "\"" + "," +
+                "\"winner\":" + "\"" + winner + "\"" +
+                "}";
+        return new TextMessage(payload);
     }
 
     private void sendBanned(String username, TextMessage message)
@@ -410,7 +433,6 @@ public class RoomSocketHandler {
             return !turnBlack && !turnWhite;
         }
 
-        // call when createMatch
         TimeState(long timeDuration) {
             timeWhiteDuration = timeDuration;
             timeBlackDuration = timeDuration;

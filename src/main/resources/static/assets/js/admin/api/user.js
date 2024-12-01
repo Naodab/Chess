@@ -3,7 +3,7 @@ function getUserSize() {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("TOKEN")}`
+            "Authorization": `Bearer ${sessionStorage.getItem("TOKEN")}`
         }
     }).then(res => {
         if (res.status === 200) {
@@ -19,7 +19,7 @@ function getUsers() {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`
+            Authorization: `Bearer ${sessionStorage.getItem("TOKEN")}`
         }
     }).then(response=> {
         if (response.ok) {
@@ -38,7 +38,7 @@ function getPageUsers(page) {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
         }
     }).then(response => {
         if (response.ok) {
@@ -57,7 +57,7 @@ function countSearchUser(searchStr) {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
         }
     }).then(response => {
         if (response.ok) {
@@ -76,7 +76,7 @@ function searchUser(searchStr, page, sortField, sortDirection) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("TOKEN")
+            "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
         },
         body: JSON.stringify({searchStr, page, sortField, sortDirection})
     }).then(response => {
