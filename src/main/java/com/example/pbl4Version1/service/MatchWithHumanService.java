@@ -124,7 +124,9 @@ public class MatchWithHumanService {
                 me = black;
                 opponent = white;
             }
-            if (m.getWinner().name().equalsIgnoreCase(me.getColor())) {
+            if (m.getWinner() == null) {
+                state = "DRAW";
+            } else if (me.getColor().equalsIgnoreCase(m.getWinner().name())) {
                 state = "WIN";
             } else if (m.getWinner().name().equalsIgnoreCase(opponent.getColor())) {
                 state = "LOSE";

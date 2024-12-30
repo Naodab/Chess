@@ -61,7 +61,6 @@ public class MiniMax implements MoveStrategy {
         }
 
         executorService.shutdown();
-        executorService.close();
         return bestMove;
     }
 
