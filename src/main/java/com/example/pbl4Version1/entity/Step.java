@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,25 +19,26 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Step {
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	Long id;
-	String name;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    Long id;
 
-	@ManyToOne(cascade = CascadeType.ALL)
-	Match match;
+    String name;
 
-	@Column(name = "from_position")
-	String from;
+    @ManyToOne(cascade = CascadeType.ALL)
+    Match match;
 
-	@Column(name = "to_position")
-	String to;
+    @Column(name = "from_position")
+    String from;
 
-	// Save board state as a FEN
-	// FEN format:
-	// row1/row2/row3/row4/row5/row6/row7/roww8 turn isCastleds enPassantPawn
-	// numberOfDrawSteps thStep
-	@Column(columnDefinition = "TEXT")
-	@Builder.Default
-	String boardState = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
+    @Column(name = "to_position")
+    String to;
+
+    // Save board state as a FEN
+    // FEN format:
+    // row1/row2/row3/row4/row5/row6/row7/roww8 turn isCastleds enPassantPawn
+    // numberOfDrawSteps thStep
+    @Column(columnDefinition = "TEXT")
+    @Builder.Default
+    String boardState = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
 }

@@ -1,7 +1,6 @@
 package com.example.pbl4Version1.dto.response;
 
 import java.util.List;
-import java.util.Set;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,8 +15,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MatchWithBotResponse {
-	Long id;
-	UserResponse player;
-	String winner;
-	List<StepResponse> steps;
+    Long id;
+    UserResponse player;
+    String winner;
+    List<StepResponse> steps;
 }

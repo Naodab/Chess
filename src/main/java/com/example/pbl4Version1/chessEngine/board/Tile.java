@@ -8,77 +8,78 @@ import com.example.pbl4Version1.chessEngine.piece.Piece;
 import com.google.common.collect.ImmutableMap;
 
 public abstract class Tile {
-	protected final int tileCoordinate;
-	private static final Map<Integer, EmptyTile> EMPTY_TILES_CACHE = createAllPossibleEmptyTiles();
+    protected final int tileCoordinate;
+    private static final Map<Integer, EmptyTile> EMPTY_TILES_CACHE = createAllPossibleEmptyTiles();
 
-	private static Map<Integer, EmptyTile> createAllPossibleEmptyTiles() {
-		final Map<Integer, EmptyTile> emptyTilesMap = new HashMap<Integer, Tile.EmptyTile>();
-		for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
-			emptyTilesMap.put(i, new EmptyTile(i));
-		}
-		Collections.unmodifiableMap(emptyTilesMap);
-		return ImmutableMap.copyOf(emptyTilesMap);
-	}
+    private static Map<Integer, EmptyTile> createAllPossibleEmptyTiles() {
+        final Map<Integer, EmptyTile> emptyTilesMap = new HashMap<Integer, Tile.EmptyTile>();
+        for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
+            emptyTilesMap.put(i, new EmptyTile(i));
+        }
+        Collections.unmodifiableMap(emptyTilesMap);
+        return ImmutableMap.copyOf(emptyTilesMap);
+    }
 
-	public static Tile createTile(final int coordinate, final Piece piece) {
-		return piece != null ? new OccupiedTile(coordinate, piece) : EMPTY_TILES_CACHE.get(coordinate);
-	}
+    public static Tile createTile(final int coordinate, final Piece piece) {
+        return piece != null ? new OccupiedTile(coordinate, piece) : EMPTY_TILES_CACHE.get(coordinate);
+    }
 
-	Tile(final int tileCordinate) {
-		this.tileCoordinate = tileCordinate;
-	}
-	
-	public int getTileCoordinate() {
-		return this.tileCoordinate;
-	}
+    Tile(final int tileCordinate) {
+        this.tileCoordinate = tileCordinate;
+    }
 
-	public abstract boolean isTileOccupied();
+    public int getTileCoordinate() {
+        return this.tileCoordinate;
+    }
 
-	public abstract Piece getPiece();
+    public abstract boolean isTileOccupied();
 
-	public static final class EmptyTile extends Tile {
-		EmptyTile(final int coordinate) {
-			super(coordinate);
-		}
+    public abstract Piece getPiece();
 
-		@Override
-		public String toString() {
-			return "-";
-		}
+    public static final class EmptyTile extends Tile {
+        EmptyTile(final int coordinate) {
+            super(coordinate);
+        }
 
-		@Override
-		public boolean isTileOccupied() {
-			return false;
-		}
+        @Override
+        public String toString() {
+            return "-";
+        }
 
-		@Override
-		public Piece getPiece() {
-			return null;
-		}
-	}
+        @Override
+        public boolean isTileOccupied() {
+            return false;
+        }
 
-	public static final class OccupiedTile extends Tile {
-		private final Piece pieceOnTile;
+        @Override
+        public Piece getPiece() {
+            return null;
+        }
+    }
 
-		public OccupiedTile(final int coordinate, final Piece pieceOnTile) {
-			super(coordinate);
-			this.pieceOnTile = pieceOnTile;
-		}
+    public static final class OccupiedTile extends Tile {
+        private final Piece pieceOnTile;
 
-		@Override
-		public boolean isTileOccupied() {
-			return true;
-		}
+        public OccupiedTile(final int coordinate, final Piece pieceOnTile) {
+            super(coordinate);
+            this.pieceOnTile = pieceOnTile;
+        }
 
-		@Override
-		public Piece getPiece() {
-			return this.pieceOnTile;
-		}
+        @Override
+        public boolean isTileOccupied() {
+            return true;
+        }
 
-		@Override
-		public String toString() {
-			return this.pieceOnTile.getPieceAlliance().isBlack() ? this.pieceOnTile.toString().toLowerCase()
-					: this.pieceOnTile.toString();
-		}
-	}
+        @Override
+        public Piece getPiece() {
+            return this.pieceOnTile;
+        }
+
+        @Override
+        public String toString() {
+            return this.pieceOnTile.getPieceAlliance().isBlack()
+                    ? this.pieceOnTile.toString().toLowerCase()
+                    : this.pieceOnTile.toString();
+        }
+    }
 }

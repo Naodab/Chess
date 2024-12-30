@@ -9,6 +9,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class JoinRoomRequest {
-	String role;
-	String password;
+    String role;
+    String password;
 }

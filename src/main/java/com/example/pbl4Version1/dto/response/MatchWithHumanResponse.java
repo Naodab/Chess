@@ -12,12 +12,12 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MatchWithHumanResponse {
-	Long id;
-	RoomResponse roomResponse;
-	UserResponse white;
-	UserResponse black;
-	int timeWhite;
-	int timeBlack;
-	String winner;
-	List<StepResponse> steps;
+    Long id;
+    RoomResponse roomResponse;
+    UserResponse white;
+    UserResponse black;
+    int timeWhite;
+    int timeBlack;
+    String winner;
+    List<StepResponse> steps;
 }

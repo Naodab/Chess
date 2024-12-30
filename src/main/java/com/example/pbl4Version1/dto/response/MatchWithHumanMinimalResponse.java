@@ -3,8 +3,6 @@ package com.example.pbl4Version1.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Builder

@@ -20,23 +20,22 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AchievementService {
-	AchievementRepository achievementRepository;
-	AchievementMapper achievementMapper;
-	
-	public AchievementResponse create(AchievementRequest request) {
-		Achievement achievement = achievementMapper.toAchievement(request);
-		achievement = achievementRepository.save(achievement);
-		return achievementMapper.toAchievementResponse(achievement);
-	}
-	
-	public List<AchievementResponse> getAll() {
-		return achievementRepository.findAll()
-				.stream()
-				.map(achievementMapper::toAchievementResponse)
-				.toList();
-	}
-	
-	public void delete(String name) {
-		achievementRepository.deleteById(name);
-	}
+    AchievementRepository achievementRepository;
+    AchievementMapper achievementMapper;
+
+    public AchievementResponse create(AchievementRequest request) {
+        Achievement achievement = achievementMapper.toAchievement(request);
+        achievement = achievementRepository.save(achievement);
+        return achievementMapper.toAchievementResponse(achievement);
+    }
+
+    public List<AchievementResponse> getAll() {
+        return achievementRepository.findAll().stream()
+                .map(achievementMapper::toAchievementResponse)
+                .toList();
+    }
+
+    public void delete(String name) {
+        achievementRepository.deleteById(name);
+    }
 }

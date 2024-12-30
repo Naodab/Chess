@@ -1,11 +1,11 @@
 package com.example.pbl4Version1.utils;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class NetworkUtils {
@@ -30,7 +30,8 @@ public class NetworkUtils {
                 while (inetAddresses.hasMoreElements()) {
                     InetAddress inetAddress = inetAddresses.nextElement();
 
-                    if (inetAddress.isLoopbackAddress() || inetAddress.getHostAddress().contains(":")) {
+                    if (inetAddress.isLoopbackAddress()
+                            || inetAddress.getHostAddress().contains(":")) {
                         continue;
                     }
                     result = inetAddress;

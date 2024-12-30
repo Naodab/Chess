@@ -26,27 +26,27 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/roles")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RoleController {
-	RoleService roleService;
-	
-	@PostMapping
-	ApiResponse<RoleResponse> create(@RequestBody RoleRequest request) {
-		return ApiResponse.<RoleResponse>builder()
-				.result(roleService.create(request))
-				.build();
-	}
-	
-	@GetExchange
-	ApiResponse<List<RoleResponse>> getAll() {
-		return ApiResponse.<List<RoleResponse>>builder()
-				.result(roleService.getAll())
-				.build();
-	}
-	
-	@DeleteMapping("/{name}")
-	public ApiResponse<?> update(@PathVariable("name") String name) {
-		roleService.delete(name);
-		return ApiResponse.builder()
-				.message("ROLE " + name + " has been deleted.")
-				.build();
-	}
+    RoleService roleService;
+
+    @PostMapping
+    ApiResponse<RoleResponse> create(@RequestBody RoleRequest request) {
+        return ApiResponse.<RoleResponse>builder()
+                .result(roleService.create(request))
+                .build();
+    }
+
+    @GetExchange
+    ApiResponse<List<RoleResponse>> getAll() {
+        return ApiResponse.<List<RoleResponse>>builder()
+                .result(roleService.getAll())
+                .build();
+    }
+
+    @DeleteMapping("/{name}")
+    public ApiResponse<?> update(@PathVariable("name") String name) {
+        roleService.delete(name);
+        return ApiResponse.builder()
+                .message("ROLE " + name + " has been deleted.")
+                .build();
+    }
 }

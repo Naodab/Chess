@@ -15,8 +15,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomUpdateRequest {
-	Long id;
-	String hostId;
-	String playerId;
-	List<String> viewerIds;
+    Long id;
+    String hostId;
+    String playerId;
+    List<String> viewerIds;
 }

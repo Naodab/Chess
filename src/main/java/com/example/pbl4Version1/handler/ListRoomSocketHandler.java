@@ -1,16 +1,18 @@
 package com.example.pbl4Version1.handler;
 
-import com.example.pbl4Version1.service.RoomService;
-import lombok.extern.slf4j.Slf4j;
+import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import com.example.pbl4Version1.service.RoomService;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ListRoomSocketHandler extends TextWebSocketHandler {
@@ -50,7 +52,8 @@ public class ListRoomSocketHandler extends TextWebSocketHandler {
                     rooms.remove(roomId);
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     @Override

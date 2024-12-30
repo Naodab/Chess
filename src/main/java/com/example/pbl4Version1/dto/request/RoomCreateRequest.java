@@ -13,6 +13,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomCreateRequest {
-	String password;
-	int time;
+    String password;
+    int time;
 }

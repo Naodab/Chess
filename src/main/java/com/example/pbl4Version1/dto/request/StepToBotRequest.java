@@ -13,9 +13,9 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class StepToBotRequest {
-	Long matchId;
-	String fen;
-	String from;
-	String to;
-	String name;
+    Long matchId;
+    String fen;
+    String from;
+    String to;
+    String name;
 }

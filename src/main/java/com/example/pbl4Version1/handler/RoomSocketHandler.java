@@ -1,5 +1,15 @@
 package com.example.pbl4Version1.handler;
 
+import java.io.IOException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
+import org.springframework.web.socket.WebSocketSession;
+
 import com.example.pbl4Version1.chessEngine.ai.AlphaBetaThreeBest;
 import com.example.pbl4Version1.chessEngine.board.Board;
 import com.example.pbl4Version1.chessEngine.board.BoardUtils;
@@ -8,20 +18,12 @@ import com.example.pbl4Version1.service.RoomService;
 import com.example.pbl4Version1.utils.DelayAction;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
-import org.springframework.web.socket.WebSocketSession;
-
-import java.io.IOException;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @Slf4j
 public class RoomSocketHandler {
@@ -61,10 +63,8 @@ public class RoomSocketHandler {
 
     public void remove(WebSocketSession session) throws Exception {
         webSocketSessions.remove(session);
-        String username = session.getAttributes()
-                .get("username").toString();
-        String role = session.getAttributes()
-                .get("role").toString();
+        String username = session.getAttributes().get("username").toString();
+        String role = session.getAttributes().get("role").toString();
         if (role.equals("HOST")) {
             if (!isMatchExecute) {
                 handlerHostDisconnection(username, role);
@@ -73,9 +73,11 @@ public class RoomSocketHandler {
                 if (isLeft) {
                     handlerHostDisconnection(username, role);
                 } else {
-                    delayPlayerAction.executeWithDelay(() -> {
-                        handlerHostDisconnection(username, role);
-                    }, 10);
+                    delayPlayerAction.executeWithDelay(
+                            () -> {
+                                handlerHostDisconnection(username, role);
+                            },
+                            10);
                 }
             }
         } else if (role.equals("PLAYER")) {
@@ -90,16 +92,17 @@ public class RoomSocketHandler {
                 if (isLeft) {
                     handlePlayerDisconnection(username, role);
                 } else {
-                    delayPlayerAction.executeWithDelay(() -> {
-                        handlePlayerDisconnection(username, role);
-                    }, 10);
+                    delayPlayerAction.executeWithDelay(
+                            () -> {
+                                handlePlayerDisconnection(username, role);
+                            },
+                            10);
                 }
             }
         } else {
             RoomResponse response = roomService.leaveRoom(roomId, username);
             broadCast(leaveRoom(username, role, response.isActive()));
-            lobbySocketHandler.handleMessage(null,
-                    leaveRoom(username, role, response.isActive(), roomId + ""));
+            lobbySocketHandler.handleMessage(null, leaveRoom(username, role, response.isActive(), roomId + ""));
         }
     }
 
@@ -112,7 +115,8 @@ public class RoomSocketHandler {
             RoomResponse response = roomService.leaveRoom(roomId, username);
             broadCast(leaveRoom(username, role, response.isActive()));
             lobbySocketHandler.handleMessage(null, leaveRoom(username, role, response.isActive(), roomId + ""));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     private void handlePlayerDisconnection(String username, String role) {
@@ -121,16 +125,15 @@ public class RoomSocketHandler {
             RoomResponse response = roomService.leaveRoom(roomId, username);
             broadCast(leaveRoom(username, role, response.isActive()));
             lobbySocketHandler.handleMessage(null, leaveRoom(username, role, response.isActive(), roomId + ""));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     public int size() {
         return webSocketSessions.size();
     }
 
-    public void handleMessage(WebSocketSession session,
-                              WebSocketMessage<?> message)
-            throws Exception {
+    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         if (message instanceof TextMessage) {
             String payload = ((TextMessage) message).getPayload();
             JsonNode jsonNode = mapper.readTree(payload);
@@ -147,7 +150,8 @@ public class RoomSocketHandler {
                     blackMoves = new ArrayList<>();
                     whiteBestMoves = new ArrayList<>();
                     blackBestMoves = new ArrayList<>();
-                    new Thread(() -> handleBestMove("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")).start();
+                    new Thread(() -> handleBestMove("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"))
+                            .start();
                 }
                 case "END_MATCH" -> {
                     isMatchExecute = false;
@@ -203,8 +207,8 @@ public class RoomSocketHandler {
                     String role = user.get("role").asText();
                     session.getAttributes().put("role", role);
                     if (timeState == null) {
-                        timeState = new TimeState(Long
-                                .parseLong(jsonNode.get("time").asText()));
+                        timeState = new TimeState(
+                                Long.parseLong(jsonNode.get("time").asText()));
                         timeState.startTimeWhite();
                         timeState.toggleTimers();
                         timeState.stopAllClocks();
@@ -234,15 +238,14 @@ public class RoomSocketHandler {
                 case "STEP" -> {
                     timeState.toggleTimers();
                     session.sendMessage(getDataTime());
-                    payload = payload.substring(0, payload.length() - 1) + "," +
-                            getDataTimeIgnoreType().getPayload().substring(1);
+                    payload = payload.substring(0, payload.length() - 1) + ","
+                            + getDataTimeIgnoreType().getPayload().substring(1);
                     message = new TextMessage(payload);
                     String from = jsonNode.get("from").asText();
                     String to = jsonNode.get("to").asText();
                     if (stepNumber % 2 == 0)
                         whiteMoves.add(MoveHandler.builder().from(from).to(to).build());
-                    else
-                        blackMoves.add(MoveHandler.builder().from(from).to(to).build());
+                    else blackMoves.add(MoveHandler.builder().from(from).to(to).build());
                     stepNumber++;
                     new Thread(() -> handleBestMove(jsonNode.get("fen").asText())).start();
                 }
@@ -280,8 +283,8 @@ public class RoomSocketHandler {
                     .from(BoardUtils.getPositionAtCoordinate(move.getFirst().getCurrentCoordinate()))
                     .to(BoardUtils.getPositionAtCoordinate(move.getFirst().getDestinationCoordinate()))
                     .build());
-            log.info(BoardUtils.getPositionAtCoordinate(move.getFirst().getCurrentCoordinate())
-                    + " " + BoardUtils.getPositionAtCoordinate(move.getFirst().getDestinationCoordinate()));
+            log.info(BoardUtils.getPositionAtCoordinate(move.getFirst().getCurrentCoordinate()) + " "
+                    + BoardUtils.getPositionAtCoordinate(move.getFirst().getDestinationCoordinate()));
         });
 
         if (bestStepNumber % 2 == 0) {
@@ -293,16 +296,14 @@ public class RoomSocketHandler {
     }
 
     private TextMessage endGameData(String gameStatus, String winner) {
-        String payload = "{" +
-                "\"type\": \"END_MATCH\"," +
-                "\"status\":" + "\"" + gameStatus + "\"" + "," +
-                "\"winner\":" + "\"" + winner + "\"" +
-                "}";
+        String payload = "{" + "\"type\": \"END_MATCH\","
+                + "\"status\":"
+                + "\"" + gameStatus + "\"" + "," + "\"winner\":"
+                + "\"" + winner + "\"" + "}";
         return new TextMessage(payload);
     }
 
-    private void sendBanned(String username, TextMessage message)
-            throws IOException {
+    private void sendBanned(String username, TextMessage message) throws IOException {
         for (WebSocketSession session : webSocketSessions) {
             if (session.getAttributes().get("username").equals(username)) {
                 session.getAttributes().put("banned", true);
@@ -313,69 +314,62 @@ public class RoomSocketHandler {
     }
 
     private TextMessage banUser() {
-        String payload = "{" +
-                "\"type\": \"FORBIDDEN\"" +
-                "}";
+        String payload = "{" + "\"type\": \"FORBIDDEN\"" + "}";
         return new TextMessage(payload);
     }
 
     private TextMessage leaveRoom(String username, String role, boolean active, String roomId) {
         String isActive = active ? "true" : "false";
-        String payload = "{" +
-                "\"type\": \"USER_LEAVE_ROOM\"," +
-                "\"roomId\": \"" + roomId + "\"," +
-                "\"username\":" + "\"" + username + "\"" + "," +
-                "\"role\":" + "\"" +  role + "\"" + "," +
-                "\"isActive\":" + isActive +
-                "}";
+        String payload = "{" + "\"type\": \"USER_LEAVE_ROOM\","
+                + "\"roomId\": \""
+                + roomId + "\"," + "\"username\":"
+                + "\"" + username + "\"" + "," + "\"role\":"
+                + "\"" + role + "\"" + "," + "\"isActive\":"
+                + isActive + "}";
         return new TextMessage(payload);
     }
 
     private TextMessage leaveRoom(String username, String role, boolean active) {
         String isActive = active ? "true" : "false";
-        String payload = "{" +
-                "\"type\": \"USER_LEAVE_ROOM\"," +
-                "\"username\":" + "\"" + username + "\"" + "," +
-                "\"role\":" + "\"" +  role + "\"" + "," +
-                "\"isActive\":" + isActive +
-                "}";
+        String payload = "{" + "\"type\": \"USER_LEAVE_ROOM\","
+                + "\"username\":"
+                + "\"" + username + "\"" + "," + "\"role\":"
+                + "\"" + role + "\"" + "," + "\"isActive\":"
+                + isActive + "}";
         return new TextMessage(payload);
     }
 
     private TextMessage getRoomInfo() {
         long timeWhite = timeState.getTimeWhiteRemaining();
         long timeBlack = timeState.getTimeBlackRemaining();
-        String jsonString = "{" +
-                "\"type\": \"RESPONSE_ENTER_ROOM\"," +
-                "\"timeWhite\":" + timeWhite + "," +
-                "\"timeBlack\":" + timeBlack + "," +
-                "\"turnWhite\":" + timeState.isTurnWhite() + "," +
-                "\"isMatchExecute\":" + isMatchExecute + "," +
-                "\"matchNumber\":" + matchNumber +
-                 "}";
+        String jsonString = "{" + "\"type\": \"RESPONSE_ENTER_ROOM\","
+                + "\"timeWhite\":"
+                + timeWhite + "," + "\"timeBlack\":"
+                + timeBlack + "," + "\"turnWhite\":"
+                + timeState.isTurnWhite() + "," + "\"isMatchExecute\":"
+                + isMatchExecute + "," + "\"matchNumber\":"
+                + matchNumber + "}";
         return new TextMessage(jsonString);
     }
 
     private TextMessage getDataTime() {
         long timeWhite = timeState.getTimeWhiteRemaining();
         long timeBlack = timeState.getTimeBlackRemaining();
-        String jsonString = "{" +
-                "\"type\": \"DATA_TIME\"," +
-                "\"timeWhite\":" + timeWhite + "," +
-                "\"timeBlack\":" + timeBlack + "," +
-                "\"turnWhite\":" + timeState.isTurnWhite() +
-                "}";
+        String jsonString = "{" + "\"type\": \"DATA_TIME\","
+                + "\"timeWhite\":"
+                + timeWhite + "," + "\"timeBlack\":"
+                + timeBlack + "," + "\"turnWhite\":"
+                + timeState.isTurnWhite() + "}";
         return new TextMessage(jsonString);
     }
 
     private TextMessage getDataTimeIgnoreType() {
         long timeWhite = timeState.getTimeWhiteRemaining();
         long timeBlack = timeState.getTimeBlackRemaining();
-        String jsonString = "{" +
-                "\"timeWhite\":" + timeWhite + "," +
-                "\"timeBlack\":" + timeBlack + "," +
-                "\"turnWhite\":" + timeState.isTurnWhite() +
-                "}";
+        String jsonString = "{" + "\"timeWhite\":"
+                + timeWhite + "," + "\"timeBlack\":"
+                + timeBlack + "," + "\"turnWhite\":"
+                + timeState.isTurnWhite() + "}";
         return new TextMessage(jsonString);
     }
 
@@ -403,13 +397,17 @@ public class RoomSocketHandler {
         }
 
         public synchronized long getTimeWhiteRemaining() {
-            return turnWhite ? Math.max(0, timeWhiteEndTime.getEpochSecond() -
-                    Instant.now().getEpochSecond()) : timeWhiteDuration;
+            return turnWhite
+                    ? Math.max(
+                            0, timeWhiteEndTime.getEpochSecond() - Instant.now().getEpochSecond())
+                    : timeWhiteDuration;
         }
 
         public synchronized long getTimeBlackRemaining() {
-            return !turnWhite ? Math.max(0, timeBlackEndTime.getEpochSecond() -
-                    Instant.now().getEpochSecond()) : timeBlackDuration;
+            return !turnWhite
+                    ? Math.max(
+                            0, timeBlackEndTime.getEpochSecond() - Instant.now().getEpochSecond())
+                    : timeBlackDuration;
         }
 
         public synchronized void stopAllClocks() {

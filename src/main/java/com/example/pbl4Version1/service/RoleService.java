@@ -20,22 +20,20 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RoleService {
-	RoleRepository roleRepository;
-	RoleMapper roleMapper;
-	
-	public RoleResponse create(RoleRequest request) {
-		Role role = roleMapper.toRole(request);
-		role = roleRepository.save(role);
-		return roleMapper.toRoleResponse(role);
-	}
-	
-	public List<RoleResponse> getAll() {
-		return roleRepository.findAll().stream()
-				.map(roleMapper::toRoleResponse)
-				.toList();
-	}
-	
-	public void delete(String name) {
-		roleRepository.deleteById(name);
-	}
+    RoleRepository roleRepository;
+    RoleMapper roleMapper;
+
+    public RoleResponse create(RoleRequest request) {
+        Role role = roleMapper.toRole(request);
+        role = roleRepository.save(role);
+        return roleMapper.toRoleResponse(role);
+    }
+
+    public List<RoleResponse> getAll() {
+        return roleRepository.findAll().stream().map(roleMapper::toRoleResponse).toList();
+    }
+
+    public void delete(String name) {
+        roleRepository.deleteById(name);
+    }
 }

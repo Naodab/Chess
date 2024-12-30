@@ -13,11 +13,11 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class StepResponse {
-	Long matchId;
-	String fen;
-	String from;
-	String to;
-	String name;
-	String gameStatus;
-	String winner;
+    Long matchId;
+    String fen;
+    String from;
+    String to;
+    String name;
+    String gameStatus;
+    String winner;
 }

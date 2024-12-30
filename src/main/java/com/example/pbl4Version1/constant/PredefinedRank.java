@@ -1,13 +1,13 @@
-//package com.example.pbl4Version1.constant;
+// package com.example.pbl4Version1.constant;
 //
-//import java.util.ArrayList;
-//import java.util.List;
+// import java.util.ArrayList;
+// import java.util.List;
 //
-//import com.example.pbl4Version1.entity.Rank;
+// import com.example.pbl4Version1.entity.Rank;
 //
-//public class PredefinedRank {
+// public class PredefinedRank {
 //	private PredefinedRank() {}
-//	
+//
 //	private static final Rank BEGINNER = new Rank("Beginner", 0, 799);
 //	private static final Rank AMATEUR = new Rank("Amateur", 800, 1099);
 //	private static final Rank INTERMEDIATE = new Rank("Intermediate", 1100, 1399);
@@ -17,7 +17,7 @@
 //	private static final Rank FIDE_MASTER = new Rank("Fide Master", 2200, 2499);
 //	private static final Rank GRANDMASTER = new Rank("Grandmaster", 2500, 2699);
 //	private static final Rank SUPER_GRANDMASTER = new Rank("Super Grandmaster", 2700, Integer.MAX_VALUE);
-//	
+//
 //	private static final List<Rank> ranks = new ArrayList<Rank>();
 //	public static List<Rank> initPredefinedRank() {
 //		ranks.add(BEGINNER);
@@ -31,4 +31,4 @@
 //		ranks.add(SUPER_GRANDMASTER);
 //		return rank;
 //	}
-//}
+// }

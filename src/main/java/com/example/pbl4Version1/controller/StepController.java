@@ -19,26 +19,26 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/steps")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StepController {
-	StepService stepService;
-	
-	@PostMapping
-	public ApiResponse<StepResponse> create(@RequestBody StepRequest request) {
-		return ApiResponse.<StepResponse>builder()
-				.result(stepService.create(request))
-				.build();
-	}
-	
-	@PostMapping("/bot")
-	public ApiResponse<StepResponse> createBotStep(@RequestBody StepToBotRequest request) {
-		return ApiResponse.<StepResponse>builder()
-				.result(stepService.toBot(request))
-				.build();
-	}
+    StepService stepService;
 
-	@GetMapping("/bot/{matchID}")
-	public ApiResponse<StepResponse> getNewestBotStep(@PathVariable Long matchID) {
-		return ApiResponse.<StepResponse>builder()
-				.result(stepService.getNewestStepOfMatchWithBot(matchID))
-				.build();
-	}
+    @PostMapping
+    public ApiResponse<StepResponse> create(@RequestBody StepRequest request) {
+        return ApiResponse.<StepResponse>builder()
+                .result(stepService.create(request))
+                .build();
+    }
+
+    @PostMapping("/bot")
+    public ApiResponse<StepResponse> createBotStep(@RequestBody StepToBotRequest request) {
+        return ApiResponse.<StepResponse>builder()
+                .result(stepService.toBot(request))
+                .build();
+    }
+
+    @GetMapping("/bot/{matchID}")
+    public ApiResponse<StepResponse> getNewestBotStep(@PathVariable Long matchID) {
+        return ApiResponse.<StepResponse>builder()
+                .result(stepService.getNewestStepOfMatchWithBot(matchID))
+                .build();
+    }
 }

@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCreateRequest {
-	String email;
-	String username;
-	String password;
+    String email;
+    String username;
+    String password;
 }

@@ -16,18 +16,18 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
-	String id;
-	String email;
-	String username;
-	LocalDate createDate;
-	LocalDate latestLogin;
-	int elo;
-	int battleNumber;
-	int winNumber;
-	int drawNumber;
-	float percent;
-	boolean active;
-	Set<AchievementResponse> achievements;
-	String rank;
-	String avatar;
+    String id;
+    String email;
+    String username;
+    LocalDate createDate;
+    LocalDate latestLogin;
+    int elo;
+    int battleNumber;
+    int winNumber;
+    int drawNumber;
+    float percent;
+    boolean active;
+    Set<AchievementResponse> achievements;
+    String rank;
+    String avatar;
 }

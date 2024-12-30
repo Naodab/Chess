@@ -8,17 +8,17 @@ import com.example.pbl4Version1.entity.Role;
 
 @Component
 public class RoleMapper {
-	public Role toRole(RoleRequest request) {
-		return Role.builder()
-				.name(request.getName())
-				.description(request.getDescription())
-				.build();
-	}
-	
-	public RoleResponse toRoleResponse(Role role) {
-		return RoleResponse.builder()
-				.name(role.getName())
-				.description(role.getDescription())
-				.build();
-	}
+    public Role toRole(RoleRequest request) {
+        return Role.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .build();
+    }
+
+    public RoleResponse toRoleResponse(Role role) {
+        return RoleResponse.builder()
+                .name(role.getName())
+                .description(role.getDescription())
+                .build();
+    }
 }

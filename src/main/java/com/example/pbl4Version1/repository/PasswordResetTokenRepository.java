@@ -9,7 +9,8 @@ import org.springframework.stereotype.Repository;
 import com.example.pbl4Version1.entity.PasswordResetToken;
 
 @Repository
-public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long>{
-	Optional<PasswordResetToken> findByToken(String token);
-	void deleteByExpiryDateBefore(Date date);
+public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
+    Optional<PasswordResetToken> findByToken(String token);
+
+    void deleteByExpiryDateBefore(Date date);
 }

@@ -1,5 +1,17 @@
 package com.example.pbl4Version1.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+
 import com.example.pbl4Version1.dto.response.AccountDataResponse;
 import com.example.pbl4Version1.dto.response.MatchDataResponse;
 import com.example.pbl4Version1.dto.response.MatchInDateResponse;
@@ -9,21 +21,11 @@ import com.example.pbl4Version1.repository.MatchWithBotRepository;
 import com.example.pbl4Version1.repository.MatchWithHumanRepository;
 import com.example.pbl4Version1.repository.TrafficRepository;
 import com.example.pbl4Version1.repository.UserRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -38,14 +40,11 @@ public class TrafficService {
     @PreAuthorize("hasRole('ADMIN')")
     public AccountDataResponse getAccountData() {
         LocalDate today = LocalDate.now();
-        long onlineSize = userRepository.countUserByOperatingStatus
-                (OperatingStatus.ONLINE);
+        long onlineSize = userRepository.countUserByOperatingStatus(OperatingStatus.ONLINE);
         long userSize = userRepository.count();
-        long trafficSize = trafficRepository
-                .findTrafficByDate(today)
-                .orElse(new Traffic()).getSize();
-        long newUser = userRepository.countUsersCreatedInMonth
-                (today.getMonthValue(), today.getYear());
+        long trafficSize =
+                trafficRepository.findTrafficByDate(today).orElse(new Traffic()).getSize();
+        long newUser = userRepository.countUsersCreatedInMonth(today.getMonthValue(), today.getYear());
 
         return AccountDataResponse.builder()
                 .newMemberSize(newUser)
@@ -82,18 +81,24 @@ public class TrafficService {
         Date sevenDaysAgo = calendar.getTime();
         List<MatchInDateResponse> result = new ArrayList<>();
 
-        List<Object[]>  listData = matchWithBotRepository.countMatchesPerDayInLast7Days();
+        List<Object[]> listData = matchWithBotRepository.countMatchesPerDayInLast7Days();
         for (Object[] data : listData) {
             Date matchDate = (Date) data[0];
             long matchCount = ((Number) data[1]).longValue();
-            result.add(MatchInDateResponse.builder().matchDate(matchDate).size(matchCount).build());
+            result.add(MatchInDateResponse.builder()
+                    .matchDate(matchDate)
+                    .size(matchCount)
+                    .build());
         }
 
         listData = matchWithHumanRepository.countMatchesPerDayInLast7Days();
         for (Object[] data : listData) {
             Date matchDate = (Date) data[0];
             long matchCount = ((Number) data[1]).longValue();
-            result.add(MatchInDateResponse.builder().matchDate(matchDate).size(matchCount).build());
+            result.add(MatchInDateResponse.builder()
+                    .matchDate(matchDate)
+                    .size(matchCount)
+                    .build());
         }
         return result;
     }

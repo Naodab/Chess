@@ -13,6 +13,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class VerifyPasswordResponse {
-	String token;
-	boolean valid;
+    String token;
+    boolean valid;
 }

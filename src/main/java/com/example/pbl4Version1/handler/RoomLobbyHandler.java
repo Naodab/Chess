@@ -1,10 +1,10 @@
 package com.example.pbl4Version1.handler;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -14,10 +14,13 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomLobbyHandler {
     Long id;
+
     @Builder.Default
     int time = 15;
+
     @Builder.Default
     boolean hasPassword = false;
+
     String host;
     String player;
     List<String> viewers = new ArrayList<>();
@@ -31,9 +34,9 @@ public class RoomLobbyHandler {
     }
 
     public String toString() {
-        return "RoomLobbyHandler [" +
-                    "id=" + id + ", time=" + time + ", " +
-                    "hasPassword=" + hasPassword + ", host=" + host + ", " +
-                    "player=" + player + ", numberOfViewers=" + viewers.size() + "]";
+        return "RoomLobbyHandler [" + "id="
+                + id + ", time=" + time + ", " + "hasPassword="
+                + hasPassword + ", host=" + host + ", " + "player="
+                + player + ", numberOfViewers=" + viewers.size() + "]";
     }
 }

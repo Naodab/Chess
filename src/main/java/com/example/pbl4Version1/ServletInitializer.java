@@ -7,9 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServletInitializer extends SpringBootServletInitializer {
 
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(Pbl4Version1Application.class);
-	}
-
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(Pbl4Version1Application.class);
+    }
 }

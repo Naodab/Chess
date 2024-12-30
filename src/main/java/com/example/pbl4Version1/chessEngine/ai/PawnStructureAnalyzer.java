@@ -1,10 +1,10 @@
 package com.example.pbl4Version1.chessEngine.ai;
 
-import com.example.pbl4Version1.chessEngine.piece.Piece;
-import com.example.pbl4Version1.chessEngine.player.Player;
-
 import java.util.Collection;
 import java.util.stream.Collectors;
+
+import com.example.pbl4Version1.chessEngine.piece.Piece;
+import com.example.pbl4Version1.chessEngine.player.Player;
 
 public class PawnStructureAnalyzer {
     private static final PawnStructureAnalyzer INSTANCE = new PawnStructureAnalyzer();
@@ -12,8 +12,7 @@ public class PawnStructureAnalyzer {
     public static final int ISOLATED_PAWN_PENALTY = -10;
     public static final int DOUBLED_PAWN_PENALTY = -10;
 
-    private PawnStructureAnalyzer() {
-    }
+    private PawnStructureAnalyzer() {}
 
     public static PawnStructureAnalyzer get() {
         return INSTANCE;
@@ -29,8 +28,7 @@ public class PawnStructureAnalyzer {
 
     public int pawnStructureScore(final Player player) {
         final int[] pawnsOnColumnTable = createPawnColumnTable(calculatePlayerPawns(player));
-        return calculatePawnColumnStack(pawnsOnColumnTable)
-                + calculateIsolatedPawnPenalty(pawnsOnColumnTable);
+        return calculatePawnColumnStack(pawnsOnColumnTable) + calculateIsolatedPawnPenalty(pawnsOnColumnTable);
     }
 
     private static Collection<Piece> calculatePlayerPawns(final Player player) {
@@ -41,8 +39,8 @@ public class PawnStructureAnalyzer {
 
     private static int calculatePawnColumnStack(final int[] pawnsOnColumnTable) {
         int pawnStackPenalty = 0;
-        for(final int pawnStack : pawnsOnColumnTable) {
-            if(pawnStack > 1) {
+        for (final int pawnStack : pawnsOnColumnTable) {
+            if (pawnStack > 1) {
                 pawnStackPenalty += pawnStack;
             }
         }
@@ -51,14 +49,14 @@ public class PawnStructureAnalyzer {
 
     private static int calculateIsolatedPawnPenalty(final int[] pawnsOnColumnTable) {
         int numIsolatedPawns = 0;
-        if(pawnsOnColumnTable[0] > 0 && pawnsOnColumnTable[1] == 0) {
+        if (pawnsOnColumnTable[0] > 0 && pawnsOnColumnTable[1] == 0) {
             numIsolatedPawns += pawnsOnColumnTable[0];
         }
-        if(pawnsOnColumnTable[7] > 0 && pawnsOnColumnTable[6] == 0) {
+        if (pawnsOnColumnTable[7] > 0 && pawnsOnColumnTable[6] == 0) {
             numIsolatedPawns += pawnsOnColumnTable[7];
         }
-        for(int i = 1; i < pawnsOnColumnTable.length - 1; i++) {
-            if((pawnsOnColumnTable[i-1] == 0 && pawnsOnColumnTable[i+1] == 0)) {
+        for (int i = 1; i < pawnsOnColumnTable.length - 1; i++) {
+            if ((pawnsOnColumnTable[i - 1] == 0 && pawnsOnColumnTable[i + 1] == 0)) {
                 numIsolatedPawns += pawnsOnColumnTable[i];
             }
         }
@@ -67,10 +65,9 @@ public class PawnStructureAnalyzer {
 
     private static int[] createPawnColumnTable(final Collection<Piece> playerPawns) {
         final int[] table = new int[8];
-        for(final Piece playerPawn : playerPawns) {
+        for (final Piece playerPawn : playerPawns) {
             table[playerPawn.getPiecePosition() % 8]++;
         }
         return table;
     }
-
 }

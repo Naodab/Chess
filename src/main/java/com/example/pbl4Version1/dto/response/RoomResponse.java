@@ -16,12 +16,12 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomResponse {
-	Long id;
-	LocalDate playDay;
-	UserResponse host;
-	UserResponse player;
-	Set<UserResponse> viewers;
-	Long matchActiveId;
-	boolean active;
-	int time;
+    Long id;
+    LocalDate playDay;
+    UserResponse host;
+    UserResponse player;
+    Set<UserResponse> viewers;
+    Long matchActiveId;
+    boolean active;
+    int time;
 }
