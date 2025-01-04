@@ -107,4 +107,10 @@ public class UserController {
                 .result(userService.countSearch(searchStr))
                 .build();
     }
+
+    @PutMapping("/ban/{userID}")
+    public ApiResponse<?> ban(@PathVariable("userID") String userID) {
+        userService.banOrUnban(userID);
+        return ApiResponse.builder().build();
+    }
 }

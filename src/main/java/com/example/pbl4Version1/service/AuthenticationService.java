@@ -125,7 +125,7 @@ public class AuthenticationService {
                 .or(() -> userRepository.findByEmail(request.getUsername()))
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword()) && user.isActive();
         if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
         user.setLatestLogin(LocalDate.now());
         String token = generateToken(user);

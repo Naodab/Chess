@@ -12,7 +12,7 @@ function logout(token) {
             alert(response.message);
         }
     }).then(data => {
-        window.location.href = "./home";
+        window.location.href = "./";
     });
 }
 

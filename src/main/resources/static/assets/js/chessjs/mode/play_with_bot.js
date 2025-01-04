@@ -24,3 +24,11 @@ if (btnNewBotMatch) {
         }
     }
 }
+
+const returnBtn = $("#return");
+if (returnBtn) {
+    returnBtn.onclick = async () => {
+        if (!(await confirm("Bạn chắc chứ?"))) return;
+        window.history.back();
+    }
+}

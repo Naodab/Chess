@@ -65,7 +65,7 @@
                 <i class="fa-solid fa-arrow-right-arrow-left header-img"></i>
                 <div class="right-item__title">Nước đi</div>
             </div>
-            <div class="steps scrollable-element-x">
+            <div class="steps scrollable-element">
                 <div class="steps-table">
                     <div class="step-item">
                         <div class="step-index-review">avatar</div>

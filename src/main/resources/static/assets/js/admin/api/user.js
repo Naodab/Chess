@@ -91,4 +91,14 @@ function searchUser(searchStr, page, sortField, sortDirection) {
     });
 }
 
-export { getUserSize, getUsers, getPageUsers, searchUser, countSearchUser }
+function banOrUnbanUser(userID) {
+    return fetch("/chess/api/users/ban/" + userID, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
+        }
+    }).then(resp => resp.json()).then(data => data.code)
+}
+
+export { getUserSize, getUsers, getPageUsers, searchUser, countSearchUser, banOrUnbanUser }

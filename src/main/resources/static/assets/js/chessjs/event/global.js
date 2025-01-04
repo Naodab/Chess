@@ -993,7 +993,7 @@ async function sendStepToServer(from, to) {
             if (status === "CHECK_MATE" || status === "STALE_MATE") {
                 alertMessage(status);
             } else if (status === "IN_CHECK") {
-                alert(status);
+                alertMessage("Chiếu tướng");
             }
             turnWhite = !turnWhite;
         }

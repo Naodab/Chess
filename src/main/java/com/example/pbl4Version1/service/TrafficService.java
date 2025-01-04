@@ -2,7 +2,6 @@ package com.example.pbl4Version1.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -75,10 +74,8 @@ public class TrafficService {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public List<MatchInDateResponse> getMatchIn7Days() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_YEAR, -7);
-        Date sevenDaysAgo = calendar.getTime();
         List<MatchInDateResponse> result = new ArrayList<>();
 
         List<Object[]> listData = matchWithBotRepository.countMatchesPerDayInLast7Days();

@@ -1,11 +1,10 @@
 import logout from "../account/logout.js";
 import changePassword from "../account/changePassword.js";
-import {getPageUsers, searchUser, countSearchUser } from "./api/user.js";
+import {getPageUsers, searchUser, countSearchUser, banOrUnbanUser} from "./api/user.js";
 import {getAccountData, getMatchData, getMatchDataChart, getTrafficRecently} from "./api/traffic.js";
 import {getPageMatches} from "./api/match.js";
 
 const $ = document.querySelector.bind(document);
-const $$ = document.querySelectorAll.bind(document);
 
 const init = {
     navbar: {
@@ -14,10 +13,6 @@ const init = {
                 name: "Quản lý tài khoản",
                 icon: "fa-solid fa-users-viewfinder"
             },
-            // {
-            //     name: "Quản lý thành tựu",
-            //     icon: "fa-solid fa-star"
-            // },
             {
                 name: "Quản lý trận đấu",
                 icon: "fa-solid fa-chess"
@@ -329,6 +324,7 @@ function loadAccountChart(page, content) {
 
 function loadMatchChart(content) {
     getMatchDataChart().then(data => {
+        console.log(data)
         const labels = [];
         const sizes = [];
         data.forEach(matchDate => {
@@ -395,6 +391,18 @@ function saveDataPasswordChangeModal (modal) {
 }
 
 const actions = {
+    banUser: (state) => {
+        const id = state.modal.personalPage.user.id;
+        banOrUnbanUser(id).then(code => {
+            if (code === 1000) {
+                dispatch('closeModal');
+                state.content.account.detail.table.rows.forEach(user => {
+                    if (user.id === id)
+                        user.active = !user.active;
+                })
+            }
+        })
+    },
     changeOption: ({navbar, content}, index) => {
         if (navbar.activeIndex === index) return;
         navbar.activeIndex = index;
@@ -532,7 +540,7 @@ const actions = {
                     modal.changePassword.errorMessage = "Mật khẩu cũ không chính xác!";
                 }
                 dispatch('rerender');
-            }).catch(error => {
+            }).catch(() => {
                 modal.changePassword.errorMessage = "Mật khẩu cũ không chính xác!";
                 dispatch('rerender');
             });

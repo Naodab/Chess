@@ -1,14 +1,31 @@
+.right-item {
+    flex: none;
+}
+
+.right-panel {
+    height: 100%;
+}
+
+.steps-container {
+    height: 100%;
+}
+
+.steps {
+    height: 90%;
+}
+
 .steps-table {
     display: flex;
     flex-direction: column;
     width: 100%;
+    height: unset;
 }
 
 .step-item {
     display: flex;
     flex-direction: row;
     width: 100%;
-    height: 60px;
+    min-height: 60px;
     border-bottom: 1px solid var(--text-color);
 }
 

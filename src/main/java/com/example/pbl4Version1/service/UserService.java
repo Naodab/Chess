@@ -154,4 +154,11 @@ public class UserService {
     public long countSearch(String searchStr) {
         return userRepository.countByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(searchStr, searchStr);
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public void banOrUnban(String userID) {
+        User user = userRepository.findById(userID).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setActive(!user.isActive());
+        userRepository.save(user);
+    }
 }

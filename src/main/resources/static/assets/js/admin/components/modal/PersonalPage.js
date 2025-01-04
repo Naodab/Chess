@@ -24,12 +24,12 @@ function PersonalPage({user}) {
                 </div>
             </div>
         </div>
-        <div class="achievements-container info-item">
-            
-        </div>
+<!--        <div class="achievements-container info-item">-->
+<!--            -->
+<!--        </div>-->
         <div class="info__match">
-            <div class="transfer-to-match">Ván đấu</div>
-            <div class="transfer-to-match transfer-to-match--pink">
+            <div class="transfer-to-match transfer-to-match--pink" 
+                 onclick="dispatch('banUser')">
                 ${(user.active && "Cấm") || "Bỏ cấm"}
             </div>
         </div>
