@@ -24,7 +24,6 @@
             <div class="sidebar-body">
                 <button class="btn btn--pink" id="return">Trở lại</button>
             </div>
-            <a class="settings-link" href=""><i class="fas fa-cog"></i>Cài đặt</a>
         </div>
 
         <div class="play-area">
@@ -94,11 +93,9 @@
                     </div>
                 </div>
                 <div class="step__footer">
-                    <div class="btn btn--pink step__function"><i class="fa-solid fa-angle-left"></i></div>
                     <div class="btn btn--green step__function" id="create-new-match">
                         <i class="fa-solid fa-plus"></i>
                     </div>
-                    <div class="btn btn--pink step__function"><i class="fa-solid fa-angle-right"></i></div>
                 </div>
             </div>
         </div>
