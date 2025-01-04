@@ -204,6 +204,7 @@ public class AuthenticationService {
                 .findByUsername(username)
                 .or(() -> userRepository.findByEmail(username))
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        log.info("Old password: {}", request.getOldPassword());
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
         }

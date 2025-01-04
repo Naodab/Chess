@@ -1,7 +1,11 @@
 package com.example.pbl4Version1.exception;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class AppException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
     private ErrorCode errorCode;
 
     public AppException(ErrorCode errorCode) {
@@ -9,11 +13,4 @@ public class AppException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
-    public ErrorCode getErrorCode() {
-        return this.errorCode;
-    }
-
-    public void setErrorCode(ErrorCode errorCode) {
-        this.errorCode = errorCode;
-    }
 }

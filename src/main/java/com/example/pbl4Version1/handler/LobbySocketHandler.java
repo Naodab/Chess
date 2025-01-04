@@ -86,7 +86,7 @@ public class LobbySocketHandler extends TextWebSocketHandler {
                             } catch (Exception ignored) {
                             }
                         },
-                        2000);
+                        2);
                 return;
             }
             case "CREATE_ROOM" -> {

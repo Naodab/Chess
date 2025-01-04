@@ -17,6 +17,7 @@ import {
 import {getSpiderActivity} from "../util/spiderActivity.js";
 import {getPageMatch} from "./api/match.js";
 import {joinRoom} from "./api/room.js";
+import changePassword from "../account/changePassword.js";
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
@@ -43,6 +44,7 @@ function initializeWebsocket() {
         }
         ws.onmessage = function (event) {
             const data = JSON.parse(event.data);
+            console.log(data);
             switch (data.type) {
                 case "EXIST_USER":
                     turnOnModal(alertModal, "Tài khoản của bạn hiện đang đăng nhập ở một nơi khác!");
@@ -135,7 +137,7 @@ window.addEventListener("load", () => {
             player.onclick = () => turnOnModal(renderPersonalInformation, topUsers[index]);
         });
         $(".content__title span").innerText = sessionStorage.getItem("USERNAME");
-        $(".header__avatar").style.background = `background: url("${sessionStorage.getItem("AVATAR")}") 
+        $(".header__avatar").style.background = `background: url("${localStorage.getItem("AVATAR")}") 
                 no-repeat center center / cover`;
     });
     initializeWebsocket();
@@ -364,19 +366,12 @@ $("#change-password-btn").onclick = event => {
         } else if (newValue !== pre) {
             error.innerText = "Mật khẩu nhập lại không chính xác!";
         } else {
-            fetch("../api/auth/changePassword", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + sessionStorage.getItem("TOKEN")
-                },
-                body: JSON.stringify({ oldPassword, newPassword })
-            }).then(response => {
-                return response.ok;
-            }).then(result => {
-                if (result)
+            changePassword(sessionStorage.getItem("TOKEN"), old, newValue).then(result => {
+                if (result) {
                     turnOffModal();
-            }).catch(() => errorMessage.innerText = "Mật khẩu cũ không chính xác");
+                    turnOnModal(alertModal, "Thay đổi mật khẩu thành công.");
+                }
+            }).catch(() => error.innerText = "Mật khẩu cũ không chính xác");
         }
     }
 
